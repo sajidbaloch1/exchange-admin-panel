@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NotificationManager } from 'components/common/react-notifications';
+//import { NotificationManager } from 'components/common/react-notifications';
 
 const BaseURL = process.env.REACT_APP_BASE_URL;
 const postData = async (url, body, token = null) => {
@@ -22,7 +22,7 @@ const postData = async (url, body, token = null) => {
     window.location.reload(false);
   } else if (!(response.status === 200 || response.status === 201)) {
     const { message = 'Something went wrong.' } = await response.json();
-    NotificationManager.error(message, 'Error message', 3000, null, null, '');
+    // NotificationManager.error(message, 'Error message', 3000, null, null, '');
   }
 
   const result1 = await response.json();
@@ -46,14 +46,14 @@ const getData = async (url) => {
     localStorage.clear();
     window.location.reload(false);
   } else if (response.status !== 200) {
-    NotificationManager.error(
-      result2?.message ?? 'Something Went Wrong',
-      'Error',
-      3000,
-      null,
-      null,
-      ''
-    );
+    // NotificationManager.error(
+    //   result2?.message ?? 'Something Went Wrong',
+    //   'Error',
+    //   3000,
+    //   null,
+    //   null,
+    //   ''
+    // );
   }
 
   return result2;
@@ -75,14 +75,14 @@ const axiosPostData = async (url, formData) => {
         localStorage.clear();
         window.location.reload(false);
       } else if (err.response.status !== 200) {
-        NotificationManager.error(
-          err.response.data.message,
-          'Error message',
-          3000,
-          null,
-          null,
-          ''
-        );
+        // NotificationManager.error(
+        //   err.response.data.message,
+        //   'Error message',
+        //   3000,
+        //   null,
+        //   null,
+        //   ''
+        // );
       }
     });
 };

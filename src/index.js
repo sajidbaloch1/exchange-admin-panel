@@ -3,12 +3,10 @@ import ReactDOM from "react-dom/client";
 import "./index.scss";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
-import * as Switcherdata from "./data/Switcher/Switcherdata";
 
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
 const App = React.lazy(() => import("./components/app"));
-const Custompages = React.lazy(() => import("./components/custompages"));
 
 //Dashboard
 const Dashboard = React.lazy(() => import("./components/Dashboard/Dashboard"));
@@ -30,11 +28,7 @@ const Errorpage503 = React.lazy(() => import("./components/ErrorPages/ErrorPages
 const ProtectedRoutes = React.lazy(() => import("./components/ProtectedRoutes"));
 const PublicRoutes = React.lazy(() => import("./components/PublicRoutes"));
 
-
-
 const Loaderimg = () => {
-
-
   return (
     <div id="global-loader">
       <img
@@ -73,7 +67,19 @@ const Root = () => {
                   />
 
                   <Route
-                    path={`${process.env.PUBLIC_URL}/user-list`}
+                    path={`${process.env.PUBLIC_URL}/super-admin-list`}
+                    element={<UserList />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/admin-list`}
+                    element={<UserList />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/master-list`}
+                    element={<UserList />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/client-list`}
                     element={<UserList />}
                   />
                   <Route

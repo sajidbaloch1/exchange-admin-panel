@@ -8,7 +8,7 @@ import axios from "axios";
 import DebouncedTextInput from "../../../utils/DeboundedTextInput";
 import { postData } from '../../../utils/fetch-services';
 
-export default function UserList() {
+export default function ClientList() {
   function convertArrayOfObjectsToCSV(array) {
     let result;
 
@@ -181,7 +181,7 @@ export default function UserList() {
           <h1 className="page-title">All User</h1>
           <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
-              Users
+              Clients
             </Breadcrumb.Item>
             <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
               List
@@ -193,7 +193,7 @@ export default function UserList() {
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            Add NEW USER
+            Add NEW CLIENT
           </Link>
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>

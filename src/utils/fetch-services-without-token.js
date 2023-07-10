@@ -14,7 +14,6 @@ const postData = async (url, body) => {
   });
   if (response.status >= 400) {
     const result = await response.json();
-    console.log(result);
   }
   const result = await response.json();
   return result;

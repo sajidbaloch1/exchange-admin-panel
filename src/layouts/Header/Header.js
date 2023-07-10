@@ -47,6 +47,8 @@ export function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useContext(AuthContext);
 
+  const user = JSON.parse(localStorage.getItem('user_info'));
+
   const signout = (e) => {
     logout();
     navigate('/login');
@@ -175,8 +177,8 @@ export function Header() {
                     >
                       <div className="drop-heading">
                         <div className="text-center">
-                          <h5 className="text-dark mb-0">Elizabeth Dyer</h5>
-                          <small className="text-muted">Administrator</small>
+                          <h5 className="text-dark mb-0">{user.username}</h5>
+                          <small className="text-muted">{user.role}</small>
                         </div>
                       </div>
                       <div className="dropdown-divider m-0"></div>
