@@ -10,7 +10,7 @@ import {
   CFormInput,
   CButton,
 } from "@coreui/react";
-import * as custompagesswitcherdata from "../../data/Switcher/Custompagesswitcherdata"
+
 export default function Login() {
   const [validated, setValidated] = useState(false);
   const [username, setUsername] = useState('');
@@ -28,8 +28,9 @@ export default function Login() {
       // Perform login logic here, e.g., send login request to server
 
       // Redirect to home page after successful login
-      login();
-      navigate('/dashboard');
+      login(username, password);
+
+      //navigate('/dashboard');
     } else {
       setValidated(true);
     }

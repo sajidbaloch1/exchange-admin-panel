@@ -5,7 +5,7 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import axios from "axios";
-import DebouncedTextInput from "../../../util/DeboundedTextInput";
+import DebouncedTextInput from "../../../utils/DeboundedTextInput";
 
 export default function UserList() {
   function convertArrayOfObjectsToCSV(array) {
@@ -198,7 +198,7 @@ export default function UserList() {
   // ];
   const columns = [
     {
-      name: "S.NO",
+      name: "SR.NO",
       selector: (row) => [row.id],
       sortable: true,
       sortField: 'id'
@@ -220,6 +220,15 @@ export default function UserList() {
       selector: (row) => [row.email],
       sortable: true,
       sortField: 'email'
+    },
+    {
+      name: 'ACTION',
+      cell: row => (
+        <div>
+          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row.id}><i className="fa fa-edit"></i></Link>
+          <Link className="mx-auto mr-2" to={`${process.env.PUBLIC_URL}/user-edit/` + row.id}><i className="fa fa-trash"></i></Link>
+        </div>
+      ),
     },
   ];
 
@@ -295,7 +304,7 @@ export default function UserList() {
   };
 
   useEffect(() => {
-    console.log('innn');
+
     fetchUsers(1); // fetch page 1 of users
   }, [perPage, searchQuery]);
 

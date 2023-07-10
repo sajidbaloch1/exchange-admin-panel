@@ -80,6 +80,11 @@ const Root = () => {
                     path={`${process.env.PUBLIC_URL}/user-add`}
                     element={<UserForm />}
                   />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/user-edit/:id`}
+                    element={<UserForm />}
+                  />
                 </Route>
 
               </Route>
