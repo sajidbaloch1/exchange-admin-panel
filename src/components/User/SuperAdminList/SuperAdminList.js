@@ -178,10 +178,10 @@ export default function AdminList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">All Admin</h1>
+          <h1 className="page-title">All Super Admin</h1>
           <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
-              Admins
+              Super Admins
             </Breadcrumb.Item>
             <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
               List
@@ -189,11 +189,11 @@ export default function AdminList() {
           </Breadcrumb>
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/user-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/super-admin-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            Add NEW ADMIN
+            CREATE ACCOUNT
           </Link>
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>

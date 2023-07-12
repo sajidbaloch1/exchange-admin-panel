@@ -4,11 +4,16 @@ import { Row, Card, Col, Breadcrumb, Button, FormControl, InputGroup } from "rea
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
-import axios from "axios";
-import DebouncedTextInput from "../../../utils/DeboundedTextInput";
-import { postData } from '../../../utils/fetch-services';
+import DebouncedTextInput from "../../../../utils/DeboundedTextInput";
+import { postData } from '../../../../utils/fetch-services';
+import { ToastContainer, toast, Slide, Flip } from "react-toastify";
+import { injectStyle } from "react-toastify/dist/inject-style";
+import Swal from "sweetalert2";
 
-export default function AdminList() {
+export default function CurrencyList() {
+  if (typeof window !== "undefined") {
+    injectStyle();
+  }
   function convertArrayOfObjectsToCSV(array) {
     let result;
 
@@ -36,20 +41,28 @@ export default function AdminList() {
   }
 
   // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
-  function downloadCSV(array) {
-    const link = document.createElement("a");
-    let csv = convertArrayOfObjectsToCSV(array);
-    if (csv == null) return;
 
-    const filename = "export.csv";
+  const downloadCSV = async () => {
+    const result = await postData('currencies/getAllCurrency', {
+      searchQuery: searchQuery
+    });
+    if (result.success) {
+      setLoading(false);
 
-    if (!csv.match(/^data:text\/csv/i)) {
-      csv = `data:text/csv;charset=utf-8,${csv}`;
+      const link = document.createElement("a");
+      let csv = convertArrayOfObjectsToCSV(result.data.records);
+      if (csv == null) return;
+
+      const filename = "currency.csv";
+
+      if (!csv.match(/^data:text\/csv/i)) {
+        csv = `data:text/csv;charset=utf-8,${csv}`;
+      }
+
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", filename);
+      link.click();
     }
-
-    link.setAttribute("href", encodeURI(csv));
-    link.setAttribute("download", filename);
-    link.click();
   }
 
   const Export = ({ onExport }) => (
@@ -74,35 +87,29 @@ export default function AdminList() {
       sortable: false,
     },
     {
-      name: "USER NAME",
-      selector: (row) => [row.username],
+      name: "NAME",
+      selector: (row) => [row.name],
       sortable: true,
-      sortField: 'username'
+      sortField: 'name'
     },
     {
-      name: "RATE",
-      selector: (row) => [row.rate],
+      name: "MULTIPLIER",
+      selector: (row) => [row.multiplier],
       sortable: true,
-      sortField: 'rate'
-    },
-    {
-      name: "BALANCE",
-      selector: (row) => [row.balance],
-      sortable: true,
-      sortField: 'balance'
+      sortField: 'multiplier'
     },
     {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id}><i className="fa fa-edit"></i></Link>
-          <Link className="mx-auto mr-2" to={`${process.env.PUBLIC_URL}/user-edit/` + row._id}><i className="fa fa-trash"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/currency-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <button onClick={(e) => showAlert(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
         </div>
       ),
     },
   ];
 
-  const actionsMemo = React.useMemo(() => <Export onExport={() => downloadCSV(data)} />, []);
+  const actionsMemo = React.useMemo(() => <Export onExport={() => downloadCSV()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
   const [toggleCleared, setToggleCleared] = React.useState(false);
   let selectdata = [];
@@ -128,9 +135,9 @@ export default function AdminList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchUsers = async (page, sortBy, direction, searchQuery) => {
+  const fetchCurrency = async (page, sortBy, direction, searchQuery) => {
     setLoading(true);
-    const result = await postData('users/getAllUsers', {
+    const result = await postData('currencies/getAllCurrency', {
       page: page,
       perPage: perPage,
       sortBy: sortBy,
@@ -146,18 +153,29 @@ export default function AdminList() {
     }
   };
 
+  const removeCurrency = async (id) => {
+    setLoading(true);
+    const result = await postData('currencies/deleteCurrency', {
+      _id: id,
+    });
+    if (result.success) {
+      fetchCurrency(currentPage, sortBy, direction, searchQuery);
+      setLoading(false);
+    }
+  };
+
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchUsers(currentPage, sortBy, direction, searchQuery);
+    fetchCurrency(currentPage, sortBy, direction, searchQuery);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchUsers(page, sortBy, direction, searchQuery);
+    fetchCurrency(page, sortBy, direction, searchQuery);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -166,11 +184,31 @@ export default function AdminList() {
     setLoading(false);
   };
 
+  const showAlert = (id) => {
+    Swal.fire({
+      title: "Alert",
+      icon: "info",
+      allowOutsideClick: false,
+      confirmButtonText: "Yes",
+      showCancelButton: "true",
+      cancelButtonText: "No",
+      cancelButtonColor: "#f82649",
+      text: "Are you sure you want to delete this ?",
+
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        removeCurrency(id);
+      }
+
+    });
+  }
+
   useEffect(() => {
     if (searchQuery != '') {
-      fetchUsers(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchCurrency(currentPage, sortBy, direction, searchQuery);
     } else {
-      fetchUsers(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchCurrency(currentPage, sortBy, direction, ''); // fetch page 1 of users
     }
   }, [perPage, searchQuery]);
 
@@ -178,10 +216,10 @@ export default function AdminList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">All Admin</h1>
+          <h1 className="page-title">All Currency</h1>
           <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
-              Admins
+              Currency
             </Breadcrumb.Item>
             <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
               List
@@ -189,12 +227,13 @@ export default function AdminList() {
           </Breadcrumb>
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/user-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/currency-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            Add NEW ADMIN
+            CREATE CURRENCY
           </Link>
+
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;
@@ -208,7 +247,7 @@ export default function AdminList() {
         <Col lg={12}>
           <Card>
             <Card.Header>
-              <h3 className="card-title">All Admin</h3>
+              <h3 className="card-title">All Currency</h3>
             </Card.Header>
             <Card.Body>
               <Row>
@@ -224,18 +263,6 @@ export default function AdminList() {
                 </Col>
               </Row>
               <div className="table-responsive export-table">
-                {/* <DataTableExtensions {...tableDatas}>
-                <DataTable
-                  columns={columns}
-                  data={data}
-                  actions={actionsMemo}
-                  contextActions={contextActions}
-                  onSelectedRowsChange={handleRowSelected}
-                  clearSelectedRows={toggleCleared}
-                  selectableRows
-                  pagination
-                />
-              </DataTableExtensions> */}
                 <DataTable
                   columns={columns}
                   data={data}

@@ -33,7 +33,7 @@ export default function Dashboard() {
                 <Card.Body className="card-body">
                   <Row>
                     <div className="col">
-                      <h6 className="">Total Sales</h6>
+                      <h6 className="">Balance</h6>
                       <h3 className="mb-2 number-font">
                         <CountUp
                           end={34516}
@@ -42,13 +42,13 @@ export default function Dashboard() {
                           duration={2.94}
                         />
                       </h3>
-                      <p className="text-muted mb-0">
+                      {/* <p className="text-muted mb-0">
                         <span className="text-primary me-1">
                           <i className="fa fa-chevron-circle-up text-primary me-1"></i>
                           <span>3% </span>
                         </span>
                         last month
-                      </p>
+                      </p> */}
                     </div>
                     <div className="col col-auto">
                       <div className="counter-icon bg-primary-gradient box-shadow-primary brround ms-auto">
@@ -64,7 +64,7 @@ export default function Dashboard() {
                 <div className="card-body">
                   <Row>
                     <div className="col">
-                      <h6 className="">Total Leads</h6>
+                      <h6 className="">Exposure</h6>
                       <h3 className="mb-2 number-font">
                         <CountUp
                           end={56992}
@@ -73,13 +73,13 @@ export default function Dashboard() {
                           duration={2.94}
                         />
                       </h3>
-                      <p className="text-muted mb-0">
+                      {/* <p className="text-muted mb-0">
                         <span className="text-secondary me-1">
                           <i className="fa fa-chevron-circle-up text-secondary me-1"></i>
                           <span>3% </span>
                         </span>
                         last month
-                      </p>
+                      </p> */}
                     </div>
                     <div className="col col-auto">
                       <div className="counter-icon bg-danger-gradient box-shadow-danger brround  ms-auto">
@@ -95,9 +95,9 @@ export default function Dashboard() {
                 <Card.Body className="card-body">
                   <Row>
                     <div className="col">
-                      <h6 className="">Total Profit</h6>
+                      <h6 className="">Credit Pts</h6>
                       <h3 className="mb-2 number-font">
-                        $
+
                         <CountUp
                           end={42567}
                           separator=","
@@ -105,13 +105,13 @@ export default function Dashboard() {
                           duration={2.94}
                         />
                       </h3>
-                      <p className="text-muted mb-0">
+                      {/* <p className="text-muted mb-0">
                         <span className="text-success me-1">
                           <i className="fa fa-chevron-circle-down text-success me-1"></i>
                           <span>0.5% </span>
                         </span>
                         last month
-                      </p>
+                      </p> */}
                     </div>
                     <div className="col col-auto">
                       <div className="counter-icon bg-secondary-gradient box-shadow-secondary brround ms-auto">
@@ -127,9 +127,9 @@ export default function Dashboard() {
                 <Card.Body className="card-body">
                   <Row>
                     <div className="col">
-                      <h6 className="">Total Cost</h6>
+                      <h6 className="">All Pts</h6>
                       <h3 className="mb-2 number-font">
-                        $
+
                         <CountUp
                           end={34789}
                           separator=","
@@ -137,13 +137,13 @@ export default function Dashboard() {
                           duration={2.94}
                         />
                       </h3>
-                      <p className="text-muted mb-0">
+                      {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
                           <i className="fa fa-chevron-circle-down text-danger me-1"></i>
                           <span>0.2% </span>
                         </span>
                         last month
-                      </p>
+                      </p> */}
                     </div>
                     <div className="col col-auto">
                       <div className="counter-icon bg-success-gradient box-shadow-success brround  ms-auto">
@@ -154,67 +154,207 @@ export default function Dashboard() {
                 </Card.Body>
               </Card>
             </Col>
+
+            <Col lg={6} md={12} sm={12} xl={3}>
+              <Card className=" overflow-hidden">
+                <Card.Body className="card-body">
+                  <Row>
+                    <div className="col">
+                      <h6 className="">Settlement Pts</h6>
+                      <h3 className="mb-2 number-font">
+
+                        <CountUp
+                          end={34789}
+                          separator=","
+                          start={0}
+                          duration={2.94}
+                        />
+                      </h3>
+                      {/* <p className="text-muted mb-0">
+                        <span className="text-danger me-1">
+                          <i className="fa fa-chevron-circle-down text-danger me-1"></i>
+                          <span>0.2% </span>
+                        </span>
+                        last month
+                      </p> */}
+                    </div>
+                    <div className="col col-auto">
+                      <div className="counter-icon bg-primary-gradient box-shadow-success brround  ms-auto">
+                        <i className="fe fe-layers text-white mb-5 "></i>
+                      </div>
+                    </div>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            <Col lg={6} md={12} sm={12} xl={3}>
+              <Card className=" overflow-hidden">
+                <Card.Body className="card-body">
+                  <Row>
+                    <div className="col">
+                      <h6 className="">Upper Pts</h6>
+                      <h3 className="mb-2 number-font">
+
+                        <CountUp
+                          end={34789}
+                          separator=","
+                          start={0}
+                          duration={2.94}
+                        />
+                      </h3>
+                      {/* <p className="text-muted mb-0">
+                        <span className="text-danger me-1">
+                          <i className="fa fa-chevron-circle-down text-danger me-1"></i>
+                          <span>0.2% </span>
+                        </span>
+                        last month
+                      </p> */}
+                    </div>
+                    <div className="col col-auto">
+                      <div className="counter-icon bg-danger-gradient box-shadow-success brround  ms-auto">
+                        <i className="fe fe-arrow-up text-white mb-5 "></i>
+                      </div>
+                    </div>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col lg={6} md={12} sm={12} xl={3}>
+              <Card className=" overflow-hidden">
+                <Card.Body className="card-body">
+                  <Row>
+                    <div className="col">
+                      <h6 className="">Down Pts</h6>
+                      <h3 className="mb-2 number-font">
+
+                        <CountUp
+                          end={34789}
+                          separator=","
+                          start={0}
+                          duration={2.94}
+                        />
+                      </h3>
+                      {/* <p className="text-muted mb-0">
+                        <span className="text-danger me-1">
+                          <i className="fa fa-chevron-circle-down text-danger me-1"></i>
+                          <span>0.2% </span>
+                        </span>
+                        last month
+                      </p> */}
+                    </div>
+                    <div className="col col-auto">
+                      <div className="counter-icon bg-secondary-gradient box-shadow-success brround  ms-auto">
+                        <i className="fe fe-arrow-down text-white mb-5 "></i>
+                      </div>
+                    </div>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
           </Row>
         </Col>
       </Row>
       <Row>
-        <Col className="col-sm-12 col-md-12 col-lg-12 col-xl-9">
+        <Col className="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           <Card>
-            <Card.Header className="card-header">
+            {/* <Card.Header className="card-header">
               <h3 className="card-title">Total Transactions</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body className="card-body pb-0">
               <div id="chartArea" className="chart-donut">
                 <ReactApexChart
-                  options={dashboard.totalTransactions.options}
-                  series={dashboard.totalTransactions.series}
-                  type="area"
+                  options={dashboard.dashboardGraph.options}
+                  series={dashboard.dashboardGraph.series}
+                  type="bar"
                   height={300}
                 />
               </div>
+              <Row className="row5 align-self-center text-center">
+                <Col xs={6} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-primary"></i> Credit pts
+                  </p>
+                  <h5>1,00,000</h5>
+                </Col>
+                <Col xs={6} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-warning"></i> All pts
+                  </p>
+                  <h5>1,00,000</h5>
+                </Col>
+                <Col xs={4} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-info"></i> Settlement pts
+                  </p>
+                  <h5>0</h5>
+                </Col>
+                <Col xs={4} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-success"></i> Upper pts
+                  </p>
+                  <h5>0</h5>
+                </Col>
+                <Col xs={4} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-dark"></i> Down pts
+                  </p>
+                  <h5>0</h5>
+                </Col>
+              </Row>
             </Card.Body>
           </Card>
-        </Col>
-        <Col sm={12} md={12} lg={12} xl={3}>
-          <Card className="card custom-card ">
-            <Card.Header className="card-header">
-              <h3 className="card-title">Recent Orders</h3>
-            </Card.Header>
-            <Card.Body className="pt-0 px-3">
-              <div id="recentorders" className="apex-charts apexs">
-                <div id="chart">
-                  <ReactApexChart
-                    options={dashboard.Recentorders.options}
-                    series={dashboard.Recentorders.series}
-                    type="radialBar"
-                    height={310}
-                  />
-                </div>
+
+          <Card>
+            {/* <Card.Header className="card-header">
+              <h3 className="card-title">Total Transactions</h3>
+            </Card.Header> */}
+            <Card.Body className="card-body pb-0">
+              <div id="chartArea" className="chart-donut">
+                <ReactApexChart
+                  options={dashboard.categoryWiseGraph.options}
+                  series={dashboard.categoryWiseGraph.series}
+                  type="bar"
+                  height={300}
+                />
               </div>
-              <div className="row sales-product-infomation pb-0 mb-0 mx-auto wd-100p mt-6">
-                <div className="col-md-6 col justify-content-center text-center ">
-                  <p className="mb-0 d-flex justify-content-center">
-                    <span className="legend bg-primary"></span>Delivered
+              <Row className="row5 align-self-center text-center">
+                <Col xs={6} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-primary"></i> Sports P/L
                   </p>
-                  <h3 className="mb-1 fw-bold">5238</h3>
-                  <div className="d-flex justify-content-center ">
-                    <p className="text-muted mb-0">Last 6 months</p>
-                  </div>
-                </div>
-                <div className="col-md-6 col text-center float-end">
-                  <p className="mb-0 d-flex justify-content-center ">
-                    <span className="legend bg-background2"></span>Cancelled
+                  <h5>1,00,000</h5>
+                </Col>
+                <Col xs={6} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-warning"></i> Casino P/L
                   </p>
-                  <h3 className="mb-1 fw-bold">3467</h3>
-                  <div className="d-flex justify-content-center ">
-                    <p className="text-muted mb-0">Last 6 months</p>
-                  </div>
-                </div>
-              </div>
+                  <h5>1,00,000</h5>
+                </Col>
+                <Col xs={4} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-info"></i> Tp Casino P/L
+                  </p>
+                  <h5>0</h5>
+                </Col>
+                <Col xs={4} sm>
+                  <p className="mb-2 font-size-11">
+                    <i className="mdi mdi-circle align-middle font-size-10 me-2 text-success"></i> Total P/L
+                  </p>
+                  <h5>0</h5>
+                </Col>
+
+              </Row>
             </Card.Body>
           </Card>
         </Col>
       </Row>
+      <Row>
+        <Col className="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <h1 className="page-title">Our Live Casino </h1>
+        </Col>
+      </Row>
+
     </div>
   );
 }

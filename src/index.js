@@ -13,6 +13,17 @@ const Dashboard = React.lazy(() => import("./components/Dashboard/Dashboard"));
 
 //User
 const UserList = React.lazy(() => import("./components/User/UserList/UserList"));
+
+const CategoryList = React.lazy(() => import("./components/Master/Category/CategoryList/CategoryList"));
+const CategoryForm = React.lazy(() => import("./components/Master/Category/CategoryForm/CategoryForm"));
+
+const CurrencyList = React.lazy(() => import("./components/Master/Currency/CurrencyList/CurrencyList"));
+const CurrencyForm = React.lazy(() => import("./components/Master/Currency/CurrencyForm/CurrencyForm"));
+
+const SuperAdminList = React.lazy(() => import("./components/User/SuperAdminList/SuperAdminList"));
+const SuperAdminForm = React.lazy(() => import("./components/User/SuperAdminForm/SuperAdminForm"));
+const AdminList = React.lazy(() => import("./components/User/AdminList/AdminList"));
+
 const UserForm = React.lazy(() => import("./components/User/UserForm/UserForm"));
 
 //custom Pages
@@ -67,21 +78,53 @@ const Root = () => {
                   />
 
                   <Route
+                    path={`${process.env.PUBLIC_URL}/currency-list`}
+                    element={<CurrencyList />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/currency-add`}
+                    element={<CurrencyForm />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/currency-edit/:id`}
+                    element={<CurrencyForm />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/category-list`}
+                    element={<CategoryList />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/category-add`}
+                    element={<CategoryForm />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/category-edit/:id`}
+                    element={<CategoryForm />}
+                  />
+
+                  <Route
                     path={`${process.env.PUBLIC_URL}/super-admin-list`}
-                    element={<UserList />}
+                    element={<SuperAdminList />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/super-admin-add`}
+                    element={<SuperAdminForm />}
                   />
                   <Route
                     path={`${process.env.PUBLIC_URL}/admin-list`}
-                    element={<UserList />}
+                    element={<AdminList />}
                   />
-                  <Route
+                  {/* <Route
                     path={`${process.env.PUBLIC_URL}/master-list`}
                     element={<UserList />}
                   />
                   <Route
                     path={`${process.env.PUBLIC_URL}/client-list`}
                     element={<UserList />}
-                  />
+                  /> */}
                   <Route
                     path={`${process.env.PUBLIC_URL}/user-add`}
                     element={<UserForm />}

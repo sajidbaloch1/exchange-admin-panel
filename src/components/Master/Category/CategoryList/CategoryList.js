@@ -5,10 +5,11 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import axios from "axios";
-import DebouncedTextInput from "../../../utils/DeboundedTextInput";
-import { postData } from '../../../utils/fetch-services';
+import DebouncedTextInput from "../../../../utils/DeboundedTextInput";
+import { postData } from '../../../../utils/fetch-services';
+import Swal from "sweetalert2";
 
-export default function AdminList() {
+export default function CategoryList() {
   function convertArrayOfObjectsToCSV(array) {
     let result;
 
@@ -36,20 +37,27 @@ export default function AdminList() {
   }
 
   // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
-  function downloadCSV(array) {
-    const link = document.createElement("a");
-    let csv = convertArrayOfObjectsToCSV(array);
-    if (csv == null) return;
 
-    const filename = "export.csv";
+  const downloadCSV = async () => {
+    const result = await postData('categories/getAllCategory', {
+      searchQuery: searchQuery
+    });
+    if (result.success) {
+      setLoading(false);
+      const link = document.createElement("a");
+      let csv = convertArrayOfObjectsToCSV(result.data.records);
+      if (csv == null) return;
 
-    if (!csv.match(/^data:text\/csv/i)) {
-      csv = `data:text/csv;charset=utf-8,${csv}`;
+      const filename = "category.csv";
+
+      if (!csv.match(/^data:text\/csv/i)) {
+        csv = `data:text/csv;charset=utf-8,${csv}`;
+      }
+
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", filename);
+      link.click();
     }
-
-    link.setAttribute("href", encodeURI(csv));
-    link.setAttribute("download", filename);
-    link.click();
   }
 
   const Export = ({ onExport }) => (
@@ -74,29 +82,17 @@ export default function AdminList() {
       sortable: false,
     },
     {
-      name: "USER NAME",
-      selector: (row) => [row.username],
+      name: "NAME",
+      selector: (row) => [row.name],
       sortable: true,
       sortField: 'username'
-    },
-    {
-      name: "RATE",
-      selector: (row) => [row.rate],
-      sortable: true,
-      sortField: 'rate'
-    },
-    {
-      name: "BALANCE",
-      selector: (row) => [row.balance],
-      sortable: true,
-      sortField: 'balance'
     },
     {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id}><i className="fa fa-edit"></i></Link>
-          <Link className="mx-auto mr-2" to={`${process.env.PUBLIC_URL}/user-edit/` + row._id}><i className="fa fa-trash"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/category-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <button onClick={(e) => showAlert(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
         </div>
       ),
     },
@@ -128,9 +124,9 @@ export default function AdminList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchUsers = async (page, sortBy, direction, searchQuery) => {
+  const fetchCategory = async (page, sortBy, direction, searchQuery) => {
     setLoading(true);
-    const result = await postData('users/getAllUsers', {
+    const result = await postData('categories/getAllCategory', {
       page: page,
       perPage: perPage,
       sortBy: sortBy,
@@ -146,18 +142,29 @@ export default function AdminList() {
     }
   };
 
+  const removeCategory = async (id) => {
+    setLoading(true);
+    const result = await postData('categories/deleteCategory', {
+      _id: id,
+    });
+    if (result.success) {
+      fetchCategory(currentPage, sortBy, direction, searchQuery);
+      setLoading(false);
+    }
+  };
+
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchUsers(currentPage, sortBy, direction, searchQuery);
+    fetchCategory(currentPage, sortBy, direction, searchQuery);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchUsers(page, sortBy, direction, searchQuery);
+    fetchCategory(page, sortBy, direction, searchQuery);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -166,11 +173,30 @@ export default function AdminList() {
     setLoading(false);
   };
 
+  const showAlert = (id) => {
+    Swal.fire({
+      title: "Alert",
+      icon: "info",
+      allowOutsideClick: false,
+      confirmButtonText: "Yes",
+      showCancelButton: "true",
+      cancelButtonText: "No",
+      cancelButtonColor: "#f82649",
+      text: "Are you sure you want to delete this ?",
+
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        removeCategory(id);
+      }
+    });
+  }
+
   useEffect(() => {
     if (searchQuery != '') {
-      fetchUsers(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchCategory(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
     } else {
-      fetchUsers(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchCategory(currentPage, sortBy, direction, ''); // fetch page 1 of users
     }
   }, [perPage, searchQuery]);
 
@@ -178,10 +204,10 @@ export default function AdminList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">All Admin</h1>
+          <h1 className="page-title">All Category</h1>
           <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
-              Admins
+              Categorys
             </Breadcrumb.Item>
             <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
               List
@@ -189,11 +215,11 @@ export default function AdminList() {
           </Breadcrumb>
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/user-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/category-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            Add NEW ADMIN
+            CREATE CATEGORY
           </Link>
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
@@ -208,7 +234,7 @@ export default function AdminList() {
         <Col lg={12}>
           <Card>
             <Card.Header>
-              <h3 className="card-title">All Admin</h3>
+              <h3 className="card-title">All Category</h3>
             </Card.Header>
             <Card.Body>
               <Row>
