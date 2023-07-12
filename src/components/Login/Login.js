@@ -10,14 +10,13 @@ import {
   CFormInput,
   CButton,
 } from "@coreui/react";
-import * as custompagesswitcherdata from "../../data/Switcher/Custompagesswitcherdata"
+
 export default function Login() {
   const [validated, setValidated] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  //const [token, setToken] = useState('');
 
-  const { login } = useContext(AuthContext);
+  const { login, loginError } = useContext(AuthContext);
 
   const navigate = useNavigate();
   const handleSubmit = (e) => {
@@ -26,10 +25,12 @@ export default function Login() {
     const form = e.currentTarget;
     if (form.checkValidity()) {
       // Perform login logic here, e.g., send login request to server
+      login(username, password);
+      // if (!isAuthenticated) {
+      //   //setLoginError('Please check the credentails');
+      // }
+      // Redirect to dashboard page after successful login
 
-      // Redirect to home page after successful login
-      login();
-      navigate('/dashboard');
     } else {
       setValidated(true);
     }
@@ -60,6 +61,8 @@ export default function Login() {
                   method="post"
                 >
                   <span className="login100-form-title">Login</span>
+
+                  <div className="text-center pb-3"> <p className="text-danger mb-0">{loginError}</p></div>
 
                   <div className="wrap-input100 validate-input">
                     <CFormInput

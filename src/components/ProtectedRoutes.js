@@ -14,7 +14,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 const ProtectedRoutes = () => {
 
     //const auth = useAuth()
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem('jws_token');
 
     return token ? <Outlet /> : <Navigate to="/login" />
 }

@@ -1,6 +1,6 @@
 import debounce from 'lodash.debounce';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Card, InputGroup, FormControl } from "react-bootstrap";
+import { InputGroup, FormControl } from "react-bootstrap";
 
 export function useDebounce(callback, timer = 2000) {
   const ref = useRef();

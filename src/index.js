@@ -3,18 +3,27 @@ import ReactDOM from "react-dom/client";
 import "./index.scss";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
-import * as Switcherdata from "./data/Switcher/Switcherdata";
 
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
 const App = React.lazy(() => import("./components/app"));
-const Custompages = React.lazy(() => import("./components/custompages"));
 
 //Dashboard
 const Dashboard = React.lazy(() => import("./components/Dashboard/Dashboard"));
 
 //User
 const UserList = React.lazy(() => import("./components/User/UserList/UserList"));
+
+const CategoryList = React.lazy(() => import("./components/Category/CategoryList/CategoryList"));
+const CategoryForm = React.lazy(() => import("./components/Category/CategoryForm/CategoryForm"));
+
+const CurrencyList = React.lazy(() => import("./components/Currency/CurrencyList/CurrencyList"));
+const CurrencyForm = React.lazy(() => import("./components/Currency/CurrencyForm/CurrencyForm"));
+
+const SuperAdminList = React.lazy(() => import("./components/User/SuperAdminList/SuperAdminList"));
+const SuperAdminForm = React.lazy(() => import("./components/User/SuperAdminForm/SuperAdminForm"));
+const AdminList = React.lazy(() => import("./components/User/AdminList/AdminList"));
+
 const UserForm = React.lazy(() => import("./components/User/UserForm/UserForm"));
 
 //custom Pages
@@ -30,11 +39,7 @@ const Errorpage503 = React.lazy(() => import("./components/ErrorPages/ErrorPages
 const ProtectedRoutes = React.lazy(() => import("./components/ProtectedRoutes"));
 const PublicRoutes = React.lazy(() => import("./components/PublicRoutes"));
 
-
-
 const Loaderimg = () => {
-
-
   return (
     <div id="global-loader">
       <img
@@ -73,11 +78,60 @@ const Root = () => {
                   />
 
                   <Route
-                    path={`${process.env.PUBLIC_URL}/user-list`}
+                    path={`${process.env.PUBLIC_URL}/currency-list`}
+                    element={<CurrencyList />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/currency-add`}
+                    element={<CurrencyForm />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/currency-edit/:id`}
+                    element={<CurrencyForm />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/category-list`}
+                    element={<CategoryList />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/category-add`}
+                    element={<CategoryForm />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/category-edit/:id`}
+                    element={<CategoryForm />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/super-admin-list`}
+                    element={<SuperAdminList />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/super-admin-add`}
+                    element={<SuperAdminForm />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/admin-list`}
+                    element={<AdminList />}
+                  />
+                  {/* <Route
+                    path={`${process.env.PUBLIC_URL}/master-list`}
                     element={<UserList />}
                   />
                   <Route
+                    path={`${process.env.PUBLIC_URL}/client-list`}
+                    element={<UserList />}
+                  /> */}
+                  <Route
                     path={`${process.env.PUBLIC_URL}/user-add`}
+                    element={<UserForm />}
+                  />
+
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/user-edit/:id`}
                     element={<UserForm />}
                   />
                 </Route>

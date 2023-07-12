@@ -1,63 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button, FormControl, InputGroup } from "react-bootstrap";
+import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
-import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
-import axios from "axios";
 import DebouncedTextInput from "../../../utils/DeboundedTextInput";
-import { postData } from '../../../utils/fetch-services';
+import { getAllData, deleteData } from "../currencyService";
+import { downloadCSV } from '../../../utils/csvUtils';
+import { showAlert } from '../../../utils//alertUtils';
 
-export default function UserList() {
-  function convertArrayOfObjectsToCSV(array) {
-    let result;
-
-    const columnDelimiter = ",";
-    const lineDelimiter = "\n";
-    const keys = Object.keys(data[0]);
-
-    result = "";
-    result += keys.join(columnDelimiter);
-    result += lineDelimiter;
-
-    array.forEach((item) => {
-      let ctr = 0;
-      keys.forEach((key) => {
-        if (ctr > 0) result += columnDelimiter;
-
-        result += item[key];
-
-        ctr++;
-      });
-      result += lineDelimiter;
-    });
-
-    return result;
-  }
-
-  // Blatant "inspiration" from https://codepen.io/Jacqueline34/pen/pyVoWr
-  function downloadCSV(array) {
-    const link = document.createElement("a");
-    let csv = convertArrayOfObjectsToCSV(array);
-    if (csv == null) return;
-
-    const filename = "export.csv";
-
-    if (!csv.match(/^data:text\/csv/i)) {
-      csv = `data:text/csv;charset=utf-8,${csv}`;
-    }
-
-    link.setAttribute("href", encodeURI(csv));
-    link.setAttribute("download", filename);
-    link.click();
-  }
+export default function CurrencyList() {
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
   );
 
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [filteredData, setFilteredData] = useState(data);
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,35 +31,29 @@ export default function UserList() {
       sortable: false,
     },
     {
-      name: "USER NAME",
-      selector: (row) => [row.username],
+      name: "NAME",
+      selector: (row) => [row.name],
       sortable: true,
-      sortField: 'username'
+      sortField: 'name'
     },
     {
-      name: "RATE",
-      selector: (row) => [row.rate],
+      name: "MULTIPLIER",
+      selector: (row) => [row.multiplier],
       sortable: true,
-      sortField: 'rate'
-    },
-    {
-      name: "BALANCE",
-      selector: (row) => [row.balance],
-      sortable: true,
-      sortField: 'balance'
+      sortField: 'multiplier'
     },
     {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id}><i className="fa fa-edit"></i></Link>
-          <Link className="mx-auto mr-2" to={`${process.env.PUBLIC_URL}/user-edit/` + row._id}><i className="fa fa-trash"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/currency-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
         </div>
       ),
     },
   ];
 
-  const actionsMemo = React.useMemo(() => <Export onExport={() => downloadCSV(data)} />, []);
+  const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
   const [toggleCleared, setToggleCleared] = React.useState(false);
   let selectdata = [];
@@ -128,36 +79,53 @@ export default function UserList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchUsers = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page, sortBy, direction, searchQuery) => {
     setLoading(true);
-    const result = await postData('users/getAllUsers', {
-      page: page,
-      perPage: perPage,
-      sortBy: sortBy,
-      direction: direction,
-      searchQuery: searchQuery
-    });
-    if (result.success) {
-      setData(result.data.records);
-      setTotalRows(result.data.totalRecords);
+    try {
+      const result = await getAllData(page, perPage, sortBy, direction, searchQuery);
+      console.log(result);
+      setData(result.records);
+      setTotalRows(result.totalRecords);
       setLoading(false);
-    } else {
-      setData([]);
+    } catch (error) {
+      // Handle error
+      console.error("Error fetching :", error);
+      // Display error message or show notification to the user
+      // Set the state to indicate the error condition
+      setLoading(false);
     }
   };
+
+  const removeRow = async (id) => {
+    setLoading(true);
+    try {
+      const success = await deleteData(id);
+      if (success) {
+        fetchData(currentPage, sortBy, direction, searchQuery);
+        setLoading(false);
+      }
+    } catch (error) {
+      // Handle error
+      console.error("Error removing :", error);
+      // Display error message or show notification to the user
+      // Set the state to indicate the error condition
+      setLoading(false);
+    }
+  };
+
 
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchUsers(currentPage, sortBy, direction, searchQuery);
+    fetchData(currentPage, sortBy, direction, searchQuery);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchUsers(page, sortBy, direction, searchQuery);
+    fetchData(page, sortBy, direction, searchQuery);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -166,11 +134,19 @@ export default function UserList() {
     setLoading(false);
   };
 
+  const handleDownload = async () => {
+    await downloadCSV('currencies/getAllCurrency', searchQuery, 'currency.csv');
+  };
+
+  const handleDelete = (id) => {
+    showAlert(id, removeRow);
+  };
+
   useEffect(() => {
-    if (searchQuery != '') {
-      fetchUsers(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+    if (searchQuery !== '') {
+      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
     } else {
-      fetchUsers(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
     }
   }, [perPage, searchQuery]);
 
@@ -178,22 +154,15 @@ export default function UserList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">All User</h1>
-          <Breadcrumb className="breadcrumb">
-            <Breadcrumb.Item className="breadcrumb-item" href="#">
-              Users
-            </Breadcrumb.Item>
-            <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
-              List
-            </Breadcrumb.Item>
-          </Breadcrumb>
+          <h1 className="page-title">ALL CURRENCY</h1>
+
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/user-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/currency-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            Add NEW USER
+            CREATE CURRENCY
           </Link>
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
@@ -207,9 +176,7 @@ export default function UserList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
-            <Card.Header>
-              <h3 className="card-title">All User</h3>
-            </Card.Header>
+
             <Card.Body>
               <Row>
                 <Col lg={9}></Col>
@@ -224,18 +191,6 @@ export default function UserList() {
                 </Col>
               </Row>
               <div className="table-responsive export-table">
-                {/* <DataTableExtensions {...tableDatas}>
-                <DataTable
-                  columns={columns}
-                  data={data}
-                  actions={actionsMemo}
-                  contextActions={contextActions}
-                  onSelectedRowsChange={handleRowSelected}
-                  clearSelectedRows={toggleCleared}
-                  selectableRows
-                  pagination
-                />
-              </DataTableExtensions> */}
                 <DataTable
                   columns={columns}
                   data={data}
@@ -259,7 +214,6 @@ export default function UserList() {
           </Card>
         </Col>
       </Row>
-
     </div>
   );
 }
