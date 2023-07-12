@@ -12,9 +12,9 @@ const postData = async (url, body) => {
     },
     body: JSON.stringify(body),
   });
-  if (response.status >= 400) {
-    const result = await response.json();
-  }
+  // if (response.status >= 400) {
+  //   const result = await response.json();
+  // }
   const result = await response.json();
   return result;
 };

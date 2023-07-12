@@ -1,35 +1,35 @@
-import React, { useState, useContext } from "react";
-import { Dropdown, Navbar, Container, Button } from "react-bootstrap";
+import React, { useContext } from "react";
+import { Dropdown, Navbar, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../components/AuthContext";
 
 export function Header() {
 
   //full screen
-  function Fullscreen() {
-    if (
-      (document.fullScreenElement && document.fullScreenElement === null) ||
-      (!document.mozFullScreen && !document.webkitIsFullScreen)
-    ) {
-      if (document.documentElement.requestFullScreen) {
-        document.documentElement.requestFullScreen();
-      } else if (document.documentElement.mozRequestFullScreen) {
-        document.documentElement.mozRequestFullScreen();
-      } else if (document.documentElement.webkitRequestFullScreen) {
-        document.documentElement.webkitRequestFullScreen(
-          Element.ALLOW_KEYBOARD_INPUT
-        );
-      }
-    } else {
-      if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-      }
-    }
-  }
+  // function Fullscreen() {
+  //   if (
+  //     (document.fullScreenElement && document.fullScreenElement === null) ||
+  //     (!document.mozFullScreen && !document.webkitIsFullScreen)
+  //   ) {
+  //     if (document.documentElement.requestFullScreen) {
+  //       document.documentElement.requestFullScreen();
+  //     } else if (document.documentElement.mozRequestFullScreen) {
+  //       document.documentElement.mozRequestFullScreen();
+  //     } else if (document.documentElement.webkitRequestFullScreen) {
+  //       document.documentElement.webkitRequestFullScreen(
+  //         Element.ALLOW_KEYBOARD_INPUT
+  //       );
+  //     }
+  //   } else {
+  //     if (document.cancelFullScreen) {
+  //       document.cancelFullScreen();
+  //     } else if (document.mozCancelFullScreen) {
+  //       document.mozCancelFullScreen();
+  //     } else if (document.webkitCancelFullScreen) {
+  //       document.webkitCancelFullScreen();
+  //     }
+  //   }
+  // }
   //dark-mode
   const Darkmode = () => {
     document.querySelector(".app").classList.toggle("dark-mode");
@@ -45,7 +45,7 @@ export function Header() {
     document.querySelector(".header-search").classList.toggle("show");
   };
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
 
   const user = JSON.parse(localStorage.getItem('user_info'));
 

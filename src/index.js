@@ -14,11 +14,11 @@ const Dashboard = React.lazy(() => import("./components/Dashboard/Dashboard"));
 //User
 const UserList = React.lazy(() => import("./components/User/UserList/UserList"));
 
-const CategoryList = React.lazy(() => import("./components/Master/Category/CategoryList/CategoryList"));
-const CategoryForm = React.lazy(() => import("./components/Master/Category/CategoryForm/CategoryForm"));
+const CategoryList = React.lazy(() => import("./components/Category/CategoryList/CategoryList"));
+const CategoryForm = React.lazy(() => import("./components/Category/CategoryForm/CategoryForm"));
 
-const CurrencyList = React.lazy(() => import("./components/Master/Currency/CurrencyList/CurrencyList"));
-const CurrencyForm = React.lazy(() => import("./components/Master/Currency/CurrencyForm/CurrencyForm"));
+const CurrencyList = React.lazy(() => import("./components/Currency/CurrencyList/CurrencyList"));
+const CurrencyForm = React.lazy(() => import("./components/Currency/CurrencyForm/CurrencyForm"));
 
 const SuperAdminList = React.lazy(() => import("./components/User/SuperAdminList/SuperAdminList"));
 const SuperAdminForm = React.lazy(() => import("./components/User/SuperAdminForm/SuperAdminForm"));

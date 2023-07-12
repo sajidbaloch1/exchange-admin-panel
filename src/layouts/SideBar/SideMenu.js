@@ -11,13 +11,12 @@ export const MENUITEMS = [
       },
     ],
   },
-
   {
     menutitle: "CURRENCY",
     Items: [
       {
         path: `${process.env.PUBLIC_URL}/currency-list`,
-        icon: "layers",
+        icon: "dollar-sign",
         type: "link",
         active: false,
         title: "Currency",
