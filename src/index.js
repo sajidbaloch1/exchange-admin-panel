@@ -9,25 +9,16 @@ import { AuthProvider } from "./components/AuthContext";
 const App = React.lazy(() => import("./components/app"));
 
 //Dashboard
-const Dashboard = React.lazy(() => import("./components/Dashboard/Dashboard"));
+const Dashboard = React.lazy(() => import("./Pages/Dashboard/Dashboard"));
 
-//User
-const UserList = React.lazy(() => import("./components/User/UserList/UserList"));
+const CategoryList = React.lazy(() => import("./Pages/Category/CategoryList/CategoryList"));
+const CategoryForm = React.lazy(() => import("./Pages/Category/CategoryForm/CategoryForm"));
 
-const CategoryList = React.lazy(() => import("./components/Category/CategoryList/CategoryList"));
-const CategoryForm = React.lazy(() => import("./components/Category/CategoryForm/CategoryForm"));
-
-const CurrencyList = React.lazy(() => import("./components/Currency/CurrencyList/CurrencyList"));
-const CurrencyForm = React.lazy(() => import("./components/Currency/CurrencyForm/CurrencyForm"));
-
-const SuperAdminList = React.lazy(() => import("./components/User/SuperAdminList/SuperAdminList"));
-const SuperAdminForm = React.lazy(() => import("./components/User/SuperAdminForm/SuperAdminForm"));
-const AdminList = React.lazy(() => import("./components/User/AdminList/AdminList"));
-
-const UserForm = React.lazy(() => import("./components/User/UserForm/UserForm"));
+const CurrencyList = React.lazy(() => import("./Pages/Currency/CurrencyList/CurrencyList"));
+const CurrencyForm = React.lazy(() => import("./Pages/Currency/CurrencyForm/CurrencyForm"));
 
 //custom Pages
-const Login = React.lazy(() => import("./components/Login/Login"));
+const Login = React.lazy(() => import("./Pages/Login/Login"));
 
 //Errorpages
 const Errorpage400 = React.lazy(() => import("./components/ErrorPages/ErrorPages/400/400"));
@@ -104,7 +95,7 @@ const Root = () => {
                     element={<CategoryForm />}
                   />
 
-                  <Route
+                  {/* <Route
                     path={`${process.env.PUBLIC_URL}/super-admin-list`}
                     element={<SuperAdminList />}
                   />
@@ -116,7 +107,7 @@ const Root = () => {
                   <Route
                     path={`${process.env.PUBLIC_URL}/admin-list`}
                     element={<AdminList />}
-                  />
+                  /> */}
                   {/* <Route
                     path={`${process.env.PUBLIC_URL}/master-list`}
                     element={<UserList />}
@@ -125,15 +116,7 @@ const Root = () => {
                     path={`${process.env.PUBLIC_URL}/client-list`}
                     element={<UserList />}
                   /> */}
-                  <Route
-                    path={`${process.env.PUBLIC_URL}/user-add`}
-                    element={<UserForm />}
-                  />
 
-                  <Route
-                    path={`${process.env.PUBLIC_URL}/user-edit/:id`}
-                    element={<UserForm />}
-                  />
                 </Route>
 
               </Route>

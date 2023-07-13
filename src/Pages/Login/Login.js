@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "react-bootstrap";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../../components/AuthContext";
 import {
   CForm,
   CCol,

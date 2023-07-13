@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Breadcrumb, Card, Row, Col } from "react-bootstrap";
+import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
 import { useFormik } from 'formik';
 import { useNavigate } from "react-router-dom";
-import { getDetailByID, addData, updateData } from "../currencyService";
-import FormInput from "../../FormComponents/FormInput"; // Import the FormInput component
+import { getDetailByID, addData, updateData } from "../categoryService";
+import FormInput from "../../../components/Common/FormComponents/FormInput";
 import * as Yup from 'yup';
 import {
   CForm,
@@ -14,7 +14,7 @@ import {
   CButton,
 } from "@coreui/react";
 
-export default function CurrencyForm() {
+export default function CategoryForm() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,11 +23,9 @@ export default function CurrencyForm() {
   const formik = useFormik({
     initialValues: {
       name: '',
-      multiplier: ''
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Name is required'),
-      multiplier: Yup.number().required('Multiplier must be a number'),
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
@@ -35,16 +33,14 @@ export default function CurrencyForm() {
         if (id !== '' && id !== undefined) {
           await updateData({
             _id: id,
-            name: values.name,
-            multiplier: values.multiplier
+            name: values.name
           });
         } else {
           await addData({
-            name: values.name,
-            multiplier: values.multiplier
+            name: values.name
           });
         }
-        navigate('/currency-list');
+        navigate('/category-list');
       } catch (error) {
         // Handle error
       }
@@ -59,20 +55,20 @@ export default function CurrencyForm() {
         formik.setValues((prevValues) => ({
           ...prevValues,
           name: result.name || '',
-          multiplier: result.multiplier || '',
         }));
       }
     };
     fetchData();
   }, [id, getDetailByID]);
 
-  const formTitle = id ? "UPDATE CURRENCY" : "CREATE CURRENCY";
+  const formTitle = id ? "UPDATE CATEGORY" : "CREATE CATEGORY";
 
   return (
     <div>
       <div className="page-header">
         <div>
           <h1 className="page-title"> {formTitle}</h1>
+
         </div>
       </div>
 
@@ -99,23 +95,12 @@ export default function CurrencyForm() {
                   error={formik.touched.name && formik.errors.name}
                 />
 
-                <FormInput
-                  label="Multiplier"
-                  name="multiplier"
-                  type="text"
-                  value={formik.values.multiplier}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.multiplier && formik.errors.multiplier}
-                />
-
-
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-block">
                     <CButton color="primary" type="submit" className="me-3">
                       Save
                     </CButton>
-                    <Link to={`${process.env.PUBLIC_URL}/currency-list`} className="btn btn-danger btn-icon text-white ">
+                    <Link to={`${process.env.PUBLIC_URL}/category-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel
                     </Link>
                   </div>
