@@ -3,8 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
 import { useFormik } from 'formik';
 import { useNavigate } from "react-router-dom";
-import { getDetailByID, addData, updateData } from "../categoryService";
+import { getBetCategoryDetailByID, addBetCategory, updateBetCategory } from "../betcategoryService";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
+import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import * as Yup from 'yup';
 import {
   CForm,
@@ -14,7 +15,7 @@ import {
   CButton,
 } from "@coreui/react";
 
-export default function CategoryForm() {
+export default function BetCategoryForm() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,16 +32,16 @@ export default function CategoryForm() {
       // Perform form submission logic
       try {
         if (id !== '' && id !== undefined) {
-          await updateData({
+          await updateBetCategory({
             _id: id,
             name: values.name
           });
         } else {
-          await addData({
+          await addBetCategory({
             name: values.name
           });
         }
-        navigate('/category-list');
+        navigate('/bet-category-list');
       } catch (error) {
         // Handle error
       }
@@ -51,7 +52,7 @@ export default function CategoryForm() {
   useEffect(() => {
     const fetchData = async () => {
       if (id) {
-        const result = await getDetailByID(id);
+        const result = await getBetCategoryDetailByID(id);
         formik.setValues((prevValues) => ({
           ...prevValues,
           name: result.name || '',
@@ -59,9 +60,9 @@ export default function CategoryForm() {
       }
     };
     fetchData();
-  }, [id, getDetailByID]);
+  }, [id, getBetCategoryDetailByID]);
 
-  const formTitle = id ? "UPDATE CATEGORY" : "CREATE CATEGORY";
+  const formTitle = id ? "UPDATE BET CATEGORY" : "CREATE BET CATEGORY";
 
   return (
     <div>
@@ -100,7 +101,7 @@ export default function CategoryForm() {
                     <CButton color="primary" type="submit" className="me-3">
                       Save
                     </CButton>
-                    <Link to={`${process.env.PUBLIC_URL}/category-list`} className="btn btn-danger btn-icon text-white ">
+                    <Link to={`${process.env.PUBLIC_URL}/bet-category-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel
                     </Link>
                   </div>

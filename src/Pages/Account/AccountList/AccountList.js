@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { Row, Card, Col, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import DebouncedTextInput from "../../../utils/DeboundedTextInput";
-import { getAllData, deleteData } from "../categoryService";
+import { getAllData, deleteData } from "../accountService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils//alertUtils';
+import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 
-export default function CategoryList() {
+export default function AccountList() {
+
+  let login_user_id = '';
+  const user = JSON.parse(localStorage.getItem('user_info'));
+  if (user.role !== 'system_owner') {
+    login_user_id = user._id;
+  }
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
@@ -24,6 +30,9 @@ export default function CategoryList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
+  const [parentId, setParentId] = useState(login_user_id);
+  const [selectedUserIdStack, setSelectedUserIdStack] = useState([]);
+
   const columns = [
     {
       name: "SR.NO",
@@ -31,16 +40,61 @@ export default function CategoryList() {
       sortable: false,
     },
     {
-      name: "NAME",
-      selector: (row) => [row.name],
+      name: "USERNAME",
+      selector: (row) => [row.username],
       sortable: true,
-      sortField: 'name'
+      sortField: 'username',
+      cell: (row) => (
+        row.hasChild ? (
+          <div>
+            <Link to={`${process.env.PUBLIC_URL}/account-list/`} onClick={() => handleClick(row._id)}>{row.username}</Link>
+          </div>
+        ) : (
+          <span>{row.username}</span>
+        )
+      ),
+    },
+    {
+      name: "FULL NAME",
+      selector: (row) => [row.fullName],
+      sortable: true,
+      sortField: 'fullName'
+    },
+    {
+      name: "MOBILE NUMBER",
+      selector: (row) => [row.mobileNumber],
+      sortable: true,
+      sortField: 'mobileNumber'
+    },
+    {
+      name: "RATE",
+      selector: (row) => [row.rate],
+      sortable: true,
+      sortField: 'rate'
+    },
+    {
+      name: "BALANCE",
+      selector: (row) => [row.balance],
+      sortable: true,
+      sortField: 'balance'
+    },
+    {
+      name: "ACCOUNT TYPE",
+      selector: (row) => [row.role],
+      sortable: true,
+      sortField: 'role'
+    },
+    {
+      name: "CITY",
+      selector: (row) => [row.city],
+      sortable: true,
+      sortField: 'city'
     },
     {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/category-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/account-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
           <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
         </div>
       ),
@@ -53,7 +107,19 @@ export default function CategoryList() {
   let selectdata = [];
   const handleRowSelected = React.useCallback((state) => {
     setSelectedRows(state.selectedRows);
+    const selectedUser = state.selectedRows[0]; // Assuming only one user can be selected at a time
+    if (selectedUser) {
+      setParentId(selectedUser._id);
+    }
   }, []);
+
+  const handleClick = (_id) => {
+    const newSelectedUserIdStack = [...selectedUserIdStack, _id];
+    setSelectedUserIdStack(newSelectedUserIdStack);
+
+    //const lastValue = newSelectedUserIdStack[newSelectedUserIdStack.length - 1];
+    setParentId(_id);
+  };
 
   const contextActions = React.useMemo(() => {
     const Selectdata = () => {
@@ -73,10 +139,12 @@ export default function CategoryList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchData = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page) => {
     setLoading(true);
     try {
-      const result = await getAllData(page, perPage, sortBy, direction, searchQuery);
+
+      const result = await getAllData(page, perPage, sortBy, direction, searchQuery, parentId);
+
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -94,7 +162,7 @@ export default function CategoryList() {
     try {
       const success = await deleteData(id);
       if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
+        fetchData(currentPage);
         setLoading(false);
       }
     } catch (error) {
@@ -106,19 +174,18 @@ export default function CategoryList() {
     }
   };
 
-
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchData(currentPage, sortBy, direction, searchQuery);
+    fetchData(currentPage);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchData(page, sortBy, direction, searchQuery);
+    fetchData(page);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -128,7 +195,7 @@ export default function CategoryList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('categories/getAllCategory', searchQuery, 'category.csv');
+    await downloadCSV('users/getAllUsers', searchQuery, 'account.csv');
   };
 
   const handleDelete = (id) => {
@@ -136,33 +203,27 @@ export default function CategoryList() {
   };
 
   useEffect(() => {
+
     if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
     }
-  }, [perPage, searchQuery]);
+  }, [perPage, searchQuery, parentId]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL CATEGORIES</h1>
-          {/* <Breadcrumb className="breadcrumb">
-            <Breadcrumb.Item className="breadcrumb-item" href="#">
-              Category
-            </Breadcrumb.Item>
-            <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
-              List
-            </Breadcrumb.Item>
-          </Breadcrumb> */}
+          <h1 className="page-title">ALL ACCOUNT</h1>
+
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/category-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/account-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            CREATE CATEGORY
+            CREATE ACCOUNT
           </Link>
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
@@ -178,18 +239,11 @@ export default function CategoryList() {
           <Card>
 
             <Card.Body>
-              <Row>
-                <Col lg={9}></Col>
-                <Col lg={3}>
-                  <DebouncedTextInput
-                    disabled={loading}
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    label="Search transaction"
-                    duration={500}
-                  />
-                </Col>
-              </Row>
+              <SearchInput
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                loading={loading}
+              />
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}

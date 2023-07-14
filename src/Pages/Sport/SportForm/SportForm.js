@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Breadcrumb, Card, Row, Col } from "react-bootstrap";
+import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
 import { useFormik } from 'formik';
 import { useNavigate } from "react-router-dom";
-import { getCurrencyDetailByID, addCurrency, updateCurrency } from "../currencyService";
-import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
+import { getSportDetailByID, addSport, updateSport } from "../sportService";
+import FormInput from "../../../components/Common/FormComponents/FormInput";
 import * as Yup from 'yup';
 import {
   CForm,
@@ -14,7 +14,7 @@ import {
   CButton,
 } from "@coreui/react";
 
-export default function CurrencyForm() {
+export default function SportForm() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,28 +23,24 @@ export default function CurrencyForm() {
   const formik = useFormik({
     initialValues: {
       name: '',
-      multiplier: ''
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Name is required'),
-      multiplier: Yup.number().required('Multiplier must be a number'),
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
       try {
         if (id !== '' && id !== undefined) {
-          await updateCurrency({
+          await updateSport({
             _id: id,
-            name: values.name,
-            multiplier: values.multiplier
+            name: values.name
           });
         } else {
-          await addCurrency({
-            name: values.name,
-            multiplier: values.multiplier
+          await addSport({
+            name: values.name
           });
         }
-        navigate('/currency-list');
+        navigate('/sport-list');
       } catch (error) {
         // Handle error
       }
@@ -55,24 +51,24 @@ export default function CurrencyForm() {
   useEffect(() => {
     const fetchData = async () => {
       if (id) {
-        const result = await getCurrencyDetailByID(id);
+        const result = await getSportDetailByID(id);
         formik.setValues((prevValues) => ({
           ...prevValues,
           name: result.name || '',
-          multiplier: result.multiplier || '',
         }));
       }
     };
     fetchData();
-  }, [id, getCurrencyDetailByID]);
+  }, [id, getSportDetailByID]);
 
-  const formTitle = id ? "UPDATE CURRENCY" : "CREATE CURRENCY";
+  const formTitle = id ? "UPDATE SPORT" : "CREATE SPORT";
 
   return (
     <div>
       <div className="page-header">
         <div>
           <h1 className="page-title"> {formTitle}</h1>
+
         </div>
       </div>
 
@@ -99,23 +95,12 @@ export default function CurrencyForm() {
                   error={formik.touched.name && formik.errors.name}
                 />
 
-                <FormInput
-                  label="Multiplier"
-                  name="multiplier"
-                  type="text"
-                  value={formik.values.multiplier}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.multiplier && formik.errors.multiplier}
-                />
-
-
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-block">
                     <CButton color="primary" type="submit" className="me-3">
                       Save
                     </CButton>
-                    <Link to={`${process.env.PUBLIC_URL}/currency-list`} className="btn btn-danger btn-icon text-white ">
+                    <Link to={`${process.env.PUBLIC_URL}/sport-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel
                     </Link>
                   </div>

@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllCurrency, deleteCurrency } from "../currencyService";
+import { getAllSport, deleteSport } from "../sportService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils//alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
 
-export default function CurrencyList() {
+export default function SportList() {
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
@@ -37,16 +37,10 @@ export default function CurrencyList() {
       sortField: 'name'
     },
     {
-      name: "MULTIPLIER",
-      selector: (row) => [row.multiplier],
-      sortable: true,
-      sortField: 'multiplier'
-    },
-    {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/currency-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/sport-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
           <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
         </div>
       ),
@@ -82,8 +76,7 @@ export default function CurrencyList() {
   const fetchData = async (page, sortBy, direction, searchQuery) => {
     setLoading(true);
     try {
-      const result = await getAllCurrency(page, perPage, sortBy, direction, searchQuery);
-      console.log(result);
+      const result = await getAllSport(page, perPage, sortBy, direction, searchQuery);
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -99,7 +92,7 @@ export default function CurrencyList() {
   const removeRow = async (id) => {
     setLoading(true);
     try {
-      const success = await deleteCurrency(id);
+      const success = await deleteSport(id);
       if (success) {
         fetchData(currentPage, sortBy, direction, searchQuery);
         setLoading(false);
@@ -135,7 +128,7 @@ export default function CurrencyList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('currencies/getAllCurrency', searchQuery, 'currency.csv');
+    await downloadCSV('sport/getAllSport', searchQuery, 'sports.csv');
   };
 
   const handleDelete = (id) => {
@@ -154,15 +147,22 @@ export default function CurrencyList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL CURRENCY</h1>
-
+          <h1 className="page-title">ALL SPORTS</h1>
+          {/* <Breadcrumb className="breadcrumb">
+            <Breadcrumb.Item className="breadcrumb-item" href="#">
+              Category
+            </Breadcrumb.Item>
+            <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
+              List
+            </Breadcrumb.Item>
+          </Breadcrumb> */}
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/currency-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/sport-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            CREATE CURRENCY
+            CREATE SPORT
           </Link>
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>

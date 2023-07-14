@@ -11,11 +11,17 @@ const App = React.lazy(() => import("./components/app"));
 //Dashboard
 const Dashboard = React.lazy(() => import("./Pages/Dashboard/Dashboard"));
 
-const CategoryList = React.lazy(() => import("./Pages/Category/CategoryList/CategoryList"));
-const CategoryForm = React.lazy(() => import("./Pages/Category/CategoryForm/CategoryForm"));
+const SportList = React.lazy(() => import("./Pages/Sport/SportList/SportList"));
+const SportForm = React.lazy(() => import("./Pages/Sport/SportForm/SportForm"));
 
 const CurrencyList = React.lazy(() => import("./Pages/Currency/CurrencyList/CurrencyList"));
 const CurrencyForm = React.lazy(() => import("./Pages/Currency/CurrencyForm/CurrencyForm"));
+
+const BetCategoryList = React.lazy(() => import("./Pages/BetCategory/BetCategoryList/BetCategoryList"));
+const BetCategoryForm = React.lazy(() => import("./Pages/BetCategory/BetCategoryForm/BetCategoryForm"));
+
+const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
+const AccountForm = React.lazy(() => import("./Pages/Account/AccountForm/AccountForm"));
 
 //custom Pages
 const Login = React.lazy(() => import("./Pages/Login/Login"));
@@ -82,43 +88,45 @@ const Root = () => {
                   />
 
                   <Route
-                    path={`${process.env.PUBLIC_URL}/category-list`}
-                    element={<CategoryList />}
+                    path={`${process.env.PUBLIC_URL}/sport-list`}
+                    element={<SportList />}
                   />
 
                   <Route
-                    path={`${process.env.PUBLIC_URL}/category-add`}
-                    element={<CategoryForm />}
+                    path={`${process.env.PUBLIC_URL}/sport-add`}
+                    element={<SportForm />}
                   />
                   <Route
-                    path={`${process.env.PUBLIC_URL}/category-edit/:id`}
-                    element={<CategoryForm />}
-                  />
-
-                  {/* <Route
-                    path={`${process.env.PUBLIC_URL}/super-admin-list`}
-                    element={<SuperAdminList />}
+                    path={`${process.env.PUBLIC_URL}/sport-edit/:id`}
+                    element={<SportForm />}
                   />
 
                   <Route
-                    path={`${process.env.PUBLIC_URL}/super-admin-add`}
-                    element={<SuperAdminForm />}
+                    path={`${process.env.PUBLIC_URL}/bet-category-list`}
+                    element={<BetCategoryList />}
                   />
                   <Route
-                    path={`${process.env.PUBLIC_URL}/admin-list`}
-                    element={<AdminList />}
-                  /> */}
-                  {/* <Route
-                    path={`${process.env.PUBLIC_URL}/master-list`}
-                    element={<UserList />}
+                    path={`${process.env.PUBLIC_URL}/bet-category-add`}
+                    element={<BetCategoryForm />}
                   />
                   <Route
-                    path={`${process.env.PUBLIC_URL}/client-list`}
-                    element={<UserList />}
-                  /> */}
+                    path={`${process.env.PUBLIC_URL}/bet-category-edit/:id`}
+                    element={<BetCategoryForm />}
+                  />
 
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/account-list`}
+                    element={<AccountList />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/account-add`}
+                    element={<AccountForm />}
+                  />
+                  <Route
+                    path={`${process.env.PUBLIC_URL}/account-edit/:id`}
+                    element={<AccountForm />}
+                  />
                 </Route>
-
               </Route>
 
               <Route path="/" element={<PublicRoutes />}>

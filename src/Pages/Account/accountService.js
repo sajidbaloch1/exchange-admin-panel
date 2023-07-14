@@ -1,36 +1,38 @@
 import { postData } from '../../utils/fetch-services';
 
-export const getAllData = async (page, perPage, sortBy, direction, searchQuery) => {
-    const result = await postData('categories/getAllCategory', {
+export const getAllData = async (page, perPage, sortBy, direction, searchQuery, parentId) => {
+    const result = await postData('users/getAllUsers', {
         page: page,
         perPage: perPage,
         sortBy: sortBy,
         direction: direction,
-        searchQuery: searchQuery
+        searchQuery: searchQuery,
+        parentId: parentId
     });
     return result.success ? result.data : [];
 };
 
 export const deleteData = async (id) => {
-    const result = await postData('categories/deleteCategory', {
+    const result = await postData('users/deleteUser', {
         _id: id,
     });
     return result.success;
 };
 
 export const getDetailByID = async (id) => {
-    const result = await postData('categories/getCategoryById', {
+    const result = await postData('users/getUserById', {
         _id: id,
     });
     return result.success ? result.data.details : [];
 };
 
 export const addData = async (request) => {
-    const result = await postData('categories/createCategory', request);
+    console.log(request);
+    const result = await postData('users/createUser', request);
     return result.success ? result.data.details : [];
 };
 
 export const updateData = async (request) => {
-    const result = await postData('categories/updateCategory', request);
+    const result = await postData('users/updateUser', request);
     return result.success ? result.data.details : [];
 };
