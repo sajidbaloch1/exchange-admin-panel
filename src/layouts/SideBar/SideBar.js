@@ -1,12 +1,105 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { MENUITEMS } from "./SideMenu";
 import { Link, NavLink } from "react-router-dom";
 import Scrollbars from "react-custom-scrollbars";
+
 const Sidebar = () => {
-  const [mainmenu, setMainMenu] = useState(MENUITEMS);
+
+  const [mainmenu, setMainMenu] = useState([]);
+  const userRole = JSON.parse(localStorage.getItem("user_info")).role;
+
+  useEffect(() => {
+    setMainMenu(getMenuItems(userRole));
+
+  }, []);
+
+  const getMenuItems = (userRole) => {
+
+    let menuItems = [
+      {
+        menutitle: "MAIN",
+        Items: [
+          {
+            path: `${process.env.PUBLIC_URL}/dashboard`,
+            icon: "home",
+            type: "link",
+            active: true,
+            title: "Dashboard",
+          },
+        ],
+      },
+      {
+        menutitle: "ACCOUNT",
+        Items: [
+          {
+            path: `${process.env.PUBLIC_URL}/account-list`,
+            icon: "users",
+            type: "link",
+            active: false,
+            title: "Account",
+          },
+        ],
+      },
+    ];
+
+    if (userRole === "system_owner") {
+      menuItems.push(
+        {
+          menutitle: "CURRENCY",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/currency-list`,
+              icon: "dollar-sign",
+              type: "link",
+              active: false,
+              title: "Currency",
+            },
+          ],
+        },
+        {
+          menutitle: "CATEGORY",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/sport-list`,
+              icon: "grid",
+              type: "link",
+              active: false,
+              title: "Sport",
+            },
+          ],
+        },
+        {
+          menutitle: "BETCATEGORY",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/bet-category-list`,
+              icon: "cpu",
+              type: "link",
+              active: false,
+              title: "Bet Category",
+            },
+          ],
+        },
+        {
+          menutitle: "RULE",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/rule-list`,
+              icon: "cpu",
+              type: "link",
+              active: false,
+              title: "Rule",
+            },
+          ],
+        }
+      );
+    }
+
+    return menuItems;
+  };
+
   useEffect(() => {
     const currentUrl = window.location.pathname.slice(0, -1);
-    MENUITEMS.map((items) => {
+    mainmenu.map((items) => {
       items.Items.filter((Items) => {
         if (Items.path === currentUrl) setNavActive(Items);
         if (!Items.children) return false;
@@ -28,8 +121,9 @@ const Sidebar = () => {
       return items;
     });
   }, []);
+
   const setNavActive = (item) => {
-    MENUITEMS.map((menuItems) => {
+    mainmenu.map((menuItems) => {
       menuItems.Items.filter((Items) => {
         if (Items !== item) {
           Items.active = false;
@@ -39,7 +133,10 @@ const Sidebar = () => {
         }
         if (Items.children) {
           Items.children.filter((submenuItems) => {
-            if (submenuItems.children && submenuItems.children.includes(item)) {
+            if (
+              submenuItems.children &&
+              submenuItems.children.includes(item)
+            ) {
               Items.active = true;
               submenuItems.active = true;
               return true;
@@ -53,7 +150,7 @@ const Sidebar = () => {
       return menuItems;
     });
     item.active = !item.active;
-    setMainMenu({ mainmenu: MENUITEMS });
+    setMainMenu([...mainmenu]);
   };
 
   const toggletNavActive = (item) => {
@@ -62,7 +159,7 @@ const Sidebar = () => {
       }
     }
     if (!item.active) {
-      MENUITEMS.map((a) => {
+      mainmenu.map((a) => {
         a.Items.filter((Items) => {
           if (a.Items.includes(item)) Items.active = false;
           if (!Items.children) return false;
@@ -83,52 +180,37 @@ const Sidebar = () => {
       });
     }
     item.active = !item.active;
-    setMainMenu({ mainmenu: MENUITEMS });
+    setMainMenu([...mainmenu]);
   };
 
-  //Hover effect
-  function Onhover() {
-    if (document.querySelector(".app").classList.contains("sidenav-toggled"))
-      document.querySelector(".app").classList.add("sidenav-toggled-open");
-
-  }
-  function Outhover() {
-    document.querySelector(".app").classList.remove("sidenav-toggled-open");
-  }
+  // Hover effect functions
 
   return (
     <div className="sticky">
       <div className="app-sidebar__overlay"></div>
-      <aside
-        className="app-sidebar"
-        onMouseOver={() => Onhover()}
-        onMouseOut={() => Outhover()}
-      >
-        <Scrollbars >
+      <aside className="app-sidebar">
+        <Scrollbars>
           <div className="header side-header">
-            <Link
-              to={`${process.env.PUBLIC_URL}/dashboard/`}
-              className="header-brand1"
-            >
+            <Link to={`${process.env.PUBLIC_URL}/dashboard/`} className="header-brand1">
               <img
                 src={require("../../assets/images/brand/logo.png")}
                 className="header-brand-img desktop-logo"
-                alt={"logo"}
+                alt="logo"
               />
               <img
                 src={require("../../assets/images/brand/logo-1.png")}
                 className="header-brand-img toggle-logo"
-                alt={"logo-1"}
+                alt="logo-1"
               />
               <img
                 src={require("../../assets/images/brand/logo-2.png")}
                 className="header-brand-img light-logo"
-                alt={"logo-2"}
+                alt="logo-2"
               />
               <img
                 src={require("../../assets/images/brand/logo-3.png")}
                 className="header-brand-img light-logo1"
-                alt={"logo-3"}
+                alt="logo-3"
               />
             </Link>
           </div>
@@ -156,33 +238,27 @@ const Sidebar = () => {
               </svg>
             </div>
             <ul className="side-menu" id="sidebar-main">
-              {MENUITEMS.map((Item, i) => (
+              {mainmenu.map((Item, i) => (
                 <Fragment key={i}>
                   <li className="sub-category">
                     <h3>{Item.menutitle}</h3>
                   </li>
                   {Item.Items.map((menuItem, i) => (
                     <li
-                      className={`slide ${menuItem.active ? "is-expanded" : ""
-                        }`}
+                      className={`slide ${menuItem.active ? "is-expanded" : ""}`}
                       key={i}
                     >
                       {menuItem.type === "link" ? (
                         <NavLink
                           to={menuItem.path + "/"}
-                          className={`side-menu__item ${menuItem.active ? "active" : ""
-                            }`}
+                          className={`side-menu__item ${menuItem.active ? "active" : ""}`}
                           onClick={() => {
                             setNavActive(menuItem);
                             toggletNavActive(menuItem);
                           }}
                         >
-                          <i
-                            className={`side-menu__icon fe fe-${menuItem.icon}`}
-                          ></i>
-                          <span className="side-menu__label">
-                            {menuItem.title}
-                          </span>
+                          <i className={`side-menu__icon fe fe-${menuItem.icon}`}></i>
+                          <span className="side-menu__label">{menuItem.title}</span>
                           {menuItem.badge ? (
                             <label className={`${menuItem.badge} side-badge`}>
                               {menuItem.badgetxt}
@@ -198,19 +274,14 @@ const Sidebar = () => {
                       {menuItem.type === "sub" ? (
                         <NavLink
                           to={menuItem.path + "/"}
-                          className={`side-menu__item ${menuItem.active ? "active" : ""
-                            }`}
+                          className={`side-menu__item ${menuItem.active ? "active" : ""}`}
                           onClick={(event) => {
                             event.preventDefault();
                             setNavActive(menuItem);
                           }}
                         >
-                          <i
-                            className={`side-menu__icon fe fe-${menuItem.icon}`}
-                          ></i>
-                          <span className="side-menu__label">
-                            {menuItem.title}
-                          </span>
+                          <i className={`side-menu__icon fe fe-${menuItem.icon}`}></i>
+                          <span className="side-menu__label">{menuItem.title}</span>
                           {menuItem.badge ? (
                             <label className={`${menuItem.badge} side-badge`}>
                               {menuItem.badgetxt}
@@ -218,9 +289,7 @@ const Sidebar = () => {
                           ) : (
                             ""
                           )}
-                          <i
-                            className={`${menuItem.background} fa angle fa-angle-right `}
-                          ></i>
+                          <i className={`${menuItem.background} fa angle fa-angle-right `}></i>
                         </NavLink>
                       ) : (
                         ""
@@ -266,9 +335,7 @@ const Sidebar = () => {
                                   <NavLink
                                     to={childrenItem.path + "/"}
                                     className="slide-item"
-                                    onClick={() =>
-                                      toggletNavActive(childrenItem)
-                                    }
+                                    onClick={() => toggletNavActive(childrenItem)}
                                   >
                                     {childrenItem.title}
                                   </NavLink>
@@ -292,9 +359,7 @@ const Sidebar = () => {
                                               to={childrenSubItem.path + "/"}
                                               className={`${"sub-slide-item"}`}
                                               onClick={() =>
-                                                toggletNavActive(
-                                                  childrenSubItem
-                                                )
+                                                toggletNavActive(childrenSubItem)
                                               }
                                             >
                                               {childrenSubItem.title}

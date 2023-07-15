@@ -24,7 +24,19 @@ export default function AccountForm() {
   const [selectedRole, setSelectedRole] = useState('');
   const { creditPoints, role, rate } = JSON.parse(localStorage.getItem('user_info')) || {};
   const { id } = useParams();
-  const user_role = ['super_admin', 'admin', 'super_master', 'master', 'agent', 'user'];
+
+  const roleHierarchy = {
+    system_owner: ['super_admin', 'admin', 'super_master', 'master', 'agent', 'user'],
+    super_admin: ['admin', 'super_master', 'master', 'agent', 'user'],
+    admin: ['super_master', 'master', 'agent', 'user'],
+    super_master: ['master', 'agent', 'user'],
+    master: ['agent', 'user'],
+    agent: ['user'],
+    user: [],
+  };
+
+  const allowedRoles = roleHierarchy[role] || [];
+
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -39,7 +51,14 @@ export default function AccountForm() {
       rate: ''
     },
     validationSchema: Yup.object({
-      username: Yup.string().required('Username is required'),
+      username: Yup.string()
+        .required("Username is required")
+        .test("no-spaces", "Spaces are not allowed in the username", (value) => {
+          if (value) {
+            return !/\s/.test(value); // Check if there are no spaces in the username
+          }
+          return true;
+        }),
       fullName: Yup.string().required('Full name is required'),
       password: Yup.string()
         .required('Password is required')
@@ -50,7 +69,8 @@ export default function AccountForm() {
 
       currency: Yup.string().required('Currency is required'),
       role: Yup.string().required('User type is required'),
-      mobileNumber: Yup.number().required('Mobile No is required'),
+      mobileNumber: Yup.string()
+        .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
       creditPoints: Yup.number()
         .required('Credit amount is required')
         .test('creditPoints', 'Credit amount exceeds available balance', function (value) {
@@ -89,8 +109,8 @@ export default function AccountForm() {
             city: values.city,
             mobileNumber: values.mobileNumber,
             creditPoints: values.creditPoints,
-            //password: values.password,
-            //confirmPassword: values.confirmPassword,
+            password: values.password,
+            confirmPassword: values.confirmPassword,
             currencyId: values.currency,
             role: values.role,
             rate: values.rate
@@ -121,7 +141,7 @@ export default function AccountForm() {
     const fetchData = async () => {
       if (id) {
         const result = await getDetailByID(id);
-        console.log(result);
+
         formik.setValues((prevValues) => ({
 
           ...prevValues,
@@ -278,7 +298,7 @@ export default function AccountForm() {
                     isRequired="true"
                   >
                     <option value="">Select User Type</option>
-                    {user_role.map((role, index) => (
+                    {allowedRoles.map((role, index) => (
                       <option key={index} value={role}>
                         {role}
                       </option>

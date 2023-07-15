@@ -167,11 +167,7 @@ export function Header() {
                       variant=""
                     >
                       <span>
-                        <img
-                          src={require("../../assets/images/users/8.jpg")}
-                          alt="profile-user"
-                          className="avatar  profile-user brround cover-image"
-                        />
+                        {user.username} <i className=" fe fe-chevron-down"></i>
                       </span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu

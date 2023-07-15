@@ -26,7 +26,7 @@ export const MENUITEMS = [
 ];
 
 const userRole = JSON.parse(localStorage.getItem("user_info")).role;
-console.log(userRole);
+
 if (userRole === "system_owner") {
   // Add additional menu items for system owner role
   MENUITEMS.push(

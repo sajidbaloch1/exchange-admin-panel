@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('user_info', JSON.stringify(result.data.user));
             localStorage.setItem('jws_token', result.data.token);
             setIsAuthenticated(true);
+            setLoginError('')
             navigate('/dashboard');
         } else {
             setLoginError(result.message);
