@@ -1,12 +1,13 @@
 import React from "react";
-import { CCol, CFormLabel, CFormInput } from "@coreui/react";
+import { CCol, CFormLabel, CFormTextarea } from "@coreui/react";
 
-const FormInput = ({ label, name, type, value, onChange, onBlur, error, isRequired, width }) => {
+const FormTextarea = ({ label, name, value, onChange, onBlur, error, isRequired, width }) => {
     return (
         <CCol md={width}>
-            <CFormLabel htmlFor={name}>{label} {isRequired === 'true' && <span className="text-red">*</span>}</CFormLabel>
-            <CFormInput
-                type={type}
+            <CFormLabel htmlFor={name}>
+                {label} {isRequired === 'true' && <span className="text-red">*</span>}
+            </CFormLabel>
+            <CFormTextarea
                 id={name}
                 name={name}
                 value={value}
@@ -19,4 +20,4 @@ const FormInput = ({ label, name, type, value, onChange, onBlur, error, isRequir
     );
 };
 
-export default FormInput;
+export default FormTextarea;

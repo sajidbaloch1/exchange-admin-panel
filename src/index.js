@@ -4,6 +4,7 @@ import "./index.scss";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
 
+
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
 const App = React.lazy(() => import("./components/app"));
@@ -11,23 +12,30 @@ const App = React.lazy(() => import("./components/app"));
 //Dashboard
 const Dashboard = React.lazy(() => import("./Pages/Dashboard/Dashboard"));
 
+//Sport module
 const SportList = React.lazy(() => import("./Pages/Sport/SportList/SportList"));
 const SportForm = React.lazy(() => import("./Pages/Sport/SportForm/SportForm"));
+const BetCategoryListBySport = React.lazy(() => import("./Pages/Sport/BetCategoryList/BetCategoryList"));
+const BetCategorySettingForm = React.lazy(() => import("./Pages/Sport/BetCategorySettingForm/BetCategorySettingForm"));
 
+// Currency Module
 const CurrencyList = React.lazy(() => import("./Pages/Currency/CurrencyList/CurrencyList"));
 const CurrencyForm = React.lazy(() => import("./Pages/Currency/CurrencyForm/CurrencyForm"));
 
-const BetCategoryList = React.lazy(() => import("./Pages/BetCategory/BetCategoryList/BetCategoryList"));
-const BetCategoryForm = React.lazy(() => import("./Pages/BetCategory/BetCategoryForm/BetCategoryForm"));
-
-const RuleList = React.lazy(() => import("./Pages/Rule/RuleList/RuleList"));
-const RuleForm = React.lazy(() => import("./Pages/Rule/RuleForm/RuleForm"));
-
 const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
 const AccountForm = React.lazy(() => import("./Pages/Account/AccountForm/AccountForm"));
+const SuperAdminForm = React.lazy(() => import("./Pages/Account/SuperAdminForm/SuperAdminForm"));
+const AdminForm = React.lazy(() => import("./Pages/Account/AdminForm/AdminForm"));
+const SuperMasterForm = React.lazy(() => import("./Pages/Account/SuperMasterForm/SuperMasterForm"));
+const MasterForm = React.lazy(() => import("./Pages/Account/MasterForm/MasterForm"));
+const AgentForm = React.lazy(() => import("./Pages/Account/AgentForm/AgentForm"));
+const UserForm = React.lazy(() => import("./Pages/Account/UserForm/UserForm"));
+const UserList = React.lazy(() => import("./Pages/Account/UserList/UserList"));
+const UserEditForm = React.lazy(() => import("./Pages/Account/UserEditForm/UserEditForm"));
 
 //custom Pages
 const Login = React.lazy(() => import("./Pages/Login/Login"));
+const ResetPassword = React.lazy(() => import("./Pages/ResetPassword/ResetPassword"));
 
 //Errorpages
 const Errorpage400 = React.lazy(() => import("./components/ErrorPages/ErrorPages/400/400"));
@@ -78,26 +86,25 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
                     <Route
+                      path={`${process.env.PUBLIC_URL}/currency-form`}
+                      element={<CurrencyForm />}
+                    />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
                       path={`${process.env.PUBLIC_URL}/currency-list`}
                       element={<CurrencyList />}
                     />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/currency-add`}
-                      element={<CurrencyForm />}
-                    />
-                  </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/currency-edit/:id`}
-                      element={<CurrencyForm />}
-                    />
-                  </Route>
-
                   {/* Sports route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/sport-form`}
+                      element={<SportForm />}
+                    />
+                  </Route>
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
                     <Route
@@ -108,59 +115,15 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
                     <Route
-                      path={`${process.env.PUBLIC_URL}/sport-add`}
-                      element={<SportForm />}
-                    />
-                  </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/sport-edit/:id`}
-                      element={<SportForm />}
-                    />
-                  </Route>
-
-                  {/* Bet Category route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
                       path={`${process.env.PUBLIC_URL}/bet-category-list`}
-                      element={<BetCategoryList />}
+                      element={<BetCategoryListBySport />}
                     />
                   </Route>
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
                     <Route
-                      path={`${process.env.PUBLIC_URL}/bet-category-add`}
-                      element={<BetCategoryForm />}
-                    />
-                  </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/bet-category-edit/:id`}
-                      element={<BetCategoryForm />}
-                    />
-                  </Route>
-
-                  {/* Rule route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/rule-list`}
-                      element={<RuleList />}
-                    />
-                  </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/rule-add`}
-                      element={<RuleForm />}
-                    />
-                  </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/rule-edit/:id`}
-                      element={<RuleForm />}
+                      path={`${process.env.PUBLIC_URL}/bet-category-setting`}
+                      element={<BetCategorySettingForm />}
                     />
                   </Route>
 
@@ -174,24 +137,65 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner', 'super_admin', 'admin', 'super_master', 'master', 'agent']} />}>
                     <Route
-                      path={`${process.env.PUBLIC_URL}/account-add`}
-                      element={<AccountForm />}
+                      path={`${process.env.PUBLIC_URL}/account-list/:id`}
+                      element={<AccountList />}
                     />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner', 'super_admin', 'admin', 'super_master', 'master', 'agent']} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
                     <Route
-                      path={`${process.env.PUBLIC_URL}/account-edit/:id`}
-                      element={<AccountForm />}
+                      path={`${process.env.PUBLIC_URL}/super-admin-form`}
+                      element={<SuperAdminForm />}
                     />
                   </Route>
 
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/admin-form`}
+                      element={<AdminForm />}
+                    />
+                  </Route>
 
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin', 'admin']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/super-master-form`}
+                      element={<SuperMasterForm />}
+                    />
+                  </Route>
 
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin', 'admin', 'super_master']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/master-form`}
+                      element={<MasterForm />}
+                    />
+                  </Route>
 
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin', 'admin', 'super_master', 'master']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/agent-form`}
+                      element={<AgentForm />}
+                    />
+                  </Route>
 
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin', 'admin', 'super_master', 'master', 'agent']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/user-form`}
+                      element={<UserForm />}
+                    />
+                  </Route>
 
-
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin', 'admin', 'super_master', 'master', 'agent']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/user-list`}
+                      element={<UserList />}
+                    />
+                  </Route>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin', 'admin', 'super_master', 'master', 'agent']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/user-edit/:id`}
+                      element={<UserEditForm />}
+                    />
+                  </Route>
 
                 </Route>
               </Route>
@@ -200,6 +204,10 @@ const Root = () => {
                 <Route
                   path={`${process.env.PUBLIC_URL}/login`}
                   element={<Login />}
+                />
+                <Route
+                  path={`${process.env.PUBLIC_URL}/reset-password`}
+                  element={<ResetPassword />}
                 />
                 <Route
                   path={`${process.env.PUBLIC_URL}/errorpage401`}

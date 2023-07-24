@@ -4,38 +4,26 @@ import { Card, Row, Col } from "react-bootstrap";
 import { useFormik } from 'formik';
 import { useNavigate } from "react-router-dom";
 import { getDetailByID, addData, updateData } from "../accountService";
-import { getAllCurrency } from "../../Currency/currencyService";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 
 import * as Yup from 'yup';
 import {
   CForm,
   CCol,
   CButton,
+  CFormLabel,
+  CSpinner
 } from "@coreui/react";
 
-export default function AccountForm() {
+export default function UserForm() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currencyList, setCurrencyList] = useState([]);
-  const [selectedCurrency, setSelectedCurrency] = useState('');
-  const [selectedRole, setSelectedRole] = useState('');
+  const [serverError, setServerError] = useState(null); // State to hold the server error message
   const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem('user_info')) || {};
   const { id } = useParams();
-
-  const roleHierarchy = {
-    system_owner: ['super_admin', 'admin', 'super_master', 'master', 'agent', 'user'],
-    super_admin: ['admin', 'super_master', 'master', 'agent', 'user'],
-    admin: ['super_master', 'master', 'agent', 'user'],
-    super_master: ['master', 'agent', 'user'],
-    master: ['agent', 'user'],
-    agent: ['user'],
-    user: [],
-  };
-
-  const allowedRoles = roleHierarchy[role] || [];
 
   const formik = useFormik({
     initialValues: {
@@ -46,9 +34,10 @@ export default function AccountForm() {
       city: '',
       mobileNumber: '',
       creditPoints: '',
-      currency: '',
-      role: role !== 'system_owner' ? '' : 'super_admin',
-      rate: '',
+      role: 'user',
+      isBetLock: false,
+      isActive: true,
+      forcePasswordChange: true,
       exposureLimit: '',
       exposurePercentage: '',
       stakeLimit: '',
@@ -73,9 +62,6 @@ export default function AccountForm() {
       confirmPassword: Yup.string()
         .oneOf([Yup.ref('password'), null], 'Passwords must match')
         .required('Confirm Password is required'),
-
-      currency: Yup.string().required('Currency is required'),
-      role: Yup.string().required('User type is required'),
       mobileNumber: Yup.string()
         .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
       creditPoints: Yup.number()
@@ -91,20 +77,7 @@ export default function AccountForm() {
           }
           return true; // Validation passed
         }),
-      rate: Yup.number()
-        .required('Rate is required')
-        .max(100, "Rate cannot exceed 100")
-        .test('rate', 'Rate exceeds available rate', function (value) {
-          // Access the user's role and rate
-          const user = JSON.parse(localStorage.getItem('user_info'));
-          const rate = user?.rate || 0;
 
-          // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-          if (user?.role !== 'system_owner' && value > rate) {
-            return false; // Validation failed
-          }
-          return true; // Validation passed
-        }),
       exposureLimit: Yup.number().when('role', (role, schema) => {
         if (Array.isArray(role) && role.includes('user')) {
           return schema.required('Exposure Limit is required');
@@ -150,41 +123,37 @@ export default function AccountForm() {
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
+      setServerError(null); // Reset server error state
+      setLoading(true); // Set loading state to true
       try {
         if (id !== '' && id !== undefined) {
-          await updateData({
+          const response = await updateData({
             _id: id,
-            username: values.username,
-            fullName: values.fullName,
-            city: values.city,
-            mobileNumber: values.mobileNumber,
-            creditPoints: values.creditPoints,
-            password: values.password,
-            confirmPassword: values.confirmPassword,
-            currencyId: values.currency,
-            role: values.role,
-            rate: values.rate
+            ...values,
           });
-        } else {
-          await addData({
-            username: values.username,
-            fullName: values.fullName,
-            city: values.city,
-            mobileNumber: values.mobileNumber,
-            creditPoints: values.creditPoints,
-            password: values.password,
-            confirmPassword: values.confirmPassword,
-            currencyId: values.currency,
-            role: values.role,
-            rate: values.rate
-          });
-        }
 
-        navigate('/account-list');
+          if (response.success) {
+            navigate("/user-list/");
+          } else {
+            setServerError(response.message);
+          }
+        } else {
+          const response = await addData({
+            ...values,
+          });
+
+          if (response.success) {
+            navigate("/user-list/");
+          } else {
+            setServerError(response.message);
+          }
+        }
       } catch (error) {
         // Handle error
+      } finally {
+        setLoading(false); // Set loading state to false
       }
-      console.log('Form submitted successfully:', values);
+      //console.log('Form submitted successfully:', values);
     }
   });
 
@@ -202,20 +171,24 @@ export default function AccountForm() {
           city: result.city || '',
           mobileNumber: result.mobileNumber || '',
           creditPoints: result.creditPoints || '',
-          rate: result.rate || '',
-          currency: result.currencyId || '',
           role: result.role || '',
+          isBetLock: result.isBetLock || false,
+          isActive: result.isActive || false,
+          forcePasswordChange: result.forcePasswordChange || false,
+          exposureLimit: result.exposureLimit || '',
+          exposurePercentage: result.exposurePercentage || '',
+          stakeLimit: result.stakeLimit || '',
+          maxProfit: result.maxProfit || '',
+          maxLoss: result.maxLoss || '',
+          bonus: result.bonus || '',
+          maxStake: result.maxStake || '',
         }));
-        setSelectedCurrency(result.currencyId || '',);
-        setSelectedRole(result.role || '',);
       }
-      const allCurrency = await getAllCurrency(0);
-      setCurrencyList(allCurrency.records);
     };
     fetchData();
   }, [id, getDetailByID]);
 
-  const formTitle = id ? "UPDATE ACCOUNT" : "CREATE ACCOUNT";
+  const formTitle = id ? "UPDATE USER" : "CREATE USER";
 
   return (
     <div>
@@ -322,163 +295,138 @@ export default function AccountForm() {
                   width={3}
                 />
 
-                {role === 'system_owner' && (
-                  <FormSelect
-                    label="Currency"
-                    name="currency"
-                    value={formik.values.currency}
-                    onChange={(event) => {
-                      formik.setFieldValue('currency', event.target.value);
-                      setSelectedCurrency(event.target.value);
-                    }}
+                <input type="hidden" name="role" value={formik.values.role} />
+
+                <Row>
+                  <hr className="my-5" />
+
+                  <h4 className="mb-4">User Setting </h4>
+
+                  <CCol md="1">
+                    <CFormLabel htmlFor="isBetLock">Bet Lock</CFormLabel>
+                    <FormToggleSwitch
+                      id="isBetLock"
+                      name="isBetLock"
+                      checked={formik.values.isBetLock}
+                      onChange={() => {
+                        formik.setFieldValue('isBetLock', !formik.values.isBetLock);
+                      }}
+                    />
+                  </CCol>
+
+                  <CCol md="1">
+                    <CFormLabel htmlFor="isActive">User Lock</CFormLabel>
+                    <FormToggleSwitch
+                      id="isActive"
+                      name="isActive"
+                      checked={formik.values.isActive}
+                      onChange={() => {
+                        formik.setFieldValue('isActive', !formik.values.isActive);
+                      }}
+                    />
+                  </CCol>
+
+                  <CCol md="2">
+                    <CFormLabel htmlFor="forcePasswordChange">Force Password change</CFormLabel>
+                    <FormToggleSwitch
+                      id="forcePasswordChange"
+                      name="forcePasswordChange"
+                      checked={formik.values.forcePasswordChange}
+                      onChange={() => {
+                        formik.setFieldValue('forcePasswordChange', !formik.values.forcePasswordChange);
+                      }}
+                    />
+                  </CCol>
+                  <FormInput
+                    label="Exposure Limit"
+                    name="exposureLimit"
+                    type="text"
+                    value={formik.values.exposureLimit}
+                    onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.currency && formik.errors.currency}
+                    error={formik.touched.exposureLimit && formik.errors.exposureLimit}
                     isRequired="true"
-                    width={3}
-                  >
-                    <option value="">Select Currency</option>
-                    {currencyList.map((currency, index) => (
-                      <option key={currency._id} value={currency._id}>
-                        {currency.name}
-                      </option>
-                    ))}
-                  </FormSelect>
-                )}
+                    width={2}
+                  />
 
-                {role !== 'system_owner' ? (
-                  <FormSelect
-                    label="User Type"
-                    name="role"
-                    value={formik.values.role}
-                    onChange={(event) => {
-                      formik.setFieldValue('role', event.target.value);
-                      setSelectedRole(event.target.value);
-                    }}
+                  <FormInput
+                    label="Exposure Percentage"
+                    name="exposurePercentage"
+                    type="text"
+                    value={formik.values.exposurePercentage}
+                    onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.role && formik.errors.role}
+                    error={formik.touched.exposurePercentage && formik.errors.exposurePercentage}
                     isRequired="true"
-                    width={3}
-                  >
-                    <option value="">Select User Type</option>
-                    {allowedRoles.map((role, index) => (
-                      <option key={index} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </FormSelect>
-                ) : (
-                  <>
-                    <input type="hidden" name="role" value={formik.values.role} />
-                  </>
-                )}
+                    width={2}
+                  />
 
-                <FormInput
-                  label="Partnership With No Return"
-                  name="rate"
-                  type="text"
-                  value={formik.values.rate}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.rate && formik.errors.rate}
-                  isRequired="true"
-                  width={3}
-                />
+                  <FormInput
+                    label="Stake Limit"
+                    name="stakeLimit"
+                    type="text"
+                    value={formik.values.stakeLimit}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.stakeLimit && formik.errors.stakeLimit}
+                    isRequired="true"
+                    width={2}
+                  />
 
-                {formik.values.role === 'user' && (
-                  <Row>
-                    <hr className="my-5" />
+                  <FormInput
+                    label="Max Profit"
+                    name="maxProfit"
+                    type="text"
+                    value={formik.values.maxProfit}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.maxProfit && formik.errors.maxProfit}
+                    isRequired="true"
+                    width={2}
+                  />
 
-                    <h4 className="mb-4">User Setting </h4>
-                    <FormInput
-                      label="Exposure Limit"
-                      name="exposureLimit"
-                      type="text"
-                      value={formik.values.exposureLimit}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.exposureLimit && formik.errors.exposureLimit}
-                      isRequired="true"
-                      width={2}
-                    />
+                  <FormInput
+                    label="Max Loss"
+                    name="maxLoss"
+                    type="text"
+                    value={formik.values.maxLoss}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.maxLoss && formik.errors.maxLoss}
+                    isRequired="true"
+                    width={2}
+                  />
 
-                    <FormInput
-                      label="Exposure Percentage"
-                      name="exposurePercentage"
-                      type="text"
-                      value={formik.values.exposurePercentage}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.exposurePercentage && formik.errors.exposurePercentage}
-                      isRequired="true"
-                      width={2}
-                    />
+                  <FormInput
+                    label="Bonus"
+                    name="bonus"
+                    type="text"
+                    value={formik.values.bonus}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.bonus && formik.errors.bonus}
+                    isRequired="true"
+                    width={2}
+                  />
+                  <FormInput
+                    label="Max Stake"
+                    name="maxStake"
+                    type="text"
+                    value={formik.values.maxStake}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.maxStake && formik.errors.maxStake}
+                    isRequired="true"
+                    width={2}
+                  />
 
-                    <FormInput
-                      label="Stake Limit"
-                      name="stakeLimit"
-                      type="text"
-                      value={formik.values.stakeLimit}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.stakeLimit && formik.errors.stakeLimit}
-                      isRequired="true"
-                      width={2}
-                    />
+                </Row>
 
-                    <FormInput
-                      label="Max Profit"
-                      name="maxProfit"
-                      type="text"
-                      value={formik.values.maxProfit}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.maxProfit && formik.errors.maxProfit}
-                      isRequired="true"
-                      width={2}
-                    />
-
-                    <FormInput
-                      label="Max Loss"
-                      name="maxLoss"
-                      type="text"
-                      value={formik.values.maxLoss}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.maxLoss && formik.errors.maxLoss}
-                      isRequired="true"
-                      width={2}
-                    />
-
-                    <FormInput
-                      label="Bonus"
-                      name="bonus"
-                      type="text"
-                      value={formik.values.bonus}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.bonus && formik.errors.bonus}
-                      isRequired="true"
-                      width={2}
-                    />
-                    <FormInput
-                      label="Max Stake"
-                      name="maxStake"
-                      type="text"
-                      value={formik.values.maxStake}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.maxStake && formik.errors.maxStake}
-                      isRequired="true"
-                      width={2}
-                    />
-
-                  </Row>
-                )}
 
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-block">
                     <CButton color="primary" type="submit" className="me-3">
-                      Save
+                      {loading ? <CSpinner size="sm" /> : "Save"}
                     </CButton>
                     <Link to={`${process.env.PUBLIC_URL}/account-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel

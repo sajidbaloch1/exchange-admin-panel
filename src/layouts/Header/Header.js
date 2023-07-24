@@ -70,7 +70,7 @@ export function Header() {
               className="header-logo"
             >
               <img
-                src={require("../../assets/images/brand/logo-3.png")}
+                src={require("../../assets/images/brand/logo.png")}
                 className="mobile-logo logo-1"
                 alt="logo"
               />
@@ -91,7 +91,7 @@ export function Header() {
               alt="logo"
             />
             <img
-              src={require("../../assets/images/brand/logo-3.png")}
+              src={require("../../assets/images/brand/logo.png")}
               className="header-brand-img light-logo1"
               alt="logo"
             />

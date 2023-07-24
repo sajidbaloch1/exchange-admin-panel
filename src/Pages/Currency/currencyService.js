@@ -15,7 +15,7 @@ export const deleteCurrency = async (id) => {
     const result = await postData('currencies/deleteCurrency', {
         _id: id,
     });
-    return result.success;
+    return result;
 };
 
 export const getCurrencyDetailByID = async (id) => {
@@ -27,10 +27,10 @@ export const getCurrencyDetailByID = async (id) => {
 
 export const addCurrency = async (request) => {
     const result = await postData('currencies/createCurrency', request);
-    return result.success ? result.data.details : [];
+    return result;
 };
 
 export const updateCurrency = async (request) => {
     const result = await postData('currencies/updateCurrency', request);
-    return result.success ? result.data.details : [];
+    return result;
 };

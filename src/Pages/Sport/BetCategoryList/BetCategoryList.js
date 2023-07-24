@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllRule, deleteRule } from "../ruleService";
+import { getBetCategoryListBySportID, deleteSport } from "../sportService";
 import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils//alertUtils';
+import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
 
-export default function RuleList() {
+export default function BetCategoryList(props) {
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
   );
 
   const [searchQuery, setSearchQuery] = React.useState('');
+  const location = useLocation();
+  const { sportId } = location.state;
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,8 @@ export default function RuleList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
+  // Function to generate URL with query parameter
+
   const columns = [
     {
       name: "SR.NO",
@@ -31,17 +35,33 @@ export default function RuleList() {
       sortable: false,
     },
     {
-      name: "NAME",
-      selector: (row) => [row.name],
+      name: "BET CATEGORY",
+      selector: (row) => [row.betCatName],
       sortable: true,
-      sortField: 'name'
+      sortField: 'betCatName'
     },
     {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/rule-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
+          <Link
+            to={`${process.env.PUBLIC_URL}/bet-category-setting`}
+            state={{ id: row._id, sportId: row.sportsId, betCatId: row.betCatId, betCatName: row.betCatName, sportsName: row.sportsName }}
+            className="btn btn-primary btn-lg">
+            <i className="fa fa-edit"></i>
+          </Link>
+          {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
+          <Link
+            to={{
+              pathname: `${process.env.PUBLIC_URL}/rule-list`,
+              // Pass the sportId as state
+            }}
+            state={{ sportId: row._id }}
+            className="btn btn-info btn-lg ms-2"
+
+          >
+            <i className="fa fa-file"></i>
+          </Link> */}
         </div>
       ),
     },
@@ -73,10 +93,14 @@ export default function RuleList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchData = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page, sortBy, direction, searchQuery, sportId) => {
     setLoading(true);
     try {
-      const result = await getAllRule(page, perPage, sortBy, direction, searchQuery);
+      const requestParameter = {
+        sportId: sportId
+      }
+      console.log(requestParameter);
+      const result = await getBetCategoryListBySportID(requestParameter);
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -92,7 +116,7 @@ export default function RuleList() {
   const removeRow = async (id) => {
     setLoading(true);
     try {
-      const success = await deleteRule(id);
+      const success = await deleteSport(id);
       if (success) {
         fetchData(currentPage, sortBy, direction, searchQuery);
         setLoading(false);
@@ -128,7 +152,7 @@ export default function RuleList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('rules/getAllRule', searchQuery, 'rules.csv');
+    await downloadCSV('sportsBetCategories/getAllSportsBetCategory', searchQuery, 'sports.csv');
   };
 
   const handleDelete = (id) => {
@@ -137,17 +161,17 @@ export default function RuleList() {
 
   useEffect(() => {
     if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, sportId); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, '', sportId); // fetch page 1 of users
     }
-  }, [perPage, searchQuery]);
+  }, [perPage, searchQuery, sportId]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL RULES</h1>
+          <h1 className="page-title">BET CATEGORY BY  SPORTS</h1>
           {/* <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
               Category
@@ -158,12 +182,12 @@ export default function RuleList() {
           </Breadcrumb> */}
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/rule-add`} className="btn btn-primary btn-icon text-white me-3">
+          {/* <Link to={`${process.env.PUBLIC_URL}/sport-add`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            CREATE RULE
-          </Link>
+            CREATE SPORT
+          </Link> */}
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;
@@ -187,9 +211,9 @@ export default function RuleList() {
                 <DataTable
                   columns={columns}
                   data={data}
-                  actions={actionsMemo}
-                  contextActions={contextActions}
-                  onSelectedRowsChange={handleRowSelected}
+                  // actions={actionsMemo}
+                  // contextActions={contextActions}
+                  // onSelectedRowsChange={handleRowSelected}
                   clearSelectedRows={toggleCleared}
                   //selectableRows
                   pagination

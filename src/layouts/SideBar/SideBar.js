@@ -1,9 +1,9 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import Scrollbars from "react-custom-scrollbars";
 
 const Sidebar = () => {
-
+  const location = useLocation(); // Get the current location
   const [mainmenu, setMainMenu] = useState([]);
   const userRole = JSON.parse(localStorage.getItem("user_info")).role;
 
@@ -39,6 +39,7 @@ const Sidebar = () => {
           },
         ],
       },
+
     ];
 
     if (userRole === "system_owner") {
@@ -56,7 +57,7 @@ const Sidebar = () => {
           ],
         },
         {
-          menutitle: "CATEGORY",
+          menutitle: "SPORT",
           Items: [
             {
               path: `${process.env.PUBLIC_URL}/sport-list`,
@@ -64,33 +65,38 @@ const Sidebar = () => {
               type: "link",
               active: false,
               title: "Sport",
+              allRouet: ['sport-add', 'sport-list']
             },
           ],
         },
+        // {
+        //   menutitle: "RULE",
+        //   Items: [
+        //     {
+        //       path: `${process.env.PUBLIC_URL}/rule-list`,
+        //       icon: "cpu",
+        //       type: "link",
+        //       active: false,
+        //       title: "Rule",
+        //     },
+        //   ],
+        // }
+      );
+    } else if (userRole === "super_admin" || userRole === "admin" || userRole === "super_master" || userRole === "master" || userRole === "agent") {
+      menuItems.push(
         {
-          menutitle: "BETCATEGORY",
+          menutitle: "USER",
           Items: [
             {
-              path: `${process.env.PUBLIC_URL}/bet-category-list`,
-              icon: "cpu",
+              path: `${process.env.PUBLIC_URL}/user-list`,
+              icon: "user",
               type: "link",
               active: false,
-              title: "Bet Category",
+              title: "User",
             },
           ],
         },
-        {
-          menutitle: "RULE",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/rule-list`,
-              icon: "cpu",
-              type: "link",
-              active: false,
-              title: "Rule",
-            },
-          ],
-        }
+
       );
     }
 
@@ -99,8 +105,17 @@ const Sidebar = () => {
 
   useEffect(() => {
     const currentUrl = window.location.pathname.slice(0, -1);
+    const currentPath = location.pathname; // Get the current path
+
     mainmenu.map((items) => {
+
       items.Items.filter((Items) => {
+        if (currentPath.includes(Items.path)) {
+          Items.active = true;
+        } else {
+          Items.active = false;
+        }
+
         if (Items.path === currentUrl) setNavActive(Items);
         if (!Items.children) return false;
         Items.children.filter((subItems) => {
@@ -208,7 +223,7 @@ const Sidebar = () => {
                 alt="logo-2"
               />
               <img
-                src={require("../../assets/images/brand/logo-3.png")}
+                src={require("../../assets/images/brand/logo.png")}
                 className="header-brand-img light-logo1"
                 alt="logo-3"
               />

@@ -1,9 +1,9 @@
 import React from 'react';
 import { CCol, CFormSelect, CFormLabel } from '@coreui/react';
 
-const FormSelect = ({ label, name, value, onChange, onBlur, error, children, isRequired }) => {
+const FormSelect = ({ label, name, value, onChange, onBlur, error, children, isRequired, width }) => {
     return (
-        <CCol md={4}>
+        <CCol md={width}>
             <CFormLabel htmlFor={name}>{label} {isRequired === 'true' && <span className="text-red">*</span>}</CFormLabel>
             <CFormSelect
                 id={name}

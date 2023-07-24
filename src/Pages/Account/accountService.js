@@ -27,12 +27,16 @@ export const getDetailByID = async (id) => {
 };
 
 export const addData = async (request) => {
-    console.log(request);
     const result = await postData('users/createUser', request);
-    return result.success ? result.data.details : [];
+    return result;
 };
 
 export const updateData = async (request) => {
     const result = await postData('users/updateUser', request);
-    return result.success ? result.data.details : [];
+    return result;
+};
+
+export const updateUserStatus = async (request) => {
+    const result = await postData('users/updateUserStatus', request);
+    return result;
 };

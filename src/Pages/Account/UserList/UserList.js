@@ -3,12 +3,12 @@ import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
 import { Row, Card, Col, Button, Dropdown } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllData, deleteData } from "../accountService";
+import { getAllData, deleteData, updateUserStatus } from "../accountService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils//alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 
-export default function AccountList() {
+export default function UserList() {
   const location = useLocation();
   let login_user_id = '';
   const user = JSON.parse(localStorage.getItem('user_info'));
@@ -31,17 +31,30 @@ export default function AccountList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
-  const [selectedUserIdStack, setSelectedUserIdStack] = useState([]);
-  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem('user_info')) || {};
-  const roleHierarchy = {
+  const toggleHighlight = async (id, type, toggleValue) => {
+    setLoading(true);
+    try {
+      const newStatus = !toggleValue; // Toggle the isActive status
+      let request
+      if (type === 'bet') {
+        request = { _id: id, isBetLock: newStatus.toString() };
+      } else {
+        request = { _id: id, isActive: newStatus.toString() };
+      }
 
-    super_admin: ['admin', 'super_master', 'master', 'agent'],
-    admin: ['super_master', 'master', 'agent'],
-    super_master: ['master', 'agent'],
-    master: ['agent'],
+      const success = await updateUserStatus(request);
+      if (success) {
+        fetchData(currentPage);
+        setLoading(false);
+      }
+    } catch (error) {
+      // Handle error
+      console.error("Error removing :", error);
+      // Display error message or show notification to the user
+      // Set the state to indicate the error condition
+      setLoading(false);
+    }
   };
-
-  const allowedRoles = roleHierarchy[role] || [];
 
   const columns = [
     {
@@ -54,20 +67,7 @@ export default function AccountList() {
       selector: (row) => [row.username],
       sortable: true,
       sortField: 'username',
-      cell: (row) => (
-        row.hasChild ? (
-          <div>
-            {/* <Link to={`${process.env.PUBLIC_URL}/account-list/`} state={{ parentId: row._id }} >{row.username}</Link> */}
-            <Link
-              to={`${process.env.PUBLIC_URL}/account-list/` + row._id} target="_blank"
-            >
-              {row.username}
-            </Link>
-          </div>
-        ) : (
-          <span>{row.username}</span>
-        )
-      ),
+
     },
     {
       name: "FULL NAME",
@@ -82,22 +82,10 @@ export default function AccountList() {
       sortField: 'mobileNumber'
     },
     {
-      name: "RATE",
-      selector: (row) => [row.rate],
-      sortable: true,
-      sortField: 'rate'
-    },
-    {
       name: "BALANCE",
       selector: (row) => [row.balance],
       sortable: true,
       sortField: 'balance'
-    },
-    {
-      name: "ACCOUNT TYPE",
-      selector: (row) => [row.role],
-      sortable: true,
-      sortField: 'role'
     },
     {
       name: "CITY",
@@ -106,24 +94,52 @@ export default function AccountList() {
       sortField: 'city'
     },
     {
+      name: "B STATUS",
+      selector: (row) => [row.betCategory],
+      sortable: false,
+      cell: row => (
+        <div className="material-switch mt-4">
+          <input
+            id={`betSwitch_${row._id}`}
+            name={`notes[${row._id}].isBetLock`}
+            onChange={() => toggleHighlight(row._id, 'bet', row.isBetLock)}
+            checked={row.isBetLock}
+            type="checkbox"
+          />
+          <label
+            htmlFor={`betSwitch_${row._id}`}
+            className="label-primary"
+          ></label>
+        </div>
+
+      ),
+    },
+    {
+      name: "U STATUS",
+      selector: (row) => [row.betCategory],
+      sortable: false,
+      cell: row => (
+        <div className="material-switch mt-4">
+          <input
+            id={`userSwitch_${row._id}`}
+            name={`notes[${row._id}].isActive`}
+            onChange={() => toggleHighlight(row._id, 'user', row.isActive)}
+            checked={row.isActive}
+            type="checkbox"
+          />
+          <label
+            htmlFor={`userSwitch_${row._id}`}
+            className="label-primary"
+          ></label>
+        </div>
+
+      ),
+    },
+    {
       name: 'ACTION',
       cell: row => (
         <div>
-          {row.role === 'super_admin' &&
-            <Link to={`${process.env.PUBLIC_URL}/super-admin-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          }
-          {row.role === 'admin' &&
-            <Link to={`${process.env.PUBLIC_URL}/admin-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          }
-          {row.role === 'super_master' &&
-            <Link to={`${process.env.PUBLIC_URL}/super-master-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          }
-          {row.role === 'master' &&
-            <Link to={`${process.env.PUBLIC_URL}/master-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          }
-          {row.role === 'agent' &&
-            <Link to={`${process.env.PUBLIC_URL}/agent-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          }
+          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
 
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
@@ -164,9 +180,8 @@ export default function AccountList() {
   const fetchData = async (page) => {
     setLoading(true);
     try {
-      console.log(parentId);
       const result = await getAllData(page, perPage, sortBy, direction, searchQuery, parentId);
-      console.log(result);
+
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -241,54 +256,17 @@ export default function AccountList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL ACCOUNT</h1>
+          <h1 className="page-title">ALL USERS</h1>
 
         </div>
         <div className="ms-auto pageheader-btn">
-          {role === 'system_owner' &&
-            <Link to={`${process.env.PUBLIC_URL}/super-admin-form`} className="btn btn-primary btn-icon text-white me-3">
-              <span>
-                <i className="fe fe-plus"></i>&nbsp;
-              </span>
-              CREATE ACCOUNT
-            </Link>
-          }
-          {role !== 'system_owner' &&
-            <Dropdown className="dropdown btn-group">
-              <Dropdown.Toggle
-                variant=""
-                type="button"
-                className="btn btn-primary dropdown-toggle"
-              >
-                <i className="fe fe-plus"></i>&nbsp;CREATE ACCOUNT
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="dropdown-menu">
-                {allowedRoles.includes('admin') &&
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/admin-form`}>Admin</Link>
-                  </Dropdown.Item>
-                }
+          <Link to={`${process.env.PUBLIC_URL}/user-form`} className="btn btn-primary btn-icon text-white me-3">
+            <span>
+              <i className="fe fe-plus"></i>&nbsp;
+            </span>
+            CREATE USER
+          </Link>
 
-                {allowedRoles.includes('super_master') &&
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/super-master-form`}>Super Master</Link>
-                  </Dropdown.Item>
-                }
-
-                {allowedRoles.includes('master') &&
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/master-form`}>Master</Link>
-                  </Dropdown.Item>
-                }
-
-                {allowedRoles.includes('agent') &&
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/agent-form`}>Agent</Link>
-                  </Dropdown.Item>
-                }
-              </Dropdown.Menu>
-            </Dropdown>
-          }
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;

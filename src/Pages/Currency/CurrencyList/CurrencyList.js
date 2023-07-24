@@ -46,8 +46,8 @@ export default function CurrencyList() {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/currency-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
+          <Link to={`${process.env.PUBLIC_URL}/currency-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
     },
@@ -83,7 +83,7 @@ export default function CurrencyList() {
     setLoading(true);
     try {
       const result = await getAllCurrency(page, perPage, sortBy, direction, searchQuery);
-      console.log(result);
+
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -158,7 +158,7 @@ export default function CurrencyList() {
 
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/currency-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/currency-form`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
@@ -187,9 +187,9 @@ export default function CurrencyList() {
                 <DataTable
                   columns={columns}
                   data={data}
-                  actions={actionsMemo}
-                  contextActions={contextActions}
-                  onSelectedRowsChange={handleRowSelected}
+                  // actions={actionsMemo}
+                  // contextActions={contextActions}
+                  // onSelectedRowsChange={handleRowSelected}
                   clearSelectedRows={toggleCleared}
                   //selectableRows
                   pagination

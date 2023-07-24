@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllSport, deleteSport } from "../sportService";
+import { getAllSport, deleteSport, changeStatus } from "../sportService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils//alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
@@ -24,6 +24,25 @@ export default function SportList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
+  const toggleHighlight = async (id, isActive) => {
+    setLoading(true);
+    try {
+      const newStatus = !isActive; // Toggle the isActive status
+      const request = { _id: id, status: newStatus.toString() };
+      const success = await changeStatus(request);
+      if (success) {
+        fetchData(currentPage, sortBy, direction, searchQuery);
+        setLoading(false);
+      }
+    } catch (error) {
+      // Handle error
+      console.error("Error removing :", error);
+      // Display error message or show notification to the user
+      // Set the state to indicate the error condition
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       name: "SR.NO",
@@ -37,11 +56,56 @@ export default function SportList() {
       sortField: 'name'
     },
     {
+      name: "API CODE",
+      selector: (row) => [row.apiSportId],
+      sortable: true,
+      sortField: 'apiSportId'
+    },
+    {
+      name: "TOTAL BET CATEGORY",
+      selector: (row) => [row.betCategoryCount],
+      sortable: false,
+      cell: row => (
+        <span className="ms-2"> {row.betCategoryCount}</span>
+      ),
+    },
+    {
+      name: "STATUS",
+      selector: (row) => [row.betCategory],
+      sortable: false,
+      cell: row => (
+        <div className="material-switch mt-4">
+          <input
+            id={`highlightSwitch_${row._id}`}
+            name={`notes[${row._id}].highlight`}
+            onChange={() => toggleHighlight(row._id, row.isActive)}
+            checked={row.isActive}
+            type="checkbox"
+          />
+          <label
+            htmlFor={`highlightSwitch_${row._id}`}
+            className="label-primary"
+          ></label>
+        </div>
+
+      ),
+    },
+    {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/sport-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-          <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
+          <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
+          <Link
+            to={{
+              pathname: `${process.env.PUBLIC_URL}/bet-category-list`,
+            }}
+            // Pass the sportId as state
+            state={{ sportId: row._id }}
+            className="btn btn-info btn-lg ms-2"
+          >
+            <i className="fa fa-file"></i>
+          </Link>
         </div>
       ),
     },
@@ -106,7 +170,6 @@ export default function SportList() {
     }
   };
 
-
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
@@ -158,7 +221,7 @@ export default function SportList() {
           </Breadcrumb> */}
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/sport-add`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/sport-form`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
@@ -187,9 +250,9 @@ export default function SportList() {
                 <DataTable
                   columns={columns}
                   data={data}
-                  actions={actionsMemo}
-                  contextActions={contextActions}
-                  onSelectedRowsChange={handleRowSelected}
+                  // actions={actionsMemo}
+                  // contextActions={contextActions}
+                  // onSelectedRowsChange={handleRowSelected}
                   clearSelectedRows={toggleCleared}
                   //selectableRows
                   pagination
