@@ -46,3 +46,20 @@ export const changeStatus = async (request) => {
     const result = await postData('event/updateEventStatus', request);
     return result
 };
+
+export const getAllCompetionByEvent = async (page, perPage, sortBy, direction, searchQuery) => {
+    const result = await postData('competition/getAllCompetitionEvents', {
+    });
+    return result.success ? result.data : [];
+};
+
+
+export const activeAllCompetition = async (request) => {
+    const result = await postData('competition/activeAllCompetition', request);
+    return result
+};
+
+export const activeAllEvent = async (request) => {
+    const result = await postData('event/activeAllEvent', request);
+    return result
+};
