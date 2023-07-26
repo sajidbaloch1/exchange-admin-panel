@@ -1,36 +1,34 @@
-import React, { useState, useEffect } from "react";
-import CountUp from "react-countup";
+import CryptoJS from "crypto-js";
+import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Breadcrumb, Col, Row, Card, Modal, Button } from "react-bootstrap";
+import { Breadcrumb, Card, Col, Modal, Row } from "react-bootstrap";
+import CountUp from "react-countup";
+import { useLocation } from "react-router-dom";
 import * as dashboard from "../../data/dashboard/dashboard";
-import { useNavigate, useLocation } from "react-router-dom";
-import CryptoJS from 'crypto-js';
 export default function Dashboard() {
   const [show, setShow] = useState(false);
   const location = useLocation(); // Access the location object
 
-  const secretKey = "uoZtB6r3EYHVF1Zm685RrUAI";
-  const encryptedData = "ULA+DkQIJfqvF/hGiThri1+F8CTFOAd8=";
+  const secretKey = process.env.PERMISSIONS_AES_SECRET;
+  const encryptedData = "U2FsdGVkX1/W8aPiBttudiuib2YtHyXUgnE3pKUjCLs=";
   // Decrypt
 
   useEffect(() => {
     // Check if there is state in the location object
     if (location.state && location.state.newUser) {
-
       setShow(location.state.newUser);
     }
 
     try {
       console.log(encryptedData);
-      console.log(secretKey)
+      console.log(secretKey);
       const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-      const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-      console.log(decryptedText)
+      const decryptedText = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      console.log(decryptedText);
     } catch (error) {
       console.error("Error decrypting data:", error.message);
-
     }
-  }, [location]);
+  }, []);
   //localStorage.clear();
   return (
     <div>
@@ -41,15 +39,11 @@ export default function Dashboard() {
             <Breadcrumb.Item className="breadcrumb-item" href="#">
               Home
             </Breadcrumb.Item>
-            <Breadcrumb.Item
-              className="breadcrumb-item active breadcrumds"
-              aria-current="page"
-            >
+            <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
               Dashboard
             </Breadcrumb.Item>
           </Breadcrumb>
         </div>
-
       </div>
       <Row>
         <Col lg={12} md={12} sm={12} xl={12}>
@@ -61,12 +55,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Balance</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp
-                          end={34516}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={34516} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-primary me-1">
@@ -92,12 +81,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Exposure</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp
-                          end={56992}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={56992} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-secondary me-1">
@@ -123,13 +107,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Credit Pts</h6>
                       <h3 className="mb-2 number-font">
-
-                        <CountUp
-                          end={42567}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={42567} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-success me-1">
@@ -155,13 +133,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">All Pts</h6>
                       <h3 className="mb-2 number-font">
-
-                        <CountUp
-                          end={34789}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={34789} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -188,13 +160,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Settlement Pts</h6>
                       <h3 className="mb-2 number-font">
-
-                        <CountUp
-                          end={34789}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={34789} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -221,13 +187,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Upper Pts</h6>
                       <h3 className="mb-2 number-font">
-
-                        <CountUp
-                          end={34789}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={34789} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -253,13 +213,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Down Pts</h6>
                       <h3 className="mb-2 number-font">
-
-                        <CountUp
-                          end={34789}
-                          separator=","
-                          start={0}
-                          duration={2.94}
-                        />
+                        <CountUp end={34789} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -369,7 +323,6 @@ export default function Dashboard() {
                   </p>
                   <h5>0</h5>
                 </Col>
-
               </Row>
             </Card.Body>
           </Card>
@@ -381,11 +334,7 @@ export default function Dashboard() {
         </Col>
       </Row>
 
-      <Modal show={show}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered>
-
+      <Modal show={show} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
         <Modal.Body className="text-center p-4">
           {/* <Button
             onClick={() => setShow(false)}
@@ -396,37 +345,30 @@ export default function Dashboard() {
           </Button> */}
           <i className="fe fe-check-circle fs-100 text-success lh-1 mb-4 d-inline-block"></i>
           <h4 className="text-success mb-4">Congratulations!</h4>
+          <p className="mb-4 mx-4">Your password has been successfully updated.</p>
           <p className="mb-4 mx-4">
-            Your password has been successfully updated.
+            To ensure secure transactions on our website, it is essential that you remember and safeguard your
+            transaction password. Going forward, all transactions on the website will require this password exclusively.
+            It is of utmost importance that you do not disclose this password to anyone.
           </p>
-          <p className="mb-4 mx-4">
-            To ensure secure transactions on our website, it is essential that you remember and safeguard your transaction password. Going forward, all transactions on the website will require this password exclusively. It is of utmost importance that you do not disclose this password to anyone.
-          </p>
-          <p className="mb-4 mx-4">
-            Thank You [Super Admin Domain name]
-          </p>
+          <p className="mb-4 mx-4">Thank You [Super Admin Domain name]</p>
+
+          <p className="mb-4 mx-4">आपका पासवर्ड सफलतापूर्वक अपडेट कर दिया गया है.</p>
 
           <p className="mb-4 mx-4">
-            आपका पासवर्ड सफलतापूर्वक अपडेट कर दिया गया है.
+            हमारी वेबसाइट पर सुरक्षित लेनदेन सुनिश्चित करने के लिए, यह आवश्यक है कि आप अपने लेनदेन पासवर्ड को याद रखें
+            और सुरक्षित रखें। आगे चलकर, वेबसाइट पर सभी लेनदेन के लिए विशेष रूप से इस पासवर्ड की आवश्यकता होगी। यह अत्यंत
+            महत्वपूर्ण है कि आप यह पासवर्ड किसी को न बताएं।
           </p>
 
-          <p className="mb-4 mx-4">
-            हमारी वेबसाइट पर सुरक्षित लेनदेन सुनिश्चित करने के लिए, यह आवश्यक है कि आप अपने लेनदेन पासवर्ड को याद रखें और सुरक्षित रखें। आगे चलकर, वेबसाइट पर सभी लेनदेन के लिए विशेष रूप से इस पासवर्ड की आवश्यकता होगी। यह अत्यंत महत्वपूर्ण है कि आप यह पासवर्ड किसी को न बताएं।
-          </p>
-
-          <p className="mb-4 mx-4">
-            धन्यवाद
-          </p>
+          <p className="mb-4 mx-4">धन्यवाद</p>
           <button className="btn btn-success pd-x-25 " onClick={() => setShow(false)}>
             Continue
           </button>
         </Modal.Body>
       </Modal>
-
     </div>
 
     // model pop up
-
-
   );
 }
