@@ -44,6 +44,7 @@ const Sidebar = () => {
 
     if (userRole === "system_owner") {
       menuItems.push(
+
         {
           menutitle: "CURRENCY",
           Items: [
@@ -65,24 +66,146 @@ const Sidebar = () => {
               type: "link",
               active: false,
               title: "Sport",
-              allRouet: ['sport-add', 'sport-list']
+              allRouet: ['sport-form', 'sport-list']
             },
           ],
         },
-        // {
-        //   menutitle: "RULE",
-        //   Items: [
-        //     {
-        //       path: `${process.env.PUBLIC_URL}/rule-list`,
-        //       icon: "cpu",
-        //       type: "link",
-        //       active: false,
-        //       title: "Rule",
-        //     },
-        //   ],
-        // }
+        {
+          menutitle: "COMPETITION",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/competition-list`,
+              icon: "globe",
+              type: "link",
+              active: false,
+              title: "Competition",
+              allRouet: ['competition-form', 'competition-list']
+            },
+          ],
+        },
+        {
+          menutitle: "EVENT",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/event-list`,
+              icon: "layers",
+              type: "link",
+              active: false,
+              title: "Event",
+              allRouet: ['event-form', 'event-list']
+            },
+          ],
+        }, {
+        menutitle: "API EVENT",
+        Items: [
+          {
+            path: `${process.env.PUBLIC_URL}/api-event-list`,
+            icon: "layers",
+            type: "link",
+            active: false,
+            title: "API Event",
+            allRouet: ['event-form', 'event-list']
+          },
+        ],
+      },
       );
-    } else if (userRole === "super_admin" || userRole === "admin" || userRole === "super_master" || userRole === "master" || userRole === "agent") {
+    } else if (userRole === "super_admin") {
+      menuItems.push(
+        {
+          menutitle: "MULTILOGIN",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/multi-login`,
+              icon: "copy",
+              type: "link",
+              active: false,
+              title: "Multi login",
+            },
+          ],
+        },
+        {
+          menutitle: "USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/user-list`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "User",
+            },
+          ],
+        },
+        {
+          menutitle: "REPORTS",
+          Items: [
+            {
+              title: "Reports",
+              icon: "file-text",
+              type: "sub",
+              active: false,
+              children: [
+                {
+                  path: `${process.env.PUBLIC_URL}/account-statement`,
+                  title: "Account statement",
+                  type: "link",
+                },
+              ],
+            },
+          ],
+        },
+
+      );
+    } else if (userRole === "admin") {
+      menuItems.push(
+        {
+          menutitle: "USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/user-list`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "User",
+            },
+          ],
+        },
+
+      );
+    }
+    else if (userRole === "super_master") {
+      menuItems.push(
+        {
+          menutitle: "USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/user-list`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "User",
+            },
+          ],
+        },
+
+      );
+    }
+    else if (userRole === "master") {
+      menuItems.push(
+        {
+          menutitle: "USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/user-list`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "User",
+            },
+          ],
+        },
+
+      );
+    } else if (userRole === "agent") {
       menuItems.push(
         {
           menutitle: "USER",

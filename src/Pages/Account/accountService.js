@@ -40,3 +40,8 @@ export const updateUserStatus = async (request) => {
     const result = await postData('users/updateUserStatus', request);
     return result;
 };
+
+export const getAppModuleListing = async (request) => {
+    const result = await postData('users/getAppModuleListing', request);
+    return result.success ? result.data : [];
+};

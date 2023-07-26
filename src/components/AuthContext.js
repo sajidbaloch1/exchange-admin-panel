@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('jws_token', token);
             setIsAuthenticated(true);
             setLoginError('')
-            navigate('/dashboard');
+            navigate('/dashboard', { state: { newUser: 'true' } });
         } else {
             setLoginError(result.message);
         }

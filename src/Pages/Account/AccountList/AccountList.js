@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
-import { Row, Card, Col, Button, Dropdown } from "react-bootstrap";
+import { Row, Card, Col, Button, Dropdown, Modal, Form } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllData, deleteData } from "../accountService";
@@ -30,6 +30,15 @@ export default function AccountList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
+
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawRemarks, setWithdrawRemarks] = useState('');
+
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositRemarks, setDepositRemarks] = useState('');
+
 
   const [selectedUserIdStack, setSelectedUserIdStack] = useState([]);
   const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem('user_info')) || {};
@@ -107,6 +116,7 @@ export default function AccountList() {
     },
     {
       name: 'ACTION',
+      width: '200px',
       cell: row => (
         <div>
           {row.role === 'super_admin' &&
@@ -124,6 +134,13 @@ export default function AccountList() {
           {row.role === 'agent' &&
             <Link to={`${process.env.PUBLIC_URL}/agent-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
           }
+
+          <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg ms-2">
+            D
+          </Button>
+          <Button variant="danger" onClick={() => handleWithdrawClick(row)} className="btn btn-lg ms-2">
+            W
+          </Button>
 
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
@@ -164,9 +181,9 @@ export default function AccountList() {
   const fetchData = async (page) => {
     setLoading(true);
     try {
-      console.log(parentId);
+
       const result = await getAllData(page, perPage, sortBy, direction, searchQuery, parentId);
-      console.log(result);
+
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -222,6 +239,275 @@ export default function AccountList() {
 
   const handleDelete = (id) => {
     showAlert(id, removeRow);
+  };
+
+  const WithdrawModal = () => {
+    const handleWithdrawSubmit = () => {
+      // Handle Withdraw form submission here, using withdrawAmount and withdrawRemarks
+      // Close the modal after handling the submission
+      setShowWithdrawModal(false);
+    };
+
+    return (
+      <Modal show={showWithdrawModal} onHide={() => setShowWithdrawModal(false)} >
+        <Modal.Header closeButton className="bg-danger text-white">
+          <Modal.Title>Withdraw</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Add your Withdraw form fields here */}
+          <Form className="form-horizontal">
+            <div className=" row mb-4">
+
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Creator Name</Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Current Click User</Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Profit/Loss</Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Amount</Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Remarks</Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={withdrawRemarks}
+                  onChange={(e) => setWithdrawRemarks(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Transaction Code</Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                />
+              </div>
+            </div>
+
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowWithdrawModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleWithdrawSubmit}>
+            Withdraw
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
+
+
+  const DepositModal = () => {
+    const handleDepositSubmit = () => {
+      // Handle Deposit form submission here, using depositAmount and depositRemarks
+      // Close the modal after handling the submission
+      setShowDepositModal(false);
+    };
+
+    return (
+      <Modal show={showDepositModal} onHide={() => setShowDepositModal(false)}>
+        <Modal.Header closeButton className="bg-success text-white">
+          <Modal.Title>Deposit</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Add your Deposit form fields here */}
+
+          <Form className="form-horizontal">
+            <div className=" row mb-4">
+
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Creator Name</Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Current Click User</Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Profit/Loss</Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Amount</Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  type="number"
+                  value={depositAmount}
+                  onChange={(e) => setDepositAmount(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Remarks</Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  as="textarea"
+                  value={depositRemarks}
+                  onChange={(e) => setDepositRemarks(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label">Transaction Code</Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                />
+              </div>
+            </div>
+
+          </Form>
+
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDepositModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleDepositSubmit}>
+            Deposit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
+
+  const handleDepositClick = (row) => {
+    // Set initial values for the Deposit modal based on the row data
+    setDepositAmount('');
+    setDepositRemarks('');
+    setSelectedUserIdStack([row._id]);
+    setShowDepositModal(true);
+  };
+
+  const handleWithdrawClick = (row) => {
+    // Set initial values for the Withdraw modal based on the row data
+    setWithdrawAmount('');
+    setWithdrawRemarks('');
+    setSelectedUserIdStack([row._id]);
+    setShowWithdrawModal(true);
   };
 
   useEffect(() => {
@@ -332,6 +618,9 @@ export default function AccountList() {
           </Card>
         </Col>
       </Row>
+
+      <WithdrawModal />
+      <DepositModal />
     </div>
   );
 }

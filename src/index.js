@@ -22,6 +22,16 @@ const BetCategorySettingForm = React.lazy(() => import("./Pages/Sport/BetCategor
 const CurrencyList = React.lazy(() => import("./Pages/Currency/CurrencyList/CurrencyList"));
 const CurrencyForm = React.lazy(() => import("./Pages/Currency/CurrencyForm/CurrencyForm"));
 
+// Competition Module
+const CompetitionList = React.lazy(() => import("./Pages/Competition/CompetitionList/CompetitionList"));
+const CompetitionForm = React.lazy(() => import("./Pages/Competition/CompetitionForm/CompetitionForm"));
+
+// Event Module
+const EventList = React.lazy(() => import("./Pages/Event/EventList/EventList"));
+const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
+const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
+
+// All User Accounts
 const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
 const AccountForm = React.lazy(() => import("./Pages/Account/AccountForm/AccountForm"));
 const SuperAdminForm = React.lazy(() => import("./Pages/Account/SuperAdminForm/SuperAdminForm"));
@@ -32,6 +42,11 @@ const AgentForm = React.lazy(() => import("./Pages/Account/AgentForm/AgentForm")
 const UserForm = React.lazy(() => import("./Pages/Account/UserForm/UserForm"));
 const UserList = React.lazy(() => import("./Pages/Account/UserList/UserList"));
 const UserEditForm = React.lazy(() => import("./Pages/Account/UserEditForm/UserEditForm"));
+const MultiLogin = React.lazy(() => import("./Pages/Account/MultiLogin/MultiLogin"));
+
+
+// Report 
+const AccountStatement = React.lazy(() => import("./Pages/Report/AccountStatement/AccountStatement"));
 
 //custom Pages
 const Login = React.lazy(() => import("./Pages/Login/Login"));
@@ -127,6 +142,43 @@ const Root = () => {
                     />
                   </Route>
 
+                  {/* Competition route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/competition-form`}
+                      element={<CompetitionForm />}
+                    />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/competition-list`}
+                      element={<CompetitionList />}
+                    />
+                  </Route>
+
+                  {/* Event route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/event-form`}
+                      element={<EventForm />}
+                    />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/event-list`}
+                      element={<EventList />}
+                    />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/api-event-list`}
+                      element={<ApiEventForm />}
+                    />
+                  </Route>
+
                   {/* Accounts route  */}
                   <Route path="/" element={<ProtectedRoutes allowedRoles={['system_owner', 'super_admin', 'admin', 'super_master', 'master', 'agent']} />}>
                     <Route
@@ -194,6 +246,20 @@ const Root = () => {
                     <Route
                       path={`${process.env.PUBLIC_URL}/user-edit/:id`}
                       element={<UserEditForm />}
+                    />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/multi-login`}
+                      element={<MultiLogin />}
+                    />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={['super_admin']} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/account-statement`}
+                      element={<AccountStatement />}
                     />
                   </Route>
 
