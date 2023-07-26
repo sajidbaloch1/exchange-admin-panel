@@ -70,7 +70,7 @@ export function Header() {
               className="header-logo"
             >
               <img
-                src={require("../../assets/images/brand/logo-3.png")}
+                src={require("../../assets/images/brand/logo.png")}
                 className="mobile-logo logo-1"
                 alt="logo"
               />
@@ -91,7 +91,7 @@ export function Header() {
               alt="logo"
             />
             <img
-              src={require("../../assets/images/brand/logo-3.png")}
+              src={require("../../assets/images/brand/logo.png")}
               className="header-brand-img light-logo1"
               alt="logo"
             />
@@ -147,16 +147,19 @@ export function Header() {
                       </span>
                     </Link>
                   </div>
-                  {/* <div className="dropdown d-md-flex">
-                    <Link
-                      to="#"
-                      className="nav-link icon full-screen-link nav-link-bg"
-                      onClick={Fullscreen}
-                    >
-                      <i className="fe fe-minimize fullscreen-button"></i>
-                    </Link>
-                  </div> */}
-
+                  {user.role !== 'system_owner' &&
+                    <div className="dropdown d-md-flex ms-3 me-3">
+                      <Link
+                        to="#"
+                        className=" theme-layout nav-link-bg layout-setting"
+                        onClick={() => Darkmode()}
+                      >
+                        <span className="dark-layout">
+                          Pts: {user.balance}
+                        </span>
+                      </Link>
+                    </div>
+                  }
 
                   <Dropdown className=" d-md-flex profile-1">
                     <Dropdown.Toggle
@@ -164,11 +167,7 @@ export function Header() {
                       variant=""
                     >
                       <span>
-                        <img
-                          src={require("../../assets/images/users/8.jpg")}
-                          alt="profile-user"
-                          className="avatar  profile-user brround cover-image"
-                        />
+                        {user.username} <i className=" fe fe-chevron-down"></i>
                       </span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu
