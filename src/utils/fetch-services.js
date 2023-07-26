@@ -1,42 +1,42 @@
-import axios from 'axios';
-//import { NotificationManager } from 'components/common/react-notifications';
+import axios from "axios";
 
 const BaseURL = process.env.REACT_APP_BASE_URL;
 const postData = async (url, body, token = null) => {
-  const jwsToken = localStorage.getItem('jws_token');
+  const jwsToken = localStorage.getItem("jws_token");
 
   const response = await fetch(`${BaseURL}/${url}`, {
-    method: 'POST',
-    mode: 'cors',
+    method: "POST",
+    mode: "cors",
     headers: {
-      //  "Authorization":"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9hYXJvZ3lhaW5kaWEuaW5cL3RyYWZpa3NvbFwvcHVibGljXC9hcGlcL3YxXC9sb2dpbiIsImlhdCI6MTU5OTEyMzA1MiwiZXhwIjoxNjAxNzE1MDUyLCJuYmYiOjE1OTkxMjMwNTIsImp0aSI6IlJQVmttMHhmcFRzZHpHaGoiLCJzdWIiOjEsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.DFp2qevRXpL5DKJNSyrryVAnGD0BWXm-GiMVQeNq5LQ",
       Authorization: token || jwsToken,
-      'Content-Type': 'application/json; charset=utf-8',
-      Accept: 'application/json',
+      "Content-Type": "application/json; charset=utf-8",
+      Accept: "application/json",
     },
-    //  'content-type': 'multipart/form-data'},
     body: JSON.stringify(body),
   });
-  if (response.status === 401) {
+
+  if ([200, 201].includes(response.status)) {
+    const result = await response.json();
+    return result;
+  } else if (response.status === 401) {
     localStorage.clear();
-    window.location.reload(false);
-  } else if (!(response.status === 200 || response.status === 201)) {
-    const { message = 'Something went wrong.' } = await response.json();
-    // NotificationManager.error(message, 'Error message', 3000, null, null, '');
+    window.location.reload();
+  } else if (response.status > 400) {
+    const { message = "Something went wrong." } = await response.json();
+    return { success: false, message };
   }
 
-  const result1 = await response.json();
-  return result1;
+  return { success: false, message: "Something went wrong." };
 };
 
 const getData = async (url) => {
-  const jwsToken = localStorage.getItem('jws_token');
+  const jwsToken = localStorage.getItem("jws_token");
   const response = await fetch(`${BaseURL}/${url}`, {
-    method: 'GET',
-    mode: 'cors',
+    method: "GET",
+    mode: "cors",
     headers: {
       Authorization: jwsToken,
-      'Content-Type': 'application/json; charset=utf-8',
+      "Content-Type": "application/json; charset=utf-8",
     },
   });
 
@@ -63,8 +63,8 @@ const axiosPostData = async (url, formData) => {
   return axios
     .post(`${BaseURL}/${url}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: localStorage.getItem('jws_token'),
+        "Content-Type": "multipart/form-data",
+        Authorization: localStorage.getItem("jws_token"),
       },
     })
     .then((res) => {
@@ -86,4 +86,4 @@ const axiosPostData = async (url, formData) => {
       }
     });
 };
-export { postData, getData, axiosPostData };
+export { axiosPostData, getData, postData };
