@@ -126,11 +126,12 @@ export default function UserEditForm() {
       setLoading(true);
 
       try {
+        let response = null;
         // If validation passes, perform form submission logic for the active tab
         if (!values.password) {
           delete values.password
         }
-        const response = await updateData({
+        response = await updateData({
           _id: id,
           ...values,
         });
@@ -179,7 +180,6 @@ export default function UserEditForm() {
   }, [id, getDetailByID]);
 
   const formTitle = id ? "UPDATE USER" : "CREATE USER";
-  const isFormDisabled = !formik.isValid || formik.isSubmitting || (formik.touched && !formik.isValidating);
 
   // Handle tab selection and set validation schema accordingly
   const handleTabSelect = (tabKey) => {

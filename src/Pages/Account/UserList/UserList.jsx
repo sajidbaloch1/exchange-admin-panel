@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
+import { Row, Card, Col, Button, Dropdown } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllCurrency, deleteCurrency } from "../currencyService";
+import { getAllData, deleteData, updateUserStatus } from "../accountService";
 import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils//alertUtils';
-import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { showAlert } from '../../../utils/alertUtils';
+import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 
-export default function CurrencyList() {
-
+export default function UserList() {
+  const location = useLocation();
+  let login_user_id = '';
+  const user = JSON.parse(localStorage.getItem('user_info'));
+  if (user.role !== 'system_owner') {
+    login_user_id = user._id;
+  }
+  const { id } = useParams();
+  const initialParentId = id ? id : login_user_id;
+  const [parentId, setParentId] = useState(initialParentId);
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
   );
 
   const [searchQuery, setSearchQuery] = React.useState('');
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
@@ -24,6 +31,31 @@ export default function CurrencyList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
+  const toggleHighlight = async (id, type, toggleValue) => {
+    setLoading(true);
+    try {
+      const newStatus = !toggleValue; // Toggle the isActive status
+      let request
+      if (type === 'bet') {
+        request = { _id: id, isBetLock: newStatus.toString() };
+      } else {
+        request = { _id: id, isActive: newStatus.toString() };
+      }
+
+      const success = await updateUserStatus(request);
+      if (success) {
+        fetchData(currentPage);
+        setLoading(false);
+      }
+    } catch (error) {
+      // Handle error
+      console.error("Error removing :", error);
+      // Display error message or show notification to the user
+      // Set the state to indicate the error condition
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       name: "SR.NO",
@@ -31,22 +63,84 @@ export default function CurrencyList() {
       sortable: false,
     },
     {
-      name: "NAME",
-      selector: (row) => [row.name],
+      name: "USERNAME",
+      selector: (row) => [row.username],
       sortable: true,
-      sortField: 'name'
+      sortField: 'username',
+
     },
     {
-      name: "MULTIPLIER",
-      selector: (row) => [row.multiplier],
+      name: "FULL NAME",
+      selector: (row) => [row.fullName],
       sortable: true,
-      sortField: 'multiplier'
+      sortField: 'fullName'
+    },
+    {
+      name: "MOBILE NUMBER",
+      selector: (row) => [row.mobileNumber],
+      sortable: true,
+      sortField: 'mobileNumber'
+    },
+    {
+      name: "BALANCE",
+      selector: (row) => [row.balance],
+      sortable: true,
+      sortField: 'balance'
+    },
+    {
+      name: "CITY",
+      selector: (row) => [row.city],
+      sortable: true,
+      sortField: 'city'
+    },
+    {
+      name: "B STATUS",
+      selector: (row) => [row.betCategory],
+      sortable: false,
+      cell: row => (
+        <div className="material-switch mt-4">
+          <input
+            id={`betSwitch_${row._id}`}
+            name={`notes[${row._id}].isBetLock`}
+            onChange={() => toggleHighlight(row._id, 'bet', row.isBetLock)}
+            checked={row.isBetLock}
+            type="checkbox"
+          />
+          <label
+            htmlFor={`betSwitch_${row._id}`}
+            className="label-primary"
+          ></label>
+        </div>
+
+      ),
+    },
+    {
+      name: "U STATUS",
+      selector: (row) => [row.betCategory],
+      sortable: false,
+      cell: row => (
+        <div className="material-switch mt-4">
+          <input
+            id={`userSwitch_${row._id}`}
+            name={`notes[${row._id}].isActive`}
+            onChange={() => toggleHighlight(row._id, 'user', row.isActive)}
+            checked={row.isActive}
+            type="checkbox"
+          />
+          <label
+            htmlFor={`userSwitch_${row._id}`}
+            className="label-primary"
+          ></label>
+        </div>
+
+      ),
     },
     {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/currency-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
@@ -57,9 +151,13 @@ export default function CurrencyList() {
   const [selectedRows, setSelectedRows] = React.useState([]);
   const [toggleCleared, setToggleCleared] = React.useState(false);
   let selectdata = [];
-  const handleRowSelected = React.useCallback((state) => {
-    setSelectedRows(state.selectedRows);
-  }, []);
+  // const handleRowSelected = React.useCallback((state) => {
+  //   setSelectedRows(state.selectedRows);
+  //   const selectedUser = state.selectedRows[0]; // Assuming only one user can be selected at a time
+  //   if (selectedUser) {
+  //     setParentId(selectedUser._id);
+  //   }
+  // }, []);
 
   const contextActions = React.useMemo(() => {
     const Selectdata = () => {
@@ -79,10 +177,10 @@ export default function CurrencyList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchData = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page) => {
     setLoading(true);
     try {
-      const result = await getAllCurrency(page, perPage, sortBy, direction, searchQuery);
+      const result = await getAllData(page, perPage, sortBy, direction, searchQuery, parentId);
 
       setData(result.records);
       setTotalRows(result.totalRecords);
@@ -99,9 +197,9 @@ export default function CurrencyList() {
   const removeRow = async (id) => {
     setLoading(true);
     try {
-      const success = await deleteCurrency(id);
+      const success = await deleteData(id);
       if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
+        fetchData(currentPage);
         setLoading(false);
       }
     } catch (error) {
@@ -113,19 +211,18 @@ export default function CurrencyList() {
     }
   };
 
-
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchData(currentPage, sortBy, direction, searchQuery);
+    fetchData(currentPage);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchData(page, sortBy, direction, searchQuery);
+    fetchData(page);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -135,7 +232,7 @@ export default function CurrencyList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('currencies/getAllCurrency', searchQuery, 'currency.csv');
+    await downloadCSV('users/getAllUsers', searchQuery, 'account.csv');
   };
 
   const handleDelete = (id) => {
@@ -143,27 +240,33 @@ export default function CurrencyList() {
   };
 
   useEffect(() => {
+
+    setData([])
     if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
     }
-  }, [perPage, searchQuery]);
+    return () => {
+      setData([])
+    }
+  }, [perPage, searchQuery, parentId]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL CURRENCY</h1>
+          <h1 className="page-title">ALL USERS</h1>
 
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/currency-form`} className="btn btn-primary btn-icon text-white me-3">
+          <Link to={`${process.env.PUBLIC_URL}/user-form`} className="btn btn-primary btn-icon text-white me-3">
             <span>
               <i className="fe fe-plus"></i>&nbsp;
             </span>
-            CREATE CURRENCY
+            CREATE USER
           </Link>
+
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;
@@ -187,10 +290,10 @@ export default function CurrencyList() {
                 <DataTable
                   columns={columns}
                   data={data}
-                  // actions={actionsMemo}
-                  // contextActions={contextActions}
+                  actions={actionsMemo}
+                  contextActions={contextActions}
                   // onSelectedRowsChange={handleRowSelected}
-                  clearSelectedRows={toggleCleared}
+                  // clearSelectedRows={toggleCleared}
                   //selectableRows
                   pagination
                   highlightOnHover

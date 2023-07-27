@@ -27,7 +27,7 @@ export default function EventForm() {
   const [addedEventIds, setAddedEventIds] = useState([]);
   const [searchText, setSearchText] = useState("");
 
-  const [eventSettingData, setEventSettingData] = useState("");
+  const [eventSettingData, setEventSettingData] = useState(null);
 
   const formik = useFormik({
     initialValues: {
@@ -117,16 +117,18 @@ export default function EventForm() {
   };
 
   const handleEventEditClick = (event) => {
-    setEventSettingData(event)
-    setSelectedSport(null); // Hide the selectedSport when the event is edited
-    setSelectedCompetition(null); // Hide the selectedCompetition when the event is edited
+    console.log(event)
+    //setEventSettingData(event)
+    //setSelectedSport(null); // Hide the selectedSport when the event is edited
+    //setSelectedCompetition(null); // Hide the selectedCompetition when the event is edited
   };
 
   const updateCompetition = async (e) => {
     console.log(addedCompetitionIds);
     // API here
     const response = await activeAllCompetition({
-      _id: addedEventIds,
+      competitionIds: addedCompetitionIds,
+      sportId: selectedSport._id
     });
     if (response.success) {
       navigate("/event-list/");
@@ -138,7 +140,8 @@ export default function EventForm() {
   const updateEvent = async (e) => {
     console.log(addedEventIds);
     const response = await activeAllEvent({
-      _id: addedEventIds,
+      eventIds: addedEventIds,
+      competitionId: selectedCompetition._id
     });
     if (response.success) {
       navigate("/event-list/");
@@ -188,13 +191,13 @@ export default function EventForm() {
 
   return (
     <div>
-      <div className="page-header">
+      {/* <div className="page-header">
         <div>
           <h1 className="page-title"> {formTitle}</h1>
         </div>
-      </div>
+      </div> */}
 
-      <Row>
+      <Row className="mt-5">
         <Col md={12} lg={12}>
           <Card>
             <Card.Header>
@@ -208,6 +211,7 @@ export default function EventForm() {
                       <Accordion.Item key={index} eventKey={index} className="mb-1">
                         <Accordion.Header className="panel-heading1 style3" onClick={() => {
                           setSelectedCompetition(null); // Make selectedCompetition blank on sport click
+                          setEventSettingData(null)
                           setSelectedSport(sport);
                           setAddedCompetitionIds(
                             sport.competitions.filter((comp) => comp.isActive).map((comp) => comp._id)
@@ -224,25 +228,31 @@ export default function EventForm() {
                                   <Accordion.Header className="panel-heading1 style3" onClick={() => {
                                     setSelectedCompetition(competition); // Make selectedCompetition blank on sport click
                                     setSelectedSport(null);
+                                    setEventSettingData(null);
                                     setAddedEventIds(
                                       competition.events.filter((ev) => ev.isActive).map((ev) => ev._id)
                                     );
                                   }}>
                                     {competition.name}
+                                    {/* <Link to={`${process.env.PUBLIC_URL}/competition-form`} state={{ id: competition._id }}>
+                                      <span className=" rounded-pill ">
+                                        <i className="fa fa-edit"></i>
+                                      </span>
+                                    </Link> */}
+
                                   </Accordion.Header>
                                   <Accordion.Body className="border">
                                     <div className="">
                                       <ul className="list-group">
                                         {competition.events.map((event, event_index) => (
                                           event.isActive == true &&
-                                          <li className="listunorder" key={event._id}>{event.name}
-                                            <span className="badgetext badge bg-default rounded-pill" onClick={() => {
-                                              handleEventEditClick(event)
-
-                                            }}>
-                                              <i className="fa fa-edit"></i>
-                                            </span>
-                                          </li>
+                                          <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: event._id }} >
+                                            <li className="listunorder" key={event._id}>{event.name}
+                                              <span className="badgetext badge bg-default rounded-pill">
+                                                <i className="fa fa-edit"></i>
+                                              </span>
+                                            </li>
+                                          </Link>
                                         ))}
                                       </ul>
                                     </div>
@@ -417,15 +427,119 @@ export default function EventForm() {
                         {/* Display other competition data here */}
                       </div>
 
-                      <FormInput
-                        label="Search"
-                        name="searchText"
-                        type="text"
-                        value={searchText}
-                        onChange={handleSearchTextChange}
-                        width={3}
-                      />
+                      <Row>
+                        <CCol xs={12} md={6} lg={3} >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id=""
+                              name=""
+                              checked={false}
+                            // onChange={(e) =>
+                            //   formik.setFieldValue(match_odds, e.target.checked)
+                            // }
+                            />
+                            <CFormLabel className="form-check-label">
+                              Match Odds
+                            </CFormLabel>
+                          </div>
+                        </CCol>
 
+                        <CCol xs={12} md={6} lg={3} >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id=""
+                              name=""
+                              checked={false}
+                            // onChange={(e) =>
+                            //   formik.setFieldValue(match_odds, e.target.checked)
+                            // }
+                            />
+                            <CFormLabel className="form-check-label">
+                              Visible to player
+                            </CFormLabel>
+                          </div>
+                        </CCol>
+
+                        <CCol xs={12} md={6} lg={3} >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id=""
+                              name=""
+                              checked={false}
+                            // onChange={(e) =>
+                            //   formik.setFieldValue(match_odds, e.target.checked)
+                            // }
+                            />
+                            <CFormLabel className="form-check-label">
+                              Can bet
+                            </CFormLabel>
+                          </div>
+                        </CCol>
+
+                      </Row>
+
+                      <Row>
+                        <CCol xs={12} md={6} lg={3} >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id=""
+                              name=""
+                              checked={false}
+                            // onChange={(e) =>
+                            //   formik.setFieldValue(match_odds, e.target.checked)
+                            // }
+                            />
+                            <CFormLabel className="form-check-label">
+                              Match Odds
+                            </CFormLabel>
+                          </div>
+                        </CCol>
+
+                        <CCol xs={12} md={6} lg={3} >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id=""
+                              name=""
+                              checked={false}
+                            // onChange={(e) =>
+                            //   formik.setFieldValue(match_odds, e.target.checked)
+                            // }
+                            />
+                            <CFormLabel className="form-check-label">
+                              Visible to player
+                            </CFormLabel>
+                          </div>
+                        </CCol>
+
+                        <CCol xs={12} md={6} lg={3} >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id=""
+                              name=""
+                              checked={false}
+                            // onChange={(e) =>
+                            //   formik.setFieldValue(match_odds, e.target.checked)
+                            // }
+                            />
+                            <CFormLabel className="form-check-label">
+                              Can bet
+                            </CFormLabel>
+                          </div>
+                        </CCol>
+
+                      </Row>
 
                       <CCol xs={12}>
                         <div className="d-grid gap-2 d-md-block">

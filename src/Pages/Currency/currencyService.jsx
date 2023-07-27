@@ -19,6 +19,9 @@ export const deleteCurrency = async (id) => {
 };
 
 export const getCurrencyDetailByID = async (id) => {
+    if (!id) {
+        return null;
+    }
     const result = await postData('currencies/getCurrencyById', {
         _id: id,
     });

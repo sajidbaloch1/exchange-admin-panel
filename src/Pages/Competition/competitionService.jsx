@@ -19,6 +19,9 @@ export const deleteCompetition = async (id) => {
 };
 
 export const getCompetitionDetailByID = async (id) => {
+    if (!id) {
+        return null;
+    }
     const result = await postData('competition/getCompetitionById', {
         _id: id,
     });

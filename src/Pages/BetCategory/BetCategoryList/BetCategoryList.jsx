@@ -5,7 +5,7 @@ import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllBetCategory, deleteBetCategory } from "../betcategoryService";
 import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils//alertUtils';
+import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
 
 export default function BetCategoryList() {

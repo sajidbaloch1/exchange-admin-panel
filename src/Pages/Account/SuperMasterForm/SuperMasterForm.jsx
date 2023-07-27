@@ -15,7 +15,7 @@ import {
   CSpinner
 } from "@coreui/react";
 
-export default function MasterForm() {
+export default function SuperMasterForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
@@ -35,7 +35,7 @@ export default function MasterForm() {
       city: '',
       mobileNumber: '',
       creditPoints: '',
-      role: 'master',
+      role: 'super_master',
       rate: '',
       isBetLock: false,
       isActive: true,
@@ -93,27 +93,21 @@ export default function MasterForm() {
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
       try {
+        let response = null;
         if (id !== '' && id !== undefined) {
-          const response = await updateData({
+          response = await updateData({
             _id: id,
             ...values,
           });
-
-          if (response.success) {
-            navigate("/account-list/");
-          } else {
-            setServerError(response.message);
-          }
         } else {
-          const response = await addData({
+          response = await addData({
             ...values,
           });
-
-          if (response.success) {
-            navigate("/account-list/");
-          } else {
-            setServerError(response.message);
-          }
+        }
+        if (response.success) {
+          navigate("/account-list/");
+        } else {
+          setServerError(response.message);
         }
       } catch (error) {
         // Handle error
@@ -149,7 +143,7 @@ export default function MasterForm() {
     fetchData();
   }, [id, getDetailByID]);
 
-  const formTitle = id ? "UPDATE MASTER" : "CREATE MASTER";
+  const formTitle = id ? "UPDATE SUPER MASTER" : "CREATE SUPER MASTER";
 
   return (
     <div>

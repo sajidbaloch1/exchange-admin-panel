@@ -93,27 +93,21 @@ export default function AgentForm() {
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
       try {
+        let response = null;
         if (id !== '' && id !== undefined) {
-          const response = await updateData({
+          response = await updateData({
             _id: id,
             ...values,
           });
-
-          if (response.success) {
-            navigate("/account-list/");
-          } else {
-            setServerError(response.message);
-          }
         } else {
-          const response = await addData({
+          response = await addData({
             ...values,
           });
-
-          if (response.success) {
-            navigate("/account-list/");
-          } else {
-            setServerError(response.message);
-          }
+        }
+        if (response.success) {
+          navigate("/account-list/");
+        } else {
+          setServerError(response.message);
         }
       } catch (error) {
         // Handle error

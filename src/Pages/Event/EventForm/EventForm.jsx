@@ -54,27 +54,22 @@ export default function EventForm() {
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
       try {
-
+        let response = null;
         if (id !== "" && id !== undefined) {
 
           const response = await updateEvent({
             _id: id,
             ...values,
           });
-          if (response.success) {
-            navigate("/event-list/");
-          } else {
-            setServerError(response.message);
-          }
         } else {
           const response = await addEvent({
             ...values,
           });
-          if (response.success) {
-            navigate("/event-list/");
-          } else {
-            setServerError(response.message);
-          }
+        }
+        if (response.success) {
+          navigate("/event-list/");
+        } else {
+          setServerError(response.message);
         }
       } catch (error) {
         //console.log(error);

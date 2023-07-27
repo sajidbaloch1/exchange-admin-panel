@@ -5,7 +5,7 @@ import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllCompetition, deleteCompetition, changeStatus } from "../competitionService";
 import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils//alertUtils';
+import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
 
 export default function CompetitionList() {
@@ -60,6 +60,18 @@ export default function CompetitionList() {
       selector: (row) => [row.sportsName],
       sortable: true,
       sortField: 'sportsName'
+    },
+    {
+      name: "START DATE",
+      selector: (row) => [row.startDate],
+      sortable: true,
+      sortField: 'startDate'
+    },
+    {
+      name: "END DATE",
+      selector: (row) => [row.endDate],
+      sortable: true,
+      sortField: 'endDate'
     },
     {
       name: "STATUS",

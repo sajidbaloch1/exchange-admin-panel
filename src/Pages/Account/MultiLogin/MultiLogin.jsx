@@ -7,7 +7,7 @@ import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllData, deleteData } from "../accountService";
 import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils//alertUtils';
+import { showAlert } from '../../../utils/alertUtils';
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 import * as Yup from 'yup';

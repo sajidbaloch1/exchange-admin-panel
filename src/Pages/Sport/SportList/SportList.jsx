@@ -3,18 +3,12 @@ import { Link } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllCurrency, deleteCurrency } from "../accountStatementService";
+import { getAllSport, deleteSport, changeStatus } from "../sportService";
 import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils//alertUtils';
+import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
-import { DateRangePicker } from 'react-date-range';
-import { CCol } from "@coreui/react";
 
-
-
-export default function AccountStatementList() {
+export default function SportList() {
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
@@ -30,6 +24,25 @@ export default function AccountStatementList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
+  const toggleHighlight = async (id, isActive) => {
+    setLoading(true);
+    try {
+      const newStatus = !isActive; // Toggle the isActive status
+      const request = { _id: id, status: newStatus.toString() };
+      const success = await changeStatus(request);
+      if (success) {
+        fetchData(currentPage, sortBy, direction, searchQuery);
+        setLoading(false);
+      }
+    } catch (error) {
+      // Handle error
+      console.error("Error removing :", error);
+      // Display error message or show notification to the user
+      // Set the state to indicate the error condition
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       name: "SR.NO",
@@ -37,40 +50,64 @@ export default function AccountStatementList() {
       sortable: false,
     },
     {
-      name: "DATE",
-      selector: (row) => [row.date],
+      name: "NAME",
+      selector: (row) => [row.name],
       sortable: true,
-      sortField: 'date'
+      sortField: 'name'
     },
     {
-      name: "CREDIT",
-      selector: (row) => [row.credit],
+      name: "API CODE",
+      selector: (row) => [row.apiSportId],
       sortable: true,
-      sortField: 'credit'
+      sortField: 'apiSportId'
     },
     {
-      name: "DEBIT",
-      selector: (row) => [row.debit],
-      sortable: true,
-      sortField: 'debit'
+      name: "TOTAL BET CATEGORY",
+      selector: (row) => [row.betCategoryCount],
+      sortable: false,
+      cell: row => (
+        <span className="ms-2"> {row.betCategoryCount}</span>
+      ),
     },
     {
-      name: "PTS",
-      selector: (row) => [row.pts],
-      sortable: true,
-      sortField: 'pts'
+      name: "STATUS",
+      selector: (row) => [row.betCategory],
+      sortable: false,
+      cell: row => (
+        <div className="material-switch mt-4">
+          <input
+            id={`highlightSwitch_${row._id}`}
+            name={`notes[${row._id}].highlight`}
+            onChange={() => toggleHighlight(row._id, row.isActive)}
+            checked={row.isActive}
+            type="checkbox"
+          />
+          <label
+            htmlFor={`highlightSwitch_${row._id}`}
+            className="label-primary"
+          ></label>
+        </div>
+
+      ),
     },
     {
-      name: "REMARKS",
-      selector: (row) => [row.remkars],
-      sortable: true,
-      sortField: 'remkars'
-    },
-    {
-      name: "FROMTO",
-      selector: (row) => [row.fromto],
-      sortable: true,
-      sortField: 'fromto'
+      name: 'ACTION',
+      cell: row => (
+        <div>
+          <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
+          <Link
+            to={{
+              pathname: `${process.env.PUBLIC_URL}/bet-category-list`,
+            }}
+            // Pass the sportId as state
+            state={{ sportId: row._id }}
+            className="btn btn-info btn-lg ms-2"
+          >
+            <i className="fa fa-file"></i>
+          </Link>
+        </div>
+      ),
     },
   ];
 
@@ -103,8 +140,7 @@ export default function AccountStatementList() {
   const fetchData = async (page, sortBy, direction, searchQuery) => {
     setLoading(true);
     try {
-      const result = await getAllCurrency(page, perPage, sortBy, direction, searchQuery);
-
+      const result = await getAllSport(page, perPage, sortBy, direction, searchQuery);
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -120,7 +156,7 @@ export default function AccountStatementList() {
   const removeRow = async (id) => {
     setLoading(true);
     try {
-      const success = await deleteCurrency(id);
+      const success = await deleteSport(id);
       if (success) {
         fetchData(currentPage, sortBy, direction, searchQuery);
         setLoading(false);
@@ -133,7 +169,6 @@ export default function AccountStatementList() {
       setLoading(false);
     }
   };
-
 
   const handleSort = (column, sortDirection) => {
     // simulate server sort
@@ -156,28 +191,12 @@ export default function AccountStatementList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('currencies/getAllCurrency', searchQuery, 'currency.csv');
+    await downloadCSV('sport/getAllSport', searchQuery, 'sports.csv');
   };
 
   const handleDelete = (id) => {
     showAlert(id, removeRow);
   };
-
-  const selectionRange = {
-    startDate: new Date(),
-    endDate: new Date(),
-    key: 'selection',
-  }
-
-  const handleSelect = (ranges) => {
-    console.log(ranges);
-    // {
-    //   selection: {
-    //     startDate: [native Date Object],
-    //     endDate: [native Date Object],
-    //   }
-    // }
-  }
 
   useEffect(() => {
     if (searchQuery !== '') {
@@ -191,7 +210,29 @@ export default function AccountStatementList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ACCOUNT STATEMENT</h1>
+          <h1 className="page-title">ALL SPORTS</h1>
+          {/* <Breadcrumb className="breadcrumb">
+            <Breadcrumb.Item className="breadcrumb-item" href="#">
+              Category
+            </Breadcrumb.Item>
+            <Breadcrumb.Item className="breadcrumb-item active breadcrumds" aria-current="page">
+              List
+            </Breadcrumb.Item>
+          </Breadcrumb> */}
+        </div>
+        <div className="ms-auto pageheader-btn">
+          <Link to={`${process.env.PUBLIC_URL}/sport-form`} className="btn btn-primary btn-icon text-white me-3">
+            <span>
+              <i className="fe fe-plus"></i>&nbsp;
+            </span>
+            CREATE SPORT
+          </Link>
+          {/* <Link to="#" className="btn btn-success btn-icon text-white">
+            <span>
+              <i className="fe fe-log-in"></i>&nbsp;
+            </span>
+            Export
+          </Link> */}
         </div>
       </div>
 
@@ -205,14 +246,6 @@ export default function AccountStatementList() {
                 setSearchQuery={setSearchQuery}
                 loading={loading}
               />
-              <Row>
-                <CCol xs={4}>
-                  <DateRangePicker
-                    ranges={[selectionRange]}
-                    onChange={handleSelect}
-                  />
-                </CCol>
-              </Row>
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}

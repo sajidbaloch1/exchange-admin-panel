@@ -19,6 +19,9 @@ export const deleteSport = async (id) => {
 };
 
 export const getSportDetailByID = async (id) => {
+    if (!id) {
+        return null;
+    }
     const result = await postData('sport/getSportById', {
         _id: id,
     });

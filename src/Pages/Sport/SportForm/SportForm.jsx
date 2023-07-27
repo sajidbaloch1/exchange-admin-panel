@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
 import { useFormik } from "formik";
-import { getCompetitionDetailByID, addCompetition, updateCompetition } from "../competitionService";
-import { getAllSport } from '../../Sport/sportService'
+import { getSportDetailByID, addSport, updateSport } from "../sportService";
+import { getAllBetCategory } from '../../BetCategory/betcategoryService'
 import FormInput from "../../../components/Common/FormComponents/FormInput";
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import FormMultiSelect from "../../../components/Common/FormComponents/FormMultiSelect";
 import * as Yup from "yup";
 import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
 
-export default function CompetitionForm() {
+export default function SportForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
@@ -19,43 +19,42 @@ export default function CompetitionForm() {
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null); // State to hold the server error message
-  const [sportList, setSportList] = useState([]);
+  const [betCategoryList, setBetCategoryList] = useState([]);
 
   const formik = useFormik({
     initialValues: {
       name: "",
-      sportId: "",
+      apiSportId: "",
+      betCategory: [],
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
-      sportId: Yup.string().required('Sport is required'),
+      apiSportId: Yup.number().required("SPORT API ID is required"),
+      betCategory: Yup.array()
+        .min(1, "At least one option must be selected")
+        .required("At least one option must be selected"),
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
       try {
-        const { name, sportId } = values;
+        let response = null;
+        const { name, betCategory, apiSportId } = values;
         if (id !== "" && id !== undefined) {
-
-          const response = await updateCompetition({
+          response = await updateSport({
             _id: id,
             ...values,
           });
-          if (response.success) {
-            navigate("/competition-list/");
-          } else {
-            setServerError(response.message);
-          }
         } else {
-          const response = await addCompetition({
+          response = await addSport({
             ...values,
           });
-          if (response.success) {
-            navigate("/competition-list/");
-          } else {
-            setServerError(response.message);
-          }
+        }
+        if (response.success) {
+          navigate("/sport-list");
+        } else {
+          setServerError(response.message);
         }
       } catch (error) {
         //console.log(error);
@@ -74,22 +73,27 @@ export default function CompetitionForm() {
   useEffect(() => {
     const fetchData = async () => {
       if (id) {
-        const result = await getCompetitionDetailByID(id);
+        const result = await getSportDetailByID(id);
 
         formik.setValues((prevValues) => ({
           ...prevValues,
           name: result.name || "",
-          sportId: result.sportId || "",
+          apiSportId: result.apiSportId || "",
+          betCategory: result.betCategory || [],
         }));
       }
 
-      const sportData = await getAllSport(0);
-      setSportList(sportData.records);
+      const betCategoryData = await getAllBetCategory();
+      const dropdownOptions = betCategoryData.records.map(option => ({
+        value: option._id,
+        label: option.name
+      }));
+      setBetCategoryList(dropdownOptions)
     };
     fetchData();
   }, [id]);
 
-  const formTitle = id ? "UPDATE COMPETITION" : "CREATE COMPETITION";
+  const formTitle = id ? "UPDATE SPORT" : "CREATE SPORT";
 
   return (
     <div>
@@ -122,29 +126,30 @@ export default function CompetitionForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.name && formik.errors.name}
+                  width={2}
+                />
+
+                <FormInput
+                  label="Sport API Code"
+                  name="apiSportId"
+                  type="text"
+                  value={formik.values.apiSportId}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.apiSportId && formik.errors.apiSportId}
                   width={3}
                 />
 
-                <FormSelect
-                  label="Sport"
-                  name="sportId"
-                  value={formik.values.sportId}
-                  onChange={(event) => {
-                    formik.setFieldValue('sportId', event.target.value);
-
-                  }}
+                <FormMultiSelect
+                  label="Bet Category"
+                  name="betCategory"
+                  value={formik.values.betCategory}
+                  onChange={formik.setFieldValue}
                   onBlur={formik.handleBlur}
-                  error={formik.touched.sportId && formik.errors.sportId}
-                  isRequired="true"
+                  options={betCategoryList}
+                  error={formik.touched.betCategory && formik.errors.betCategory}
                   width={3}
-                >
-                  <option value="">Select Sport</option>
-                  {sportList.map((sport, index) => (
-                    <option key={sport._id} value={sport._id}>
-                      {sport.name}
-                    </option>
-                  ))}
-                </FormSelect>
+                />
 
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-block">
@@ -152,7 +157,7 @@ export default function CompetitionForm() {
                       {loading ? <CSpinner size="sm" /> : "Save"}
                     </CButton>
                     <Link
-                      to={`${process.env.PUBLIC_URL}/competition-list`}
+                      to={`${process.env.PUBLIC_URL}/sport-list`}
                       className="btn btn-danger btn-icon text-white "
                     >
                       Cancel

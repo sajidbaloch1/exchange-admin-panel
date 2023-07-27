@@ -19,6 +19,9 @@ export const deleteEvent = async (id) => {
 };
 
 export const getEventDetailByID = async (id) => {
+    if (!id) {
+        return null;
+    }
     const result = await postData('event/getEventById', {
         _id: id,
     });

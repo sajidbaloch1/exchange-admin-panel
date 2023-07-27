@@ -1,4 +1,4 @@
-import { postData } from '../utils/fetch-services';
+import { postData } from './fetch-services';
 
 const convertArrayOfObjectsToCSV = (array) => {
     let result;

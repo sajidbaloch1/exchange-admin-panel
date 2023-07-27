@@ -39,28 +39,24 @@ export default function CurrencyForm() {
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
       try {
+        let response = null;
         if (id !== '' && id !== undefined) {
-          const response = await updateCurrency({
+          response = await updateCurrency({
             _id: id,
             name: values.name,
             multiplier: values.multiplier
           });
-          if (response.success) {
-            navigate("/currency-list/");
-          } else {
-            setServerError(response.message);
-          }
+
         } else {
-          const response = await addCurrency({
+          response = await addCurrency({
             name: values.name,
             multiplier: values.multiplier
           });
-
-          if (response.success) {
-            navigate("/currency-list");
-          } else {
-            setServerError(response.message);
-          }
+        }
+        if (response.success) {
+          navigate("/currency-list/");
+        } else {
+          setServerError(response.message);
         }
       } catch (error) {
         // Handle error
