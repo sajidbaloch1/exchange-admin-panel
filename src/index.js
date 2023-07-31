@@ -1,24 +1,54 @@
 import React, { Fragment, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import "./index.scss";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
-import * as Switcherdata from "./data/Switcher/Switcherdata";
+import "./index.scss";
 
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
 const App = React.lazy(() => import("./components/app"));
-const Custompages = React.lazy(() => import("./components/custompages"));
 
 //Dashboard
-const Dashboard = React.lazy(() => import("./components/Dashboard/Dashboard"));
+const Dashboard = React.lazy(() => import("./Pages/Dashboard/Dashboard"));
 
-//User
-const UserList = React.lazy(() => import("./components/User/UserList/UserList"));
-const UserForm = React.lazy(() => import("./components/User/UserForm/UserForm"));
+//Sport module
+const SportList = React.lazy(() => import("./Pages/Sport/SportList/SportList"));
+const SportForm = React.lazy(() => import("./Pages/Sport/SportForm/SportForm"));
+const BetCategoryListBySport = React.lazy(() => import("./Pages/Sport/BetCategoryList/BetCategoryList"));
+const BetCategorySettingForm = React.lazy(() => import("./Pages/Sport/BetCategorySettingForm/BetCategorySettingForm"));
+
+// Currency Module
+const CurrencyList = React.lazy(() => import("./Pages/Currency/CurrencyList/CurrencyList"));
+const CurrencyForm = React.lazy(() => import("./Pages/Currency/CurrencyForm/CurrencyForm"));
+
+// Competition Module
+const CompetitionList = React.lazy(() => import("./Pages/Competition/CompetitionList/CompetitionList"));
+const CompetitionForm = React.lazy(() => import("./Pages/Competition/CompetitionForm/CompetitionForm"));
+
+// Event Module
+const EventList = React.lazy(() => import("./Pages/Event/EventList/EventList"));
+const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
+const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
+
+// All User Accounts
+const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
+const AccountForm = React.lazy(() => import("./Pages/Account/AccountForm/AccountForm"));
+const SuperAdminForm = React.lazy(() => import("./Pages/Account/SuperAdminForm/SuperAdminForm"));
+const AdminForm = React.lazy(() => import("./Pages/Account/AdminForm/AdminForm"));
+const SuperMasterForm = React.lazy(() => import("./Pages/Account/SuperMasterForm/SuperMasterForm"));
+const MasterForm = React.lazy(() => import("./Pages/Account/MasterForm/MasterForm"));
+const AgentForm = React.lazy(() => import("./Pages/Account/AgentForm/AgentForm"));
+const UserForm = React.lazy(() => import("./Pages/Account/UserForm/UserForm"));
+const UserList = React.lazy(() => import("./Pages/Account/UserList/UserList"));
+const UserEditForm = React.lazy(() => import("./Pages/Account/UserEditForm/UserEditForm"));
+const MultiLogin = React.lazy(() => import("./Pages/Account/MultiLogin/MultiLogin"));
+
+// Report
+const AccountStatement = React.lazy(() => import("./Pages/Report/AccountStatement/AccountStatement"));
 
 //custom Pages
-const Login = React.lazy(() => import("./components/Login/Login"));
+const Login = React.lazy(() => import("./Pages/Login/Login"));
+const ResetPassword = React.lazy(() => import("./Pages/ResetPassword/ResetPassword"));
 
 //Errorpages
 const Errorpage400 = React.lazy(() => import("./components/ErrorPages/ErrorPages/400/400"));
@@ -30,24 +60,15 @@ const Errorpage503 = React.lazy(() => import("./components/ErrorPages/ErrorPages
 const ProtectedRoutes = React.lazy(() => import("./components/ProtectedRoutes"));
 const PublicRoutes = React.lazy(() => import("./components/PublicRoutes"));
 
-
-
 const Loaderimg = () => {
-
-
   return (
     <div id="global-loader">
-      <img
-        src={require("./assets/images/loader.svg").default}
-        className="loader-img"
-        alt="Loader"
-      />
+      <img src={require("./assets/images/loader.svg").default} className="loader-img" alt="Loader" />
     </div>
   );
 };
 const Root = () => {
   useEffect(() => {
-
     //Switcherdata.localStorageBackUp();
     //Switcherdata.HorizontalHoverMenu();
   }, []);
@@ -56,63 +77,178 @@ const Root = () => {
       <BrowserRouter>
         <React.Suspense fallback={Loaderimg()}>
           <AuthProvider>
-
             <Routes>
-              <Route path="/" element={<ProtectedRoutes />}>
-                <Route
-                  path={`${process.env.PUBLIC_URL}/`}
-                  element={<App />}
-                >
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoutes
+                    allowedRoles={["system_owner", "super_admin", "admin", "super_master", "master", "agent", "user"]}
+                  />
+                }
+              >
+                <Route path={`${process.env.PUBLIC_URL}/`} element={<App />}>
                   <Route
                     path="/"
-                    element={<Navigate to="/dashboard" replace />}
-                  />
+                    element={
+                      <ProtectedRoutes
+                        allowedRoles={[
+                          "system_owner",
+                          "super_admin",
+                          "admin",
+                          "super_master",
+                          "master",
+                          "agent",
+                          "user",
+                        ]}
+                      />
+                    }
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/dashboard`} element={<Dashboard />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/currency-form`} element={<CurrencyForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/currency-list`} element={<CurrencyList />} />
+                  </Route>
+
+                  {/* Sports route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/sport-form`} element={<SportForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/sport-list`} element={<SportList />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/bet-category-list`} element={<BetCategoryListBySport />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/bet-category-setting`}
+                      element={<BetCategorySettingForm />}
+                    />
+                  </Route>
+
+                  {/* Competition route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/competition-form`} element={<CompetitionForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/competition-list`} element={<CompetitionList />} />
+                  </Route>
+
+                  {/* Event route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/event-form`} element={<EventForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/event-list`} element={<EventList />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/api-event-list`} element={<ApiEventForm />} />
+                  </Route>
+
+                  {/* Accounts route  */}
                   <Route
-                    path={`${process.env.PUBLIC_URL}/dashboard`}
-                    element={<Dashboard />}
-                  />
+                    path="/"
+                    element={
+                      <ProtectedRoutes
+                        allowedRoles={["system_owner", "super_admin", "admin", "super_master", "master", "agent"]}
+                      />
+                    }
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/account-list`} element={<AccountList />} />
+                  </Route>
 
                   <Route
-                    path={`${process.env.PUBLIC_URL}/user-list`}
-                    element={<UserList />}
-                  />
+                    path="/"
+                    element={
+                      <ProtectedRoutes
+                        allowedRoles={["system_owner", "super_admin", "admin", "super_master", "master", "agent"]}
+                      />
+                    }
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/account-list/:id`} element={<AccountList />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/super-admin-form`} element={<SuperAdminForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/admin-form`} element={<AdminForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/super-master-form`} element={<SuperMasterForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/master-form`} element={<MasterForm />} />
+                  </Route>
+
                   <Route
-                    path={`${process.env.PUBLIC_URL}/user-add`}
-                    element={<UserForm />}
-                  />
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master"]} />}
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/agent-form`} element={<AgentForm />} />
+                  </Route>
+
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />
+                    }
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/user-form`} element={<UserForm />} />
+                  </Route>
+
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />
+                    }
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/user-list`} element={<UserList />} />
+                  </Route>
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />
+                    }
+                  >
+                    <Route path={`${process.env.PUBLIC_URL}/user-edit/:id`} element={<UserEditForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/multi-login`} element={<MultiLogin />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
+                  </Route>
                 </Route>
-
               </Route>
 
               <Route path="/" element={<PublicRoutes />}>
-                <Route
-                  path={`${process.env.PUBLIC_URL}/login`}
-                  element={<Login />}
-                />
-                <Route
-                  path={`${process.env.PUBLIC_URL}/errorpage401`}
-                  element={<Errorpage401 />}
-                />
-                <Route
-                  path={`${process.env.PUBLIC_URL}/errorpage403`}
-                  element={<Errorpage403 />}
-                />
-                <Route
-                  path={`${process.env.PUBLIC_URL}/errorpage500`}
-                  element={<Errorpage500 />}
-                />
-                <Route
-                  path={`${process.env.PUBLIC_URL}/errorpage503`}
-                  element={<Errorpage503 />}
-                />
-
+                <Route path={`${process.env.PUBLIC_URL}/login`} element={<Login />} />
+                <Route path={`${process.env.PUBLIC_URL}/reset-password`} element={<ResetPassword />} />
+                <Route path={`${process.env.PUBLIC_URL}/errorpage401`} element={<Errorpage401 />} />
+                <Route path={`${process.env.PUBLIC_URL}/errorpage403`} element={<Errorpage403 />} />
+                <Route path={`${process.env.PUBLIC_URL}/errorpage500`} element={<Errorpage500 />} />
+                <Route path={`${process.env.PUBLIC_URL}/errorpage503`} element={<Errorpage503 />} />
               </Route>
               <Route path="*" element={<Errorpage400 />} />
-
             </Routes>
-
           </AuthProvider>
-
         </React.Suspense>
       </BrowserRouter>
     </Fragment>

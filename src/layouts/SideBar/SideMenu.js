@@ -12,16 +12,62 @@ export const MENUITEMS = [
     ],
   },
   {
-    menutitle: "USERS",
+    menutitle: "ACCOUNT",
     Items: [
       {
-        path: `${process.env.PUBLIC_URL}/user-list`,
+        path: `${process.env.PUBLIC_URL}/account-list`,
         icon: "users",
         type: "link",
         active: false,
-        title: "User-list",
+        title: "Account",
       },
     ],
   },
-
 ];
+
+const userRole = JSON.parse(localStorage.getItem("user_info")).role;
+
+if (userRole === "system_owner") {
+  // Add additional menu items for system owner role
+  MENUITEMS.push(
+    {
+      menutitle: "CURRENCY",
+      Items: [
+        {
+
+          path: `${process.env.PUBLIC_URL}/currency-list`,
+          icon: "dollar-sign",
+          type: "link",
+          active: false,
+          title: "Currency",
+        },
+      ],
+    },
+    {
+      menutitle: "CATEGORY",
+      Items: [
+        {
+
+          path: `${process.env.PUBLIC_URL}/sport-list`,
+          icon: "grid",
+          type: "link",
+          active: false,
+          title: "Sport",
+        },
+      ],
+    },
+    {
+      menutitle: "BETCATEGORY",
+      Items: [
+        {
+
+          path: `${process.env.PUBLIC_URL}/bet-category-list`,
+          icon: "cpu",
+          type: "link",
+          active: false,
+          title: "Bet Category",
+        },
+      ],
+    }
+  );
+}

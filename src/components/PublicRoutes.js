@@ -5,7 +5,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 const PublicRoutes = () => {
 
     //const auth = useAuth()
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem('jws_token');
     return token ? <Navigate to="/dashboard" /> : <Outlet />
 }
 
