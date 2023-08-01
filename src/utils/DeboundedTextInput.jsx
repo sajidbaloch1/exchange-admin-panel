@@ -47,7 +47,7 @@ function DebouncedTextInput({
         type="text"
         value={inputValue}
         onChange={handleSearch}
-        placeholder="Enter text"
+        placeholder="Search here"
         className='mb-5'
       />
     </InputGroup>

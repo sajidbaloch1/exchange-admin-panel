@@ -35,7 +35,7 @@ const Sidebar = () => {
             icon: "users",
             type: "link",
             active: false,
-            title: "Account",
+            title: "Accounts",
           },
         ],
       },
@@ -53,19 +53,19 @@ const Sidebar = () => {
               icon: "dollar-sign",
               type: "link",
               active: false,
-              title: "Currency",
+              title: "Currencies",
             },
           ],
         },
         {
-          menutitle: "SPORT",
+          menutitle: "SPORTS",
           Items: [
             {
               path: `${process.env.PUBLIC_URL}/sport-list`,
               icon: "grid",
               type: "link",
               active: false,
-              title: "Sport",
+              title: "Sports",
               allRouet: ['sport-form', 'sport-list']
             },
           ],
@@ -78,7 +78,7 @@ const Sidebar = () => {
               icon: "globe",
               type: "link",
               active: false,
-              title: "Competition",
+              title: "Competitions",
               allRouet: ['competition-form', 'competition-list']
             },
           ],
@@ -91,7 +91,7 @@ const Sidebar = () => {
               icon: "layers",
               type: "link",
               active: false,
-              title: "Event",
+              title: "Events",
               allRouet: ['event-form', 'event-list']
             },
           ],

@@ -30,9 +30,11 @@ const EventList = React.lazy(() => import("./Pages/Event/EventList/EventList"));
 const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
 const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
 
+// Theme Setting 
+const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
+
 // All User Accounts
 const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
-const AccountForm = React.lazy(() => import("./Pages/Account/AccountForm/AccountForm"));
 const SuperAdminForm = React.lazy(() => import("./Pages/Account/SuperAdminForm/SuperAdminForm"));
 const AdminForm = React.lazy(() => import("./Pages/Account/AdminForm/AdminForm"));
 const SuperMasterForm = React.lazy(() => import("./Pages/Account/SuperMasterForm/SuperMasterForm"));
@@ -142,6 +144,9 @@ const Root = () => {
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/competition-list`} element={<CompetitionList />} />
                   </Route>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/competition-event-list`} element={<EventList />} />
+                  </Route>
 
                   {/* Event route  */}
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
@@ -154,6 +159,10 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/api-event-list`} element={<ApiEventForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/theme-setting`} element={<ThemeSettingForm />} />
                   </Route>
 
                   {/* Accounts route  */}

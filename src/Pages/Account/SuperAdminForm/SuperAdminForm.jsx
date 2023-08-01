@@ -205,9 +205,9 @@ export default function SuperAdminForm() {
       </div>
 
       <Card>
-        <Card.Header>
+        {/* <Card.Header>
           <h3 className="card-title">General Information</h3>
-        </Card.Header>
+        </Card.Header> */}
 
         <Card.Body>
           <CForm className="row g-3 needs-validation" onSubmit={formik.handleSubmit}>
