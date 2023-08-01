@@ -27,7 +27,7 @@ export default function Login() {
         userId: userId,
         oldPassword: oldPassword,
         newPassword: newPassword,
-        isForceChangePassword: false,
+        isForceChangePassword: location.state.isForceChangePassword === true,
       };
       resetPassword(request, token);
       // if (!isAuthenticated) {

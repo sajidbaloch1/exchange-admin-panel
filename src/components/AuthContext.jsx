@@ -6,6 +6,8 @@ import { postData } from "../utils/fetch-services-without-token";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
@@ -22,7 +24,6 @@ export const AuthProvider = ({ children }) => {
 
   // console.log(ipAddressDetail);
 
-  const navigate = useNavigate();
   const login = async (username, password) => {
     setLoading(true);
     const result = await postData("auth/login", {
@@ -31,8 +32,13 @@ export const AuthProvider = ({ children }) => {
     });
     if (result.success) {
       if (result.data.user.forcePasswordChange) {
-        navigate("/reset-password");
-        navigate("/reset-password", { state: { id: result.data.user._id, token: result.data.token } });
+        navigate("/reset-password", {
+          state: {
+            id: result.data.user._id,
+            token: result.data.token,
+            isForceChangePassword: true,
+          },
+        });
       } else {
         localStorage.setItem("user_info", JSON.stringify(result.data.user));
         localStorage.setItem("jws_token", result.data.token);
