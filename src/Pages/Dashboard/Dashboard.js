@@ -1,40 +1,36 @@
-import CryptoJS from "crypto-js";
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Breadcrumb, Card, Col, Modal, Row } from "react-bootstrap";
 import CountUp from "react-countup";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as dashboard from "../../data/dashboard/dashboard";
-export default function Dashboard() {
-  const [show, setShow] = useState(false);
-  const location = useLocation(); // Access the location object
+import { getTransactionCode } from "../../lib/transaction-code";
 
-  const secretKey = process.env.PERMISSIONS_AES_SECRET;
-  const encryptedData = "U2FsdGVkX1/W8aPiBttudiuib2YtHyXUgnE3pKUjCLs=";
-  // Decrypt
+export default function Dashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const newUser = location?.state?.newUser ?? false;
+  const authUser = location?.state?.user ?? null;
+
+  const [show, setShow] = useState(newUser);
+  const [code, setCode] = useState("");
 
   useEffect(() => {
-    // Check if there is state in the location object
-    if (location.state && location.state.newUser) {
-      setShow(location.state.newUser);
+    if (newUser && authUser) {
+      setCode(getTransactionCode(authUser.transactionCode));
     }
+    return () => {
+      setCode("");
+      setShow(false);
+    };
+  }, [authUser, newUser]);
 
-    try {
-      console.log(encryptedData);
-      console.log(secretKey);
-      const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-      const decryptedText = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      console.log(decryptedText);
-    } catch (error) {
-      console.error("Error decrypting data:", error.message);
-    }
-  }, []);
-  //localStorage.clear();
   return (
     <div>
       <div className="page-header ">
         <div>
-          <h1 className="page-title">Dashboard </h1>
+          <h1 className="page-title">Dashboard</h1>
           <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
               Home
@@ -343,15 +339,19 @@ export default function Dashboard() {
           >
             x
           </Button> */}
+
           <i className="fe fe-check-circle fs-100 text-success lh-1 mb-4 d-inline-block"></i>
           <h4 className="text-success mb-4">Congratulations!</h4>
           <p className="mb-4 mx-4">Your password has been successfully updated.</p>
+          <p className="mb-4 mx-4 h4">
+            Your transaction password is : <b>{code}</b>
+          </p>
           <p className="mb-4 mx-4">
             To ensure secure transactions on our website, it is essential that you remember and safeguard your
             transaction password. Going forward, all transactions on the website will require this password exclusively.
             It is of utmost importance that you do not disclose this password to anyone.
           </p>
-          <p className="mb-4 mx-4">Thank You [Super Admin Domain name]</p>
+          <p className="mb-4 mx-4">Thank You {authUser?.name}</p>
 
           <p className="mb-4 mx-4">आपका पासवर्ड सफलतापूर्वक अपडेट कर दिया गया है.</p>
 
@@ -362,7 +362,14 @@ export default function Dashboard() {
           </p>
 
           <p className="mb-4 mx-4">धन्यवाद</p>
-          <button className="btn btn-success pd-x-25 " onClick={() => setShow(false)}>
+
+          <button
+            className="btn btn-success pd-x-25 "
+            onClick={() => {
+              navigate("/dashboard");
+              setShow(false);
+            }}
+          >
             Continue
           </button>
         </Modal.Body>
