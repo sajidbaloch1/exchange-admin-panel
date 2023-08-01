@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import { getEventDetailByID, addEvent, updateEvent } from "../eventService";
 import { getAllCompetition } from '../../Competition/competitionService'
 import FormInput from "../../../components/Common/FormComponents/FormInput";
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch"; // Import the FormSelect component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 import * as Yup from "yup";
 import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
@@ -22,9 +22,11 @@ export default function EventForm() {
   const [serverError, setServerError] = useState(null); // State to hold the server error message
   const [competitionList, setCompetitionList] = useState([]);
 
+
   const formik = useFormik({
     initialValues: {
       name: "",
+      matchDate: "",
       competitionId: "",
       sportId: "",
       oddsLimit: "",
@@ -41,6 +43,7 @@ export default function EventForm() {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
+      matchDate: Yup.string().required("Date is required"),
       competitionId: Yup.string().required('Competition is required'),
       oddsLimit: Yup.number().required("Odds Limit is required"),
       volumeLimit: Yup.number().required("Odds Limit is required"),
@@ -50,6 +53,7 @@ export default function EventForm() {
       minStack: Yup.number().required("Odds Limit is required"),
     }),
     onSubmit: async (values) => {
+
       // Perform form submission logic
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
@@ -108,8 +112,13 @@ export default function EventForm() {
         }));
       }
 
-      const competitionData = await getAllCompetition(0);
-      setCompetitionList(competitionData.records);
+      const competitionData = await getAllCompetition({});
+      const dropdownOptions = competitionData.records.map(option => ({
+        value: option._id,
+        label: option.name,
+        sportId: option.sportId,
+      }));
+      setCompetitionList(dropdownOptions);
     };
     fetchData();
   }, [id]);
@@ -127,9 +136,9 @@ export default function EventForm() {
       <Row>
         <Col md={12} lg={12}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <h3 className="card-title">General Information</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <CForm
                 className="row g-3 needs-validation"
@@ -140,34 +149,28 @@ export default function EventForm() {
                 {serverError && <p className="text-red">{serverError}</p>}
                 {/* Display server error message */}
 
-
-                <FormSelect
+                <FormSelectWithSearch
                   label="Competition"
                   name="competitionId"
                   value={formik.values.competitionId}
-                  onChange={(event) => {
-                    formik.setFieldValue('competitionId', event.target.value);
-
-                    const selectedCompetitionId = event.target.value;
-
+                  onChange={(name, selectedValue) => {
+                    formik.setFieldValue(name, selectedValue); // Use the 'name' argument here
                     const selectedCompetition = competitionList.find(
-                      (competition) => competition._id === selectedCompetitionId
+                      (competition) => competition.value === selectedValue
                     );
-                    formik.setFieldValue('sportId', selectedCompetition.sportId);
 
+                    if (selectedCompetition) {
+                      formik.setFieldValue('sportId', selectedCompetition.sportId);
+                    } else {
+                      formik.setFieldValue('sportId', ""); // Reset sportId if selectedCompetition is not found
+                    }
                   }}
                   onBlur={formik.handleBlur}
                   error={formik.touched.competitionId && formik.errors.competitionId}
                   isRequired="true"
                   width={3}
-                >
-                  <option value="">Select Competition</option>
-                  {competitionList.map((competition, index) => (
-                    <option key={competition._id} value={competition._id}>
-                      {competition.name}
-                    </option>
-                  ))}
-                </FormSelect>
+                  options={competitionList}
+                />
 
                 <FormInput
                   label="Name"
@@ -177,6 +180,18 @@ export default function EventForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.name && formik.errors.name}
+                  width={3}
+                  isRequired="true"
+                />
+
+                <FormInput
+                  label="Match Date"
+                  name="matchDate"
+                  type="date"
+                  value={formik.values.matchDate}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.matchDate && formik.errors.matchDate}
                   width={3}
                   isRequired="true"
                 />
@@ -206,7 +221,7 @@ export default function EventForm() {
                 />
 
                 <FormInput
-                  label="Min Stack Session"
+                  label="Min Stake Session"
                   name="minStackSession"
                   type="text"
                   value={formik.values.minStackSession}
@@ -218,7 +233,7 @@ export default function EventForm() {
                 />
 
                 <FormInput
-                  label="Max Stack"
+                  label="Max Stake"
                   name="maxStack"
                   type="text"
                   value={formik.values.maxStack}
@@ -230,7 +245,7 @@ export default function EventForm() {
                 />
 
                 <FormInput
-                  label="Max Stack Session"
+                  label="Max Stake Session"
                   name="maxStackSession"
                   type="text"
                   value={formik.values.maxStackSession}
@@ -242,7 +257,7 @@ export default function EventForm() {
                 />
 
                 <FormInput
-                  label="Min Stack"
+                  label="Min Stake"
                   name="minStack"
                   type="text"
                   value={formik.values.minStack}

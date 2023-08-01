@@ -8,6 +8,7 @@ import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import * as Yup from "yup";
 import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 
 export default function CompetitionForm() {
   const navigate = useNavigate();
@@ -74,17 +75,27 @@ export default function CompetitionForm() {
       if (id) {
         const result = await getCompetitionDetailByID(id);
 
+        const startDateObj = new Date(result.startDate);
+        const startDateFormatted = startDateObj.toISOString().split('T')[0];
+
+        const endDateObj = new Date(result.endDate);
+        const endDateFormatted = endDateObj.toISOString().split('T')[0];
+
         formik.setValues((prevValues) => ({
           ...prevValues,
           name: result.name || "",
           sportId: result.sportId || "",
-          startDate: result.startDate || "",
-          endDate: result.endDate || "",
+          startDate: startDateFormatted,
+          endDate: endDateFormatted || "",
         }));
       }
 
-      const sportData = await getAllSport(0);
-      setSportList(sportData.records);
+      const sportData = await getAllSport();
+      const dropdownOptions = sportData.records.map(option => ({
+        value: option._id,
+        label: option.name,
+      }));
+      setSportList(dropdownOptions);
     };
     fetchData();
   }, [id]);
@@ -102,9 +113,9 @@ export default function CompetitionForm() {
       <Row>
         <Col md={12} lg={12}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <h3 className="card-title">General Information</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <CForm
                 className="row g-3 needs-validation"
@@ -122,10 +133,26 @@ export default function CompetitionForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.name && formik.errors.name}
+                  isRequired="true"
                   width={3}
                 />
 
-                <FormSelect
+                <FormSelectWithSearch
+                  label="Sport"
+                  name="sportId"
+                  value={formik.values.sportId}
+                  onChange={(name, selectedValue) => {
+                    formik.setFieldValue('sportId', selectedValue); // Use the 'name' argument here
+
+                  }}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.sportId && formik.errors.sportId}
+                  isRequired="true"
+                  width={3}
+                  options={sportList}
+                />
+
+                {/* <FormSelect
                   label="Sport"
                   name="sportId"
                   value={formik.values.sportId}
@@ -144,7 +171,7 @@ export default function CompetitionForm() {
                       {sport.name}
                     </option>
                   ))}
-                </FormSelect>
+                </FormSelect> */}
 
                 <FormInput
                   label="Start Date"

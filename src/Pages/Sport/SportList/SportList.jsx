@@ -56,12 +56,6 @@ export default function SportList() {
       sortField: 'name'
     },
     {
-      name: "API CODE",
-      selector: (row) => [row.apiSportId],
-      sortable: true,
-      sortField: 'apiSportId'
-    },
-    {
       name: "TOTAL BET CATEGORY",
       selector: (row) => [row.betCategoryCount],
       sortable: false,

@@ -1,13 +1,7 @@
 import { postData, getData } from '../../utils/fetch-services';
 
-export const getAllEvent = async (page, perPage, sortBy, direction, searchQuery) => {
-    const result = await postData('event/getAllEvent', {
-        page: page,
-        perPage: perPage,
-        sortBy: sortBy,
-        direction: direction,
-        searchQuery: searchQuery
-    });
+export const getAllEvent = async (request) => {
+    const result = await postData('event/getAllEvent', request);
     return result.success ? result.data : [];
 };
 

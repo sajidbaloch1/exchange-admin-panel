@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllEvent, deleteEvent, changeStatus } from "../eventService";
+import { getAllCompetition } from "../../Competition/competitionService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
+import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import FormInput from "../../../components/Common/FormComponents/FormInput";
+import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 
 export default function EventList() {
 
@@ -14,8 +19,7 @@ export default function EventList() {
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
   );
 
-  const [searchQuery, setSearchQuery] = React.useState('');
-
+  const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
@@ -23,6 +27,12 @@ export default function EventList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
+  const [competitionList, setCompetitionList] = useState([]);
+  //Filter Param
+  const [startDateValue, setStartDateValue] = useState('');
+  const [endDateValue, setEndDateValue] = useState('');
+  const [selectedCompetition, setSelectedCompetition] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   const toggleHighlight = async (id, isActive) => {
     setLoading(true);
@@ -31,7 +41,7 @@ export default function EventList() {
       const request = { _id: id, fieldName: 'isActive', status: newStatus.toString() };
       const success = await changeStatus(request);
       if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
+        fetchData(currentPage, sortBy, direction, searchQuery, filters);
         setLoading(false);
       }
     } catch (error) {
@@ -43,6 +53,18 @@ export default function EventList() {
     }
   };
 
+  const location = useLocation();
+  const competitionId = location.state ? location.state.competitionId : '';
+  const competitionName = location.state ? location.state.competitionName : '';
+  const [filters, setFilters] = useState({
+    competitionId: location.state ? location.state.competitionId : '',
+    starDate: "",
+    endDate: "",
+    status: ""
+    // Add more filters here if needed
+  });
+
+  const statusList = [{ id: '', lable: 'All' }, { id: true, lable: 'Active' }, { id: false, lable: 'Inactive' }]
   const columns = [
     {
       name: "SR.NO",
@@ -50,9 +72,10 @@ export default function EventList() {
       sortable: false,
     },
     {
-      name: "SPORT",
-      selector: (row) => [row.sportsName],
-      sortable: true
+      name: "NAME",
+      selector: (row) => [row.name],
+      sortable: true,
+      sortField: 'name'
     },
     {
       name: "COMPETITION",
@@ -60,10 +83,23 @@ export default function EventList() {
       sortable: true,
     },
     {
-      name: "NAME",
-      selector: (row) => [row.name],
+      name: "SPORT",
+      selector: (row) => [row.sportsName],
+      sortable: true
+    },
+    {
+      name: "MATCH DATE",
+      selector: (row) => {
+        const originalDate = new Date(row.matchDate);
+        const formattedDate = originalDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        return formattedDate;
+      },
       sortable: true,
-      sortField: 'name'
+      sortField: 'matchDate',
     },
     {
       name: "STATUS",
@@ -124,10 +160,21 @@ export default function EventList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchData = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page, sortBy, direction, searchQuery, filters) => {
     setLoading(true);
     try {
-      const result = await getAllEvent(page, perPage, sortBy, direction, searchQuery);
+      const { competitionId, fromDate, toDate, status } = filters;
+      const result = await getAllEvent({
+        page: page,
+        perPage: perPage,
+        sortBy: sortBy,
+        direction: direction,
+        searchQuery: searchQuery,
+        competitionId: competitionId,
+        fromDate: fromDate,
+        toDate: toDate,
+        status: status
+      });
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -145,7 +192,7 @@ export default function EventList() {
     try {
       const success = await deleteEvent(id);
       if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
+        fetchData(currentPage, sortBy, direction, searchQuery, filters);
         setLoading(false);
       }
     } catch (error) {
@@ -162,13 +209,13 @@ export default function EventList() {
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchData(currentPage, sortBy, direction, searchQuery);
+    fetchData(currentPage, sortBy, direction, searchQuery, filters);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchData(page, sortBy, direction, searchQuery);
+    fetchData(page, sortBy, direction, searchQuery, filters);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -185,19 +232,74 @@ export default function EventList() {
     showAlert(id, removeRow);
   };
 
+  const handleFilterClick = () => {
+    const newFilters = {
+      competitionId: selectedCompetition,
+      fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
+      toDate: endDateValue, // Replace endDateValue with the actual state value for end date
+      status: selectedStatus
+    };
+    setFilters(newFilters);
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, newFilters);
+  };
+
+  const resetFilters = () => {
+    // Clear the filter values
+    setSelectedCompetition("");
+    setStartDateValue("");
+    setEndDateValue("");
+    setSelectedStatus("");
+    // Add more filter states if needed
+
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, {
+      sportId: "",
+      startDate: "",
+      endDate: "",
+      // Add more filters here if needed
+    });
+  };
+
+  const filterData = async () => {
+    const competitionData = await getAllCompetition();
+    const dropdownOptions = competitionData.records.map(option => ({
+      value: option._id,
+      label: option.name,
+    }));
+    setCompetitionList(dropdownOptions);
+  };
+
   useEffect(() => {
+
     if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, filters); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, '', filters); // fetch page 1 of users
     }
-  }, [perPage, searchQuery]);
+    filterData();
+
+  }, [perPage, searchQuery, filters]);
+
+  useEffect(() => {
+    return () => {
+      setFilters(
+        {
+          competitionId: '',
+          starDate: "",
+          endDate: ""
+          // Add more filters here if needed
+        }
+      )
+    }
+
+  }, [location]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL EVENTS</h1>
+          <h1 className="page-title"> {(competitionName !== '') ? competitionName + "'s Events" : "ALL EVENTS"}</h1>
           {/* <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
               Category
@@ -208,12 +310,14 @@ export default function EventList() {
           </Breadcrumb> */}
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/event-form`} className="btn btn-primary btn-icon text-white me-3">
-            <span>
-              <i className="fe fe-plus"></i>&nbsp;
-            </span>
-            CREATE EVENT
-          </Link>
+          {competitionName === '' &&
+            <Link to={`${process.env.PUBLIC_URL}/event-form`} className="btn btn-primary btn-icon text-white me-3">
+              <span>
+                <i className="fe fe-plus"></i>&nbsp;
+              </span>
+              CREATE EVENT
+            </Link>
+          }
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;
@@ -226,7 +330,69 @@ export default function EventList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
+            {competitionName === "" && (
+              <Card.Header>
+                <FormSelectWithSearch
+                  label="Competition"
+                  name="sportId"
+                  value={selectedCompetition} // Set the selectedCompetition as the value
+                  onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
+                  onBlur={() => { }} // Add an empty function as onBlur prop
+                  error=""
+                  width={2}
+                  options={competitionList}
+                />
 
+                <FormInput
+                  label="Start Date"
+                  name="startDate"
+                  type="date"
+                  value={startDateValue}
+                  onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
+                  onBlur={() => { }}
+                  width={2}
+                />
+
+                <FormInput
+                  label="End Date"
+                  name="endDate"
+                  type="date"
+                  value={endDateValue}
+                  onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
+                  onBlur={() => { }}
+                  width={2}
+                />
+
+                <FormSelect
+                  label="Status"
+                  name="status"
+                  value={selectedStatus}
+                  onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
+                  onBlur={() => { }}
+                  width={2}
+                >
+                  {statusList.map((status, index) => (
+                    <option key={status.index} value={status.id}>
+                      {status.lable.toUpperCase()}
+                    </option>
+                  ))}
+                </FormSelect>
+
+                <CCol xs={12}>
+                  <div className="d-grid gap-2 d-md-block">
+                    <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
+                      {loading ? <CSpinner size="sm" /> : "Filter"}
+                    </CButton>
+                    <button
+                      onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
+                      className="btn btn-danger btn-icon text-white mt-6"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </CCol>
+              </Card.Header>
+            )}
             <Card.Body>
               <SearchInput
                 searchQuery={searchQuery}

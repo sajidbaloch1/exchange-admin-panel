@@ -289,10 +289,10 @@ export default function EventForm() {
                       />
 
                       <Row className="mt-5">
-                        <CCol lg={4}>
+                        <CCol lg={2}>
                           Already Added :
                         </CCol>
-                        <CCol lg={8}>
+                        <CCol lg={10}>
                           <div className="">
                             <ul className="list-group">
                               {selectedSport.competitions.map((competition, event_index) =>
@@ -308,10 +308,10 @@ export default function EventForm() {
                       </Row>
                       <hr className="mt-5"></hr>
                       <Row className="mt-5">
-                        <CCol lg={4}>
+                        <CCol lg={2}>
                           All :
                         </CCol>
-                        <CCol lg={8}>
+                        <CCol lg={10}>
                           <div className="">
                             <ul className="list-group">
                               {selectedSport.competitions.map((event, event_index) => {

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllCurrency, deleteCurrency } from "../accountStatementService";
+import { getAllTransactionActivity, deleteCurrency } from "../accountStatementService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
@@ -38,72 +38,77 @@ export default function AccountStatementList() {
     },
     {
       name: "DATE",
-      selector: (row) => [row.date],
+      selector: (row) => {
+        const originalDate = new Date(row.createdAt);
+        const formattedDate = originalDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+        });
+        return formattedDate;
+      },
       sortable: true,
       sortField: 'date'
     },
     {
       name: "CREDIT",
-      selector: (row) => [row.credit],
+      selector: (row) => [row.points],
       sortable: true,
-      sortField: 'credit'
+      sortField: 'points',
+      cell: (row) => (
+        <div style={{ color: "green" }}>
+          {row.type === "credit" ? row.points : ""}
+        </div>
+      ),
     },
     {
       name: "DEBIT",
-      selector: (row) => [row.debit],
+      selector: (row) => [row.points],
       sortable: true,
-      sortField: 'debit'
+      sortField: 'points',
+      cell: (row) => (
+        <div style={{ color: "red" }}>
+          {row.type === "debit" ? "-" + row.points : ""}
+        </div>
+      ),
     },
     {
       name: "PTS",
-      selector: (row) => [row.pts],
+      selector: (row) => [row.balancePoints],
       sortable: true,
-      sortField: 'pts'
+      sortField: 'balancePoints',
+
     },
     {
       name: "REMARKS",
-      selector: (row) => [row.remkars],
+      selector: (row) => [row.remark],
       sortable: true,
-      sortField: 'remkars'
+      sortField: 'remark'
     },
     {
       name: "FROMTO",
-      selector: (row) => [row.fromto],
+      selector: (row) => [row.fromtoName],
       sortable: true,
-      sortField: 'fromto'
+      sortField: 'fromtoName'
     },
   ];
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
-  const [selectedRows, setSelectedRows] = React.useState([]);
-  const [toggleCleared, setToggleCleared] = React.useState(false);
-  let selectdata = [];
-  const handleRowSelected = React.useCallback((state) => {
-    setSelectedRows(state.selectedRows);
-  }, []);
-
-  const contextActions = React.useMemo(() => {
-    const Selectdata = () => {
-      if (window.confirm(`download:\r ${selectedRows.map((r) => r.SNO)}?`)) {
-        setToggleCleared(!toggleCleared);
-        data.map((e) => {
-          selectedRows.map((sr) => {
-            if (e.id === sr.id) {
-              selectdata.push(e);
-            }
-          });
-        });
-        downloadCSV(selectdata);
-      }
-    };
-
-    return <Export onExport={() => Selectdata()} icon="true" />;
-  }, [data, selectdata, selectedRows]);
 
   const fetchData = async (page, sortBy, direction, searchQuery) => {
     setLoading(true);
     try {
-      const result = await getAllCurrency(page, perPage, sortBy, direction, searchQuery);
+      const result = await getAllTransactionActivity({
+        page: page,
+        perPage: perPage,
+        sortBy: sortBy,
+        direction: direction,
+        searchQuery: searchQuery,
+        userId: '64c13adae05c20941879553a'
+      });
 
       setData(result.records);
       setTotalRows(result.totalRecords);
@@ -116,24 +121,6 @@ export default function AccountStatementList() {
       setLoading(false);
     }
   };
-
-  const removeRow = async (id) => {
-    setLoading(true);
-    try {
-      const success = await deleteCurrency(id);
-      if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
-        setLoading(false);
-      }
-    } catch (error) {
-      // Handle error
-      console.error("Error removing :", error);
-      // Display error message or show notification to the user
-      // Set the state to indicate the error condition
-      setLoading(false);
-    }
-  };
-
 
   const handleSort = (column, sortDirection) => {
     // simulate server sort
@@ -156,11 +143,7 @@ export default function AccountStatementList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('currencies/getAllCurrency', searchQuery, 'currency.csv');
-  };
-
-  const handleDelete = (id) => {
-    showAlert(id, removeRow);
+    await downloadCSV('currencies/getAllTransactionActivity', searchQuery, 'currency.csv');
   };
 
   const selectionRange = {
@@ -205,22 +188,19 @@ export default function AccountStatementList() {
                 setSearchQuery={setSearchQuery}
                 loading={loading}
               />
-              <Row>
+              {/* <Row>
                 <CCol xs={4}>
                   <DateRangePicker
                     ranges={[selectionRange]}
                     onChange={handleSelect}
                   />
                 </CCol>
-              </Row>
+              </Row> */}
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}
                   data={data}
                   // actions={actionsMemo}
-                  // contextActions={contextActions}
-                  // onSelectedRowsChange={handleRowSelected}
-                  clearSelectedRows={toggleCleared}
                   //selectableRows
                   pagination
                   highlightOnHover

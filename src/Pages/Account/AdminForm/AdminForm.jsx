@@ -157,9 +157,9 @@ export default function AdminForm() {
       <Row>
         <Col md={12} lg={12}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <h3 className="card-title">General Information</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <CForm
                 className="row g-3 needs-validation"

@@ -106,9 +106,9 @@ export default function SportForm() {
       <Row>
         <Col md={12} lg={12}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <h3 className="card-title">General Information</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <CForm
                 className="row g-3 needs-validation"
@@ -127,6 +127,7 @@ export default function SportForm() {
                   onBlur={formik.handleBlur}
                   error={formik.touched.name && formik.errors.name}
                   width={2}
+                  isRequired="true"
                 />
 
                 <FormInput
@@ -138,6 +139,7 @@ export default function SportForm() {
                   onBlur={formik.handleBlur}
                   error={formik.touched.apiSportId && formik.errors.apiSportId}
                   width={3}
+                  isRequired="true"
                 />
 
                 <FormMultiSelect
@@ -149,6 +151,7 @@ export default function SportForm() {
                   options={betCategoryList}
                   error={formik.touched.betCategory && formik.errors.betCategory}
                   width={3}
+                  isRequired="true"
                 />
 
                 <CCol xs={12}>

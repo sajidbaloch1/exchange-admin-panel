@@ -44,6 +44,7 @@ export default function AccountList() {
   const [selectedUserIdStack, setSelectedUserIdStack] = useState([]);
   const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
   const roleHierarchy = {
+    system_owner: ["super_admin"],
     super_admin: ["admin", "super_master", "master", "agent"],
     admin: ["super_master", "master", "agent"],
     super_master: ["master", "agent"],
@@ -106,16 +107,16 @@ export default function AccountList() {
       sortField: "role",
     },
     {
-      name: "CITY",
-      selector: (row) => [row.city],
-      sortable: true,
-      sortField: "city",
-    },
-    {
       name: "ACTION",
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
+          <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg ">
+            D
+          </Button>
+          <Button variant="danger" onClick={() => handleWithdrawClick(row)} className="btn btn-lg ms-2 me-2">
+            W
+          </Button>
           {row.role === "super_admin" && (
             <Link
               to={`${process.env.PUBLIC_URL}/super-admin-form`}
@@ -161,14 +162,6 @@ export default function AccountList() {
               <i className="fa fa-edit"></i>
             </Link>
           )}
-
-          <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg ms-2">
-            D
-          </Button>
-          <Button variant="danger" onClick={() => handleWithdrawClick(row)} className="btn btn-lg ms-2">
-            W
-          </Button>
-
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
@@ -208,7 +201,15 @@ export default function AccountList() {
   const fetchData = async (page) => {
     setLoading(true);
     try {
-      const result = await getAllData(page, perPage, sortBy, direction, searchQuery, parentId);
+      const result = await getAllData({
+        page: page,
+        perPage: perPage,
+        sortBy: sortBy,
+        direction: direction,
+        searchQuery: searchQuery,
+        parentId: parentId,
+        role: allowedRoles
+      });
 
       setData(result.records);
       setTotalRows(result.totalRecords);
@@ -563,7 +564,7 @@ export default function AccountList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL ACCOUNT</h1>
+          <h1 className="page-title">ALL ACCOUNTS</h1>
         </div>
         <div className="ms-auto pageheader-btn">
           {role === "system_owner" && (

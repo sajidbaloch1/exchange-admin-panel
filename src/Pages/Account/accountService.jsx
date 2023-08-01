@@ -1,14 +1,7 @@
 import { postData } from "../../utils/fetch-services";
 
-export const getAllData = async (page, perPage, sortBy, direction, searchQuery, parentId) => {
-  const result = await postData("users/getAllUsers", {
-    page: page,
-    perPage: perPage,
-    sortBy: sortBy,
-    direction: direction,
-    searchQuery: searchQuery,
-    parentId: parentId,
-  });
+export const getAllData = async (request) => {
+  const result = await postData("users/getAllUsers", request);
   return result.success ? result.data : [];
 };
 

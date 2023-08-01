@@ -4,9 +4,15 @@ import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllCompetition, deleteCompetition, changeStatus } from "../competitionService";
+import { getAllSport } from '../../Sport/sportService'
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
+import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import FormInput from "../../../components/Common/FormComponents/FormInput";
+
 
 export default function CompetitionList() {
 
@@ -23,6 +29,22 @@ export default function CompetitionList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
+  const [sportList, setSportList] = useState([]);
+  // Filter param
+  const [startDateValue, setStartDateValue] = useState('');
+  const [endDateValue, setEndDateValue] = useState('');
+  const [selectedSport, setSelectedSport] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+
+  const [filters, setFilters] = useState({
+    sportId: "",
+    starDate: "",
+    endDate: "",
+    status: ""
+    // Add more filters here if needed
+  });
+
+  const statusList = [{ id: '', lable: 'All' }, { id: true, lable: 'Active' }, { id: false, lable: 'Inactive' }]
 
   const toggleHighlight = async (id, isActive) => {
     setLoading(true);
@@ -31,7 +53,7 @@ export default function CompetitionList() {
       const request = { _id: id, fieldName: 'isActive', status: newStatus.toString() };
       const success = await changeStatus(request);
       if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
+        fetchData(currentPage, sortBy, direction, searchQuery, filters);
         setLoading(false);
       }
     } catch (error) {
@@ -63,15 +85,37 @@ export default function CompetitionList() {
     },
     {
       name: "START DATE",
-      selector: (row) => [row.startDate],
+      selector: (row) => {
+        const originalDate = new Date(row.startDate);
+        const formattedDate = originalDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        return formattedDate;
+      },
       sortable: true,
-      sortField: 'startDate'
+      sortField: 'startDate',
     },
     {
       name: "END DATE",
-      selector: (row) => [row.endDate],
+      selector: (row) => {
+        const originalDate = new Date(row.endDate);
+        const formattedDate = originalDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        return formattedDate;
+      },
       sortable: true,
-      sortField: 'endDate'
+      sortField: 'startDate',
+    },
+    {
+      name: "COMPETITION STATUS",
+      selector: (row) => [row.competitionStatus],
+      sortable: true,
+      sortField: 'competitionStatus',
     },
     {
       name: "STATUS",
@@ -95,12 +139,20 @@ export default function CompetitionList() {
       ),
     },
     {
+      name: 'TOTAL EVENTS',
+      cell: row => (
+        <div>
+          <Link to={`${process.env.PUBLIC_URL}/competition-event-list`} state={{ competitionId: row._id, competitionName: row.name }} className="btn btn-info btn-lg ms-2">{row.totalEvent}</Link>
+          {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
+        </div>
+      ),
+    },
+    {
       name: 'ACTION',
       cell: row => (
         <div>
           <Link to={`${process.env.PUBLIC_URL}/competition-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
-
         </div>
       ),
     },
@@ -132,10 +184,22 @@ export default function CompetitionList() {
     return <Export onExport={() => Selectdata()} icon="true" />;
   }, [data, selectdata, selectedRows]);
 
-  const fetchData = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page, sortBy, direction, searchQuery, filters) => {
     setLoading(true);
     try {
-      const result = await getAllCompetition(page, perPage, sortBy, direction, searchQuery);
+      const { sportId, fromDate, toDate, status } = filters;
+
+      const result = await getAllCompetition({
+        page: page,
+        perPage: perPage,
+        sortBy: sortBy,
+        direction: direction,
+        searchQuery: searchQuery,
+        sportId: sportId,
+        fromDate: fromDate,
+        toDate: toDate,
+        status: status
+      });
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -153,7 +217,7 @@ export default function CompetitionList() {
     try {
       const success = await deleteCompetition(id);
       if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
+        fetchData(currentPage, sortBy, direction, searchQuery, filters);
         setLoading(false);
       }
     } catch (error) {
@@ -170,13 +234,13 @@ export default function CompetitionList() {
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchData(currentPage, sortBy, direction, searchQuery);
+    fetchData(currentPage, sortBy, direction, searchQuery, filters);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchData(page, sortBy, direction, searchQuery);
+    fetchData(page, sortBy, direction, searchQuery, filters);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -193,12 +257,53 @@ export default function CompetitionList() {
     showAlert(id, removeRow);
   };
 
+  const filterData = async () => {
+    const sportData = await getAllSport();
+    const dropdownOptions = sportData.records.map(option => ({
+      value: option._id,
+      label: option.name,
+    }));
+    setSportList(dropdownOptions);
+  };
+
+  const handleFilterClick = () => {
+    const newFilters = {
+      sportId: selectedSport,
+      fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
+      toDate: endDateValue, // Replace endDateValue with the actual state value for end date
+      status: selectedStatus
+    };
+    setFilters(newFilters);
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, newFilters);
+  };
+
+  const resetFilters = () => {
+    // Clear the filter values
+    setSelectedSport("");
+    setStartDateValue("");
+    setEndDateValue("");
+    setSelectedStatus("");
+    // Add more filter states if needed
+
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, {
+      sportId: "",
+      startDate: "",
+      endDate: "",
+      status: ""
+      // Add more filters here if needed
+    });
+  };
+
   useEffect(() => {
+
     if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, filters); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, '', filters); // fetch page 1 of users
     }
+    filterData();
   }, [perPage, searchQuery]);
 
   return (
@@ -234,7 +339,68 @@ export default function CompetitionList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
+            <Card.Header>
 
+              <FormSelectWithSearch
+                label="Sport"
+                name="sportId"
+                value={selectedSport} // Set the selectedSport as the value
+                onChange={(name, selectedValue) => setSelectedSport(selectedValue)} // Update the selectedSport
+                onBlur={() => { }} // Add an empty function as onBlur prop
+                error=""
+                width={2}
+                options={sportList}
+              />
+
+              <FormInput
+                label="Start Date"
+                name="startDate"
+                type="date"
+                value={startDateValue}
+                onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => { }}
+                width={2}
+              />
+
+              <FormInput
+                label="End Date"
+                name="endDate"
+                type="date"
+                value={endDateValue}
+                onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => { }}
+                width={2}
+              />
+
+              <FormSelect
+                label="Status"
+                name="status"
+                value={selectedStatus}
+                onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => { }}
+                width={2}
+              >
+                {statusList.map((status, index) => (
+                  <option key={status.index} value={status.id}>
+                    {status.lable.toUpperCase()}
+                  </option>
+                ))}
+              </FormSelect>
+
+              <CCol xs={12}>
+                <div className="d-grid gap-2 d-md-block">
+                  <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
+                    {loading ? <CSpinner size="sm" /> : "Filter"}
+                  </CButton>
+                  <button
+                    onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
+                    className="btn btn-danger btn-icon text-white mt-6"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </CCol>
+            </Card.Header>
             <Card.Body>
               <SearchInput
                 searchQuery={searchQuery}

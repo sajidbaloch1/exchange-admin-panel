@@ -1,13 +1,7 @@
 import { postData } from '../../utils/fetch-services';
 
-export const getAllCurrency = async (page, perPage, sortBy, direction, searchQuery) => {
-    const result = await postData('currencies/getAllCurrency', {
-        page: page,
-        perPage: perPage,
-        sortBy: sortBy,
-        direction: direction,
-        searchQuery: searchQuery
-    });
+export const getAllTransactionActivity = async (request) => {
+    const result = await postData('transactionActivity/getAllTransactionActivity', request);
     return result.success ? result.data : [];
 };
 

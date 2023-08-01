@@ -144,6 +144,9 @@ const Root = () => {
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/competition-list`} element={<CompetitionList />} />
                   </Route>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/competition-event-list`} element={<EventList />} />
+                  </Route>
 
                   {/* Event route  */}
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>

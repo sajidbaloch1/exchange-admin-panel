@@ -93,9 +93,9 @@ export default function CurrencyForm() {
       <Row>
         <Col md={12} lg={12}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <h3 className="card-title">General Information</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <CForm
                 className="row g-3 needs-validation"
@@ -106,7 +106,7 @@ export default function CurrencyForm() {
                 {serverError && <p className="text-red">{serverError}</p>}
                 {/* Display server error message */}
                 <FormInput
-                  label="Name"
+                  label="Currency"
                   name="name"
                   type="text"
                   value={formik.values.name}
@@ -114,10 +114,11 @@ export default function CurrencyForm() {
                   onBlur={formik.handleBlur}
                   error={formik.touched.name && formik.errors.name}
                   width={3}
+                  isRequired="true"
                 />
 
                 <FormInput
-                  label="Multiplier"
+                  label="Conversion rate (INR)"
                   name="multiplier"
                   type="text"
                   value={formik.values.multiplier}
@@ -125,6 +126,7 @@ export default function CurrencyForm() {
                   onBlur={formik.handleBlur}
                   error={formik.touched.multiplier && formik.errors.multiplier}
                   width={2}
+                  isRequired="true"
                 />
 
                 <CCol xs={12}>

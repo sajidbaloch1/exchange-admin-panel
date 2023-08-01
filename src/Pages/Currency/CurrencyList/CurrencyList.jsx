@@ -31,13 +31,13 @@ export default function CurrencyList() {
       sortable: false,
     },
     {
-      name: "NAME",
+      name: "CURRENCY",
       selector: (row) => [row.name],
       sortable: true,
       sortField: 'name'
     },
     {
-      name: "MULTIPLIER",
+      name: "CONVERSION RATE (INR)",
       selector: (row) => [row.multiplier],
       sortable: true,
       sortField: 'multiplier'
@@ -154,7 +154,7 @@ export default function CurrencyList() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ALL CURRENCY</h1>
+          <h1 className="page-title">ALL CURRENCIES</h1>
 
         </div>
         <div className="ms-auto pageheader-btn">
