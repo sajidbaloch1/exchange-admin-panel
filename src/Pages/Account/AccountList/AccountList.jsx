@@ -7,6 +7,8 @@ import SearchInput from "../../../components/Common/FormComponents/SearchInput";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { deleteData, getAllData } from "../accountService";
+import FormSelect from "../../../components/Common/FormComponents/FormSelect";
+import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
 
 export default function AccountList() {
   const location = useLocation();
@@ -33,6 +35,11 @@ export default function AccountList() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [direction, setDirection] = useState("desc");
 
+  // popup fields
+
+  const [parentName, setparentName] = useState(false);
+  const [popupUserName, setpopupUserName] = useState(false);
+
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawRemarks, setWithdrawRemarks] = useState("");
@@ -43,6 +50,11 @@ export default function AccountList() {
 
   const [selectedUserIdStack, setSelectedUserIdStack] = useState([]);
   const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
+  const [selectedRole, setSelectedRole] = useState('');
+  const [filters, setFilters] = useState({
+    role: "",
+    // Add more filters here if needed
+  });
   const roleHierarchy = {
     system_owner: ["super_admin"],
     super_admin: ["admin", "super_master", "master", "agent"],
@@ -542,10 +554,35 @@ export default function AccountList() {
 
   const handleWithdrawClick = (row) => {
     // Set initial values for the Withdraw modal based on the row data
+
+    console.log(row);
     setWithdrawAmount("");
     setWithdrawRemarks("");
     setSelectedUserIdStack([row._id]);
     setShowWithdrawModal(true);
+  };
+
+  const handleFilterClick = () => {
+    const newFilters = {
+      role: selectedRole !== "" ? selectedRole : null,
+
+    };
+    setFilters(newFilters);
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, newFilters);
+  };
+
+  const resetFilters = () => {
+    // Clear the filter values
+    setSelectedRole("");
+
+    // Add more filter states if needed
+
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, {
+      role: "",
+      // Add more filters here if needed
+    });
   };
 
   useEffect(() => {
@@ -622,6 +659,33 @@ export default function AccountList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
+            {/* <Card.Header>
+
+              <FormSelect
+                label="Role"
+                name="sportId"
+                value={selectedRole} // Set the selectedRole as the value
+                onChange={(name, selectedValue) => setSelectedRole(selectedValue)} // Update the selectedSport
+                onBlur={() => { }} // Add an empty function as onBlur prop
+                error=""
+                width={2}
+                options={allowedRoles}
+              />
+
+              <CCol xs={12}>
+                <div className="d-grid gap-2 d-md-block">
+                  <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
+                    {loading ? <CSpinner size="sm" /> : "Filter"}
+                  </CButton>
+                  <button
+                    onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
+                    className="btn btn-danger btn-icon text-white mt-6"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </CCol>
+            </Card.Header> */}
             <Card.Body>
               <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
               <div className="table-responsive export-table">

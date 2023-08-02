@@ -180,7 +180,14 @@ export default function UserList() {
   const fetchData = async (page) => {
     setLoading(true);
     try {
-      const result = await getAllData(page, perPage, sortBy, direction, searchQuery, parentId);
+      const result = await getAllData({
+        page: page,
+        perPage: perPage,
+        sortBy: sortBy,
+        direction: direction,
+        searchQuery: searchQuery,
+        parentId: parentId
+      });
 
       setData(result.records);
       setTotalRows(result.totalRecords);
