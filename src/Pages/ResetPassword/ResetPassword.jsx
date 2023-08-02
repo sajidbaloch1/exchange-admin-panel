@@ -1,29 +1,21 @@
-import React, { useState, useContext, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { CButton, CForm, CFormFeedback, CFormInput } from "@coreui/react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../components/AuthContext";
-import {
-  CForm,
-  CCol,
-  CFormLabel,
-  CFormFeedback,
-  CFormInput,
-  CButton,
-} from "@coreui/react";
 
 export default function Login() {
+  const location = useLocation();
+  const { resetPassword, loginError } = useContext(AuthContext);
+
   const [validated, setValidated] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isConfirmPasswordTouched, setIsConfirmPasswordTouched] = useState(false);
 
-  const [userId, setUserId] = useState('');
-  const [token, setToken] = useState('');
-
-  const { resetPassword, loginError } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const location = useLocation(); // Access the location object
+  const [userId, setUserId] = useState("");
+  const [token, setToken] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,15 +27,13 @@ export default function Login() {
         userId: userId,
         oldPassword: oldPassword,
         newPassword: newPassword,
-        isForceChangePassword: false,
-
+        isForceChangePassword: location.state.isForceChangePassword === true,
       };
       resetPassword(request, token);
       // if (!isAuthenticated) {
       //   //setLoginError('Please check the credentails');
       // }
       // Redirect to dashboard page after successful login
-
     } else {
       setValidated(true);
       setIsConfirmPasswordTouched(true);
@@ -51,32 +41,21 @@ export default function Login() {
   };
 
   useEffect(() => {
-    // Check if there is state in the location object
     if (location.state && location.state.id) {
-      // If there is state, you can access it like this:
       setUserId(location.state.id);
-      // Do something with the user object, if needed
     }
     if (location.state && location.state.token) {
-      // If there is state, you can access it like this:
       setToken(location.state.token);
-      // Do something with the user object, if needed
     }
   }, [location]);
-
 
   return (
     <div className="login-img">
       <div className="page">
-
         <div className="">
           <div className="col col-login mx-auto">
             <div className="text-center">
-              <img
-                src={require("../../assets/images/brand/logo.png")}
-                className="header-brand-img"
-                alt=""
-              />
+              <img src={require("../../assets/images/brand/logo.png")} className="header-brand-img" alt="" />
             </div>
           </div>
           <div className="container-login100">
@@ -91,7 +70,10 @@ export default function Login() {
                 >
                   <span className="login100-form-title">Reset Password </span>
 
-                  <div className="text-center pb-3"> <p className="text-danger mb-0">{loginError}</p></div>
+                  <div className="text-center pb-3">
+                    {" "}
+                    <p className="text-danger mb-0">{loginError}</p>
+                  </div>
 
                   <div className="wrap-input100 validate-input">
                     <CFormInput
@@ -145,9 +127,7 @@ export default function Login() {
                       <i className="zmdi zmdi-lock" aria-hidden="true"></i>
                     </span>
                     {isConfirmPasswordTouched && confirmPassword !== newPassword && (
-                      <CFormFeedback className="text-danger">
-                        Passwords do not match.
-                      </CFormFeedback>
+                      <CFormFeedback className="text-danger">Passwords do not match.</CFormFeedback>
                     )}
                   </div>
 
