@@ -1,36 +1,21 @@
-import React, { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { CButton, CForm, CFormFeedback, CFormInput } from "@coreui/react";
+import React, { useContext, useState } from "react";
 import { Card } from "react-bootstrap";
 import { AuthContext } from "../../components/AuthContext";
-import {
-  CForm,
-  CCol,
-  CFormLabel,
-  CFormFeedback,
-  CFormInput,
-  CButton,
-} from "@coreui/react";
 
 export default function Login() {
-  const [validated, setValidated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
   const { login, loginError } = useContext(AuthContext);
 
-  const navigate = useNavigate();
+  const [validated, setValidated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const form = e.currentTarget;
     if (form.checkValidity()) {
-      // Perform login logic here, e.g., send login request to server
       login(username, password);
-      // if (!isAuthenticated) {
-      //   //setLoginError('Please check the credentails');
-      // }
-      // Redirect to dashboard page after successful login
-
     } else {
       setValidated(true);
     }
@@ -39,15 +24,10 @@ export default function Login() {
   return (
     <div className="login-img">
       <div className="page">
-
         <div className="">
           <div className="col col-login mx-auto">
             <div className="text-center">
-              <img
-                src={require("../../assets/images/brand/logo.png")}
-                className="header-brand-img"
-                alt=""
-              />
+              <img src={require("../../assets/images/brand/logo.png")} className="header-brand-img" alt="" />
             </div>
           </div>
           <div className="container-login100">
@@ -62,7 +42,10 @@ export default function Login() {
                 >
                   <span className="login100-form-title">Login</span>
 
-                  <div className="text-center pb-3"> <p className="text-danger mb-0">{loginError}</p></div>
+                  <div className="text-center pb-3">
+                    {" "}
+                    <p className="text-danger mb-0">{loginError}</p>
+                  </div>
 
                   <div className="wrap-input100 validate-input">
                     <CFormInput

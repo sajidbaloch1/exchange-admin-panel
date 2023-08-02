@@ -1,10 +1,9 @@
 import React, { useContext } from "react";
-import { Dropdown, Navbar, Container } from "react-bootstrap";
+import { Container, Dropdown, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../components/AuthContext";
 
 export function Header() {
-
   //full screen
   // function Fullscreen() {
   //   if (
@@ -39,7 +38,6 @@ export function Header() {
     document.querySelector(".app").classList.toggle("sidenav-toggled");
   };
 
-
   // responsivesearch
   const responsivesearch = () => {
     document.querySelector(".header-search").classList.toggle("show");
@@ -47,11 +45,11 @@ export function Header() {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
 
-  const user = JSON.parse(localStorage.getItem('user_info'));
+  const user = JSON.parse(localStorage.getItem("user_info"));
 
   const signout = (e) => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -65,26 +63,24 @@ export function Header() {
             onClick={() => openCloseSidebar()}
           ></Link>
           <div className="responsive-logo">
-            <Link
-              to={`${process.env.PUBLIC_URL}/dashboard/`}
-              className="header-logo"
-            >
+            <Link to={`${process.env.PUBLIC_URL}/dashboard/`} className="header-logo">
               <img
                 src={require("../../assets/images/brand/logo.png")}
                 className="mobile-logo logo-1"
                 alt="logo"
+                width="120px"
+                height="auto"
               />
               <img
                 src={require("../../assets/images/brand/logo.png")}
                 className="mobile-logo dark-logo-1"
                 alt="logo"
+                width="120px"
+                height="auto"
               />
             </Link>
           </div>
-          <Link
-            className="logo-horizontal "
-            to={`${process.env.PUBLIC_URL}/dashboard/`}
-          >
+          <Link className="logo-horizontal " to={`${process.env.PUBLIC_URL}/dashboard/`}>
             <img
               src={require("../../assets/images/brand/logo.png")}
               className="header-brand-img desktop-logo"
@@ -107,26 +103,15 @@ export function Header() {
             </Navbar.Toggle>
 
             <div className="navbar navbar-collapse responsive-navbar p-0">
-              <Navbar.Collapse
-                className="navbar-collapse"
-                id="navbarSupportedContent-4"
-              >
+              <Navbar.Collapse className="navbar-collapse" id="navbarSupportedContent-4">
                 <div className="d-flex order-lg-2">
                   <div className="dropdown d-block d-lg-none">
-                    <Link
-                      to="#"
-                      className="nav-link icon"
-                      onClick={() => responsivesearch()}
-                    >
+                    <Link to="#" className="nav-link icon" onClick={() => responsivesearch()}>
                       <i className="fe fe-search"></i>
                     </Link>
                     <div className="dropdown-menu header-search dropdown-menu-start">
                       <div className="input-group w-100 p-2 border">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Search...."
-                        />
+                        <input type="text" className="form-control" placeholder="Search...." />
                         <div className="input-group-text btn btn-primary">
                           <i className="fa fa-search" aria-hidden="true"></i>
                         </div>
@@ -147,33 +132,21 @@ export function Header() {
                       </span>
                     </Link>
                   </div>
-                  {user.role !== 'system_owner' &&
+                  {user.role !== "system_owner" && (
                     <div className="dropdown d-md-flex ms-3 me-3">
-                      <Link
-                        to="#"
-                        className=" theme-layout nav-link-bg layout-setting"
-                        onClick={() => Darkmode()}
-                      >
-                        <span className="dark-layout">
-                          Pts: {user.balance}
-                        </span>
+                      <Link to="#" className=" theme-layout nav-link-bg layout-setting" onClick={() => Darkmode()}>
+                        <span className="dark-layout">Pts: {user.balance}</span>
                       </Link>
                     </div>
-                  }
+                  )}
 
                   <Dropdown className=" d-md-flex profile-1">
-                    <Dropdown.Toggle
-                      className="nav-link profile leading-none d-flex px-1"
-                      variant=""
-                    >
+                    <Dropdown.Toggle className="nav-link profile leading-none d-flex px-1" variant="">
                       <span>
                         {user.username} <i className=" fe fe-chevron-down"></i>
                       </span>
                     </Dropdown.Toggle>
-                    <Dropdown.Menu
-                      className="dropdown-menu-end dropdown-menu-arrow"
-                      style={{ margin: 0 }}
-                    >
+                    <Dropdown.Menu className="dropdown-menu-end dropdown-menu-arrow" style={{ margin: 0 }}>
                       <div className="drop-heading">
                         <div className="text-center">
                           <h5 className="text-dark mb-0">{user.username}</h5>
@@ -181,15 +154,11 @@ export function Header() {
                         </div>
                       </div>
                       <div className="dropdown-divider m-0"></div>
-                      <Dropdown.Item
-                        href={`${process.env.PUBLIC_URL}/pages/profile/`}
-                      >
+                      <Dropdown.Item href={`${process.env.PUBLIC_URL}/pages/profile/`}>
                         <i className="dropdown-icon fe fe-user"></i> Profile
                       </Dropdown.Item>
 
-                      <Dropdown.Item
-                        href={`${process.env.PUBLIC_URL}/pages/mailCompose/`}
-                      >
+                      <Dropdown.Item href={`${process.env.PUBLIC_URL}/pages/mailCompose/`}>
                         <i className="dropdown-icon fe fe-settings"></i>
                         Settings
                       </Dropdown.Item>
@@ -199,16 +168,12 @@ export function Header() {
                         <i className="dropdown-icon fe fe-alert-triangle"></i>
                         Need help?p??
                       </Dropdown.Item> */}
-                      <Dropdown.Item
-
-                        onClick={() => signout()}
-                      >
+                      <Dropdown.Item onClick={() => signout()}>
                         <i className="dropdown-icon fe fe-alert-circle"></i>
                         Sign out
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
-
                 </div>
               </Navbar.Collapse>
             </div>

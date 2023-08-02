@@ -30,7 +30,7 @@ const EventList = React.lazy(() => import("./Pages/Event/EventList/EventList"));
 const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
 const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
 
-// Theme Setting 
+// Theme Setting
 const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
 
 // All User Accounts
@@ -43,7 +43,7 @@ const AgentForm = React.lazy(() => import("./Pages/Account/AgentForm/AgentForm")
 const UserForm = React.lazy(() => import("./Pages/Account/UserForm/UserForm"));
 const UserList = React.lazy(() => import("./Pages/Account/UserList/UserList"));
 const UserEditForm = React.lazy(() => import("./Pages/Account/UserEditForm/UserEditForm"));
-const MultiLogin = React.lazy(() => import("./Pages/Account/MultiLogin/MultiLogin"));
+const MultiLogin = React.lazy(() => import("./Pages/Account/MultiLogin/"));
 
 // Report
 const AccountStatement = React.lazy(() => import("./Pages/Report/AccountStatement/AccountStatement"));

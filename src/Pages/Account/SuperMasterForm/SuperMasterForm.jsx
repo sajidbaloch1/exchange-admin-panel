@@ -1,42 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
-import { Card, Row, Col } from "react-bootstrap";
-import { useFormik } from 'formik';
-import { getDetailByID, addData, updateData } from "../accountService";
+import { useFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { addData, getDetailByID, updateData } from "../accountService";
 
-import * as Yup from 'yup';
-import {
-  CForm,
-  CCol,
-  CButton,
-  CFormLabel,
-  CSpinner
-} from "@coreui/react";
+import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
+import * as Yup from "yup";
 
 export default function SuperMasterForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : '';
+  const id = location.state ? location.state.id : "";
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem('user_info')) || {};
+  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
   const [serverError, setServerError] = useState(null); // State to hold the server error message
   const formik = useFormik({
     initialValues: {
-      username: '',
-      fullName: '',
-      password: '',
-      confirmPassword: '',
-      city: '',
-      mobileNumber: '',
-      creditPoints: '',
-      role: 'super_master',
-      rate: '',
+      username: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
+      city: "",
+      mobileNumber: "",
+      creditPoints: "",
+      role: "super_master",
+      rate: "",
       isBetLock: false,
       isActive: true,
       forcePasswordChange: true,
@@ -50,51 +44,48 @@ export default function SuperMasterForm() {
           }
           return true;
         }),
-      fullName: Yup.string().required('Full name is required'),
-      password: Yup.string()
-        .required('Password is required')
-        .min(6, 'Password must be at least 6 characters long'),
+      fullName: Yup.string().required("Full name is required"),
+      password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
       confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password'), null], 'Passwords must match')
-        .required('Confirm Password is required'),
-      mobileNumber: Yup.string()
-        .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Confirm Password is required"),
+      mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
       creditPoints: Yup.number()
-        .required('Credit amount is required')
-        .test('creditPoints', 'Credit amount exceeds available balance', function (value) {
+        .required("Credit amount is required")
+        .test("creditPoints", "Credit amount exceeds available balance", function (value) {
           // Access the user's role and creditPoints
-          const user = JSON.parse(localStorage.getItem('user_info'));
-          const creditPoints = user?.creditPoints || 0;
+          const user = JSON.parse(localStorage.getItem("user_info"));
+          const creditPoints = user?.balance || 0;
 
           // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-          if (user?.role !== 'system_owner' && value > creditPoints) {
+          if (user?.role !== "system_owner" && value > creditPoints) {
             return false; // Validation failed
           }
           return true; // Validation passed
         }),
       rate: Yup.number()
-        .required('Rate is required')
+        .required("Rate is required")
         .max(100, "Rate cannot exceed 100")
-        .test('rate', 'Rate exceeds available rate', function (value) {
+        .test("rate", "Rate exceeds available rate", function (value) {
           // Access the user's role and rate
-          const user = JSON.parse(localStorage.getItem('user_info'));
+          const user = JSON.parse(localStorage.getItem("user_info"));
           const rate = user?.rate || 0;
 
           // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-          if (user?.role !== 'system_owner' && value > rate) {
+          if (user?.role !== "system_owner" && value > rate) {
             return false; // Validation failed
           }
           return true; // Validation passed
         }),
     }),
     onSubmit: async (values) => {
-      console.log('Submitting form with values:', values);
+      console.log("Submitting form with values:", values);
       // Perform form submission logic
       setServerError(null); // Reset server error state
       setLoading(true); // Set loading state to true
       try {
         let response = null;
-        if (id !== '' && id !== undefined) {
+        if (id !== "" && id !== undefined) {
           response = await updateData({
             _id: id,
             ...values,
@@ -115,7 +106,7 @@ export default function SuperMasterForm() {
         setLoading(false); // Set loading state to false
       }
       //console.log('Form submitted successfully:', values);
-    }
+    },
   });
 
   useEffect(() => {
@@ -124,16 +115,15 @@ export default function SuperMasterForm() {
         const result = await getDetailByID(id);
 
         formik.setValues((prevValues) => ({
-
           ...prevValues,
-          username: result.username || '',
-          fullName: result.fullName || '',
-          password: result.password || '',
-          city: result.city || '',
-          mobileNumber: result.mobileNumber || '',
-          creditPoints: result.creditPoints || '',
-          rate: result.rate || '',
-          role: result.role || '',
+          username: result.username || "",
+          fullName: result.fullName || "",
+          password: result.password || "",
+          city: result.city || "",
+          mobileNumber: result.mobileNumber || "",
+          creditPoints: result.creditPoints || "",
+          rate: result.rate || "",
+          role: result.role || "",
           isBetLock: result.isBetLock || false,
           isActive: result.isActive || false,
           forcePasswordChange: result.forcePasswordChange || false,
@@ -277,7 +267,7 @@ export default function SuperMasterForm() {
                       name="isBetLock"
                       checked={formik.values.isBetLock}
                       onChange={() => {
-                        formik.setFieldValue('isBetLock', !formik.values.isBetLock);
+                        formik.setFieldValue("isBetLock", !formik.values.isBetLock);
                       }}
                     />
                   </CCol>
@@ -289,7 +279,7 @@ export default function SuperMasterForm() {
                       name="isActive"
                       checked={formik.values.isActive}
                       onChange={() => {
-                        formik.setFieldValue('isActive', !formik.values.isActive);
+                        formik.setFieldValue("isActive", !formik.values.isActive);
                       }}
                     />
                   </CCol>
@@ -301,7 +291,7 @@ export default function SuperMasterForm() {
                       name="forcePasswordChange"
                       checked={formik.values.forcePasswordChange}
                       onChange={() => {
-                        formik.setFieldValue('forcePasswordChange', !formik.values.forcePasswordChange);
+                        formik.setFieldValue("forcePasswordChange", !formik.values.forcePasswordChange);
                       }}
                     />
                   </CCol>
@@ -322,6 +312,6 @@ export default function SuperMasterForm() {
           </Card>
         </Col>
       </Row>
-    </div >
+    </div>
   );
 }
