@@ -1,50 +1,42 @@
-import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Card, Row, Col } from "react-bootstrap";
-import { useFormik } from 'formik';
-import { useNavigate } from "react-router-dom";
-import { getDetailByID, addData, updateData } from "../accountService";
+import { useFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { addData, getDetailByID, updateData } from "../accountService";
 
-import * as Yup from 'yup';
-import {
-  CForm,
-  CCol,
-  CButton,
-  CFormLabel,
-  CSpinner
-} from "@coreui/react";
+import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
+import * as Yup from "yup";
 
 export default function UserForm() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null); // State to hold the server error message
-  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem('user_info')) || {};
+  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
   const { id } = useParams();
 
   const formik = useFormik({
     initialValues: {
-      username: '',
-      fullName: '',
-      password: '',
-      confirmPassword: '',
-      city: '',
-      mobileNumber: '',
-      creditPoints: '',
-      role: 'user',
+      username: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
+      city: "",
+      mobileNumber: "",
+      creditPoints: "",
+      role: "user",
       isBetLock: false,
       isActive: true,
       forcePasswordChange: true,
-      exposureLimit: '',
-      exposurePercentage: '',
-      stakeLimit: '',
-      maxProfit: '',
-      maxLoss: '',
-      bonus: '',
-      maxStake: ''
+      exposureLimit: "",
+      exposurePercentage: "",
+      stakeLimit: "",
+      maxProfit: "",
+      maxLoss: "",
+      bonus: "",
+      maxStake: "",
     },
     validationSchema: Yup.object({
       username: Yup.string()
@@ -55,68 +47,65 @@ export default function UserForm() {
           }
           return true;
         }),
-      fullName: Yup.string().required('Full name is required'),
-      password: Yup.string()
-        .required('Password is required')
-        .min(6, 'Password must be at least 6 characters long'),
+      fullName: Yup.string().required("Full name is required"),
+      password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
       confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password'), null], 'Passwords must match')
-        .required('Confirm Password is required'),
-      mobileNumber: Yup.string()
-        .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Confirm Password is required"),
+      mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
       creditPoints: Yup.number()
-        .required('Credit amount is required')
-        .test('creditPoints', 'Credit amount exceeds available balance', function (value) {
+        .required("Credit amount is required")
+        .test("creditPoints", "Credit amount exceeds available balance", function (value) {
           // Access the user's role and creditPoints
-          const user = JSON.parse(localStorage.getItem('user_info'));
-          const creditPoints = user?.creditPoints || 0;
+          const user = JSON.parse(localStorage.getItem("user_info"));
+          const creditPoints = user?.balance || 0;
 
           // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-          if (user?.role !== 'system_owner' && value > creditPoints) {
+          if (user?.role !== "system_owner" && value > creditPoints) {
             return false; // Validation failed
           }
           return true; // Validation passed
         }),
 
-      exposureLimit: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('Exposure Limit is required');
+      exposureLimit: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("Exposure Limit is required");
         }
         return schema;
       }),
-      exposurePercentage: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('Exposure Percentage Limit is required');
+      exposurePercentage: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("Exposure Percentage Limit is required");
         }
         return schema;
       }),
-      stakeLimit: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('Stake Limit is required');
+      stakeLimit: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("Stake Limit is required");
         }
         return schema;
       }),
-      maxProfit: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('Max Profit Limit is required');
+      maxProfit: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("Max Profit Limit is required");
         }
         return schema;
       }),
-      maxLoss: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('Max Loss Limit is required');
+      maxLoss: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("Max Loss Limit is required");
         }
         return schema;
       }),
-      bonus: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('Bonus Limit is required');
+      bonus: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("Bonus Limit is required");
         }
         return schema;
       }),
-      maxStake: Yup.number().when('role', (role, schema) => {
-        if (Array.isArray(role) && role.includes('user')) {
-          return schema.required('max Stake Limit is required');
+      maxStake: Yup.number().when("role", (role, schema) => {
+        if (Array.isArray(role) && role.includes("user")) {
+          return schema.required("max Stake Limit is required");
         }
         return schema;
       }),
@@ -127,7 +116,7 @@ export default function UserForm() {
       setLoading(true); // Set loading state to true
       try {
         let response = null;
-        if (id !== '' && id !== undefined) {
+        if (id !== "" && id !== undefined) {
           response = await updateData({
             _id: id,
             ...values,
@@ -148,7 +137,7 @@ export default function UserForm() {
         setLoading(false); // Set loading state to false
       }
       //console.log('Form submitted successfully:', values);
-    }
+    },
   });
 
   useEffect(() => {
@@ -157,25 +146,24 @@ export default function UserForm() {
         const result = await getDetailByID(id);
 
         formik.setValues((prevValues) => ({
-
           ...prevValues,
-          username: result.username || '',
-          fullName: result.fullName || '',
-          password: result.password || '',
-          city: result.city || '',
-          mobileNumber: result.mobileNumber || '',
-          creditPoints: result.creditPoints || '',
-          role: result.role || '',
+          username: result.username || "",
+          fullName: result.fullName || "",
+          password: result.password || "",
+          city: result.city || "",
+          mobileNumber: result.mobileNumber || "",
+          creditPoints: result.creditPoints || "",
+          role: result.role || "",
           isBetLock: result.isBetLock || false,
           isActive: result.isActive || false,
           forcePasswordChange: result.forcePasswordChange || false,
-          exposureLimit: result.exposureLimit || '',
-          exposurePercentage: result.exposurePercentage || '',
-          stakeLimit: result.stakeLimit || '',
-          maxProfit: result.maxProfit || '',
-          maxLoss: result.maxLoss || '',
-          bonus: result.bonus || '',
-          maxStake: result.maxStake || '',
+          exposureLimit: result.exposureLimit || "",
+          exposurePercentage: result.exposurePercentage || "",
+          stakeLimit: result.stakeLimit || "",
+          maxProfit: result.maxProfit || "",
+          maxLoss: result.maxLoss || "",
+          bonus: result.bonus || "",
+          maxStake: result.maxStake || "",
         }));
       }
     };
@@ -303,7 +291,7 @@ export default function UserForm() {
                       name="isBetLock"
                       checked={formik.values.isBetLock}
                       onChange={() => {
-                        formik.setFieldValue('isBetLock', !formik.values.isBetLock);
+                        formik.setFieldValue("isBetLock", !formik.values.isBetLock);
                       }}
                     />
                   </CCol>
@@ -315,7 +303,7 @@ export default function UserForm() {
                       name="isActive"
                       checked={formik.values.isActive}
                       onChange={() => {
-                        formik.setFieldValue('isActive', !formik.values.isActive);
+                        formik.setFieldValue("isActive", !formik.values.isActive);
                       }}
                     />
                   </CCol>
@@ -327,7 +315,7 @@ export default function UserForm() {
                       name="forcePasswordChange"
                       checked={formik.values.forcePasswordChange}
                       onChange={() => {
-                        formik.setFieldValue('forcePasswordChange', !formik.values.forcePasswordChange);
+                        formik.setFieldValue("forcePasswordChange", !formik.values.forcePasswordChange);
                       }}
                     />
                   </CCol>
@@ -413,9 +401,7 @@ export default function UserForm() {
                     isRequired="true"
                     width={2}
                   />
-
                 </Row>
-
 
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-block">
@@ -432,6 +418,6 @@ export default function UserForm() {
           </Card>
         </Col>
       </Row>
-    </div >
+    </div>
   );
 }
