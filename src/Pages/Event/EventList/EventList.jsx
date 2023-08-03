@@ -137,6 +137,7 @@ export default function EventList() {
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
   const [toggleCleared, setToggleCleared] = React.useState(false);
+  const [formSelectKey, setFormSelectKey] = useState(0);
   let selectdata = [];
   const handleRowSelected = React.useCallback((state) => {
     setSelectedRows(state.selectedRows);
@@ -250,8 +251,8 @@ export default function EventList() {
     setStartDateValue("");
     setEndDateValue("");
     setSelectedStatus("");
+    setFormSelectKey(formSelectKey + 1);
     // Add more filter states if needed
-
     // Fetch data with the updated filters object
     fetchData(currentPage, sortBy, direction, searchQuery, {
       sportId: "",

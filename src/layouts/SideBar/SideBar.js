@@ -131,7 +131,19 @@ const Sidebar = () => {
               icon: "user",
               type: "link",
               active: false,
-              title: "User",
+              title: "Users",
+            },
+          ],
+        },
+        {
+          menutitle: "THEME USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/theme-user-list`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "Theme Users",
             },
           ],
         },

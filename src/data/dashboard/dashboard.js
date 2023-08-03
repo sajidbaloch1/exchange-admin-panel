@@ -124,47 +124,6 @@ export const totalTransactions = {
 
 };
 
-//dashboard graph
-export const dashboardGraph = {
-  options: {
-    chart: {
-      type: 'bar',
-      height: 350
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        distributed: true,
-        dataLabels: {
-          position: 'top'
-        }
-      }
-    },
-    dataLabels: {
-      enabled: false,
-      style: {
-        colors: ['#000']
-      }
-    },
-    xaxis: {
-      categories: ['Credit pts', 'All pts', 'Settlement pts', 'Upper pts', 'Down pts'],
-      labels: {
-        show: true,
-        style: {
-          colors: ['#000']
-        }
-      }
-    },
-    colors: ['#556ee6', '#f1b44c', '#50a5f1', '#128412', '#343a40'] // Array of colors for each category
-  },
-  series: [
-    {
-      name: 'Series-1',
-      data: [10000, 11000, 5000, 3000, 6000],
-    }
-  ]
-
-};
 
 //p/l graph
 export const categoryWiseGraph = {
