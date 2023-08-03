@@ -35,6 +35,7 @@ export default function CompetitionList() {
   const [endDateValue, setEndDateValue] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [formSelectKey, setFormSelectKey] = useState(0);
 
   const [filters, setFilters] = useState({
     sportId: "",
@@ -284,6 +285,7 @@ export default function CompetitionList() {
     setStartDateValue("");
     setEndDateValue("");
     setSelectedStatus("");
+    setFormSelectKey(formSelectKey + 1);
     // Add more filter states if needed
 
     // Fetch data with the updated filters object
@@ -340,8 +342,8 @@ export default function CompetitionList() {
         <Col lg={12}>
           <Card>
             <Card.Header>
-
               <FormSelectWithSearch
+                key={formSelectKey} // Add the key prop here
                 label="Sport"
                 name="sportId"
                 value={selectedSport} // Set the selectedSport as the value

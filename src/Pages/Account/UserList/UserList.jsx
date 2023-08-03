@@ -31,29 +31,37 @@ export default function UserList() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
+  const allowedRoles = ['user'];
+
   const toggleHighlight = async (id, type, toggleValue) => {
     setLoading(true);
-    try {
-      const newStatus = !toggleValue; // Toggle the isActive status
-      let request
-      if (type === 'bet') {
-        request = { _id: id, isBetLock: newStatus.toString() };
-      } else {
-        request = { _id: id, isActive: newStatus.toString() };
-      }
+    setLoading(true);
+    const newStatus = !toggleValue; // Toggle the isActive or isBetLock status
+    let request;
 
-      const success = await updateUserStatus(request);
-      if (success) {
-        fetchData(currentPage);
-        setLoading(false);
-      }
-    } catch (error) {
-      // Handle error
-      console.error("Error removing :", error);
-      // Display error message or show notification to the user
-      // Set the state to indicate the error condition
-      setLoading(false);
+    if (type === 'bet') {
+      request = { _id: id, isBetLock: newStatus.toString() };
+    } else {
+      request = { _id: id, isActive: newStatus.toString() };
     }
+
+    // Optimistically update the status in the local 'data' state
+    setData(prevData => prevData.map(item => item._id === id ? { ...item, [type === 'bet' ? 'isBetLock' : 'isActive']: newStatus } : item));
+
+    updateUserStatus(request)
+      .then(() => {
+        // On successful response, no need to fetch data again, just setLoading to false
+        setLoading(false);
+      })
+      .catch((error) => {
+        // Handle error
+        console.error("Error updating status:", error);
+        // Display error message or show notification to the user
+        // Set the state to indicate the error condition
+        setLoading(false);
+        // Rollback the status in the local 'data' state on error
+        setData(prevData => prevData.map(item => item._id === id ? { ...item, [type === 'bet' ? 'isBetLock' : 'isActive']: toggleValue } : item));
+      });
   };
 
   const columns = [
@@ -186,7 +194,8 @@ export default function UserList() {
         sortBy: sortBy,
         direction: direction,
         searchQuery: searchQuery,
-        parentId: parentId
+        parentId: parentId,
+        role: allowedRoles
       });
 
       setData(result.records);

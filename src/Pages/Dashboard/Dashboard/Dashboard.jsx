@@ -3,8 +3,9 @@ import ReactApexChart from "react-apexcharts";
 import { Breadcrumb, Card, Col, Modal, Row } from "react-bootstrap";
 import CountUp from "react-countup";
 import { useLocation, useNavigate } from "react-router-dom";
-import * as dashboard from "../../data/dashboard/dashboard";
-import { getTransactionCode } from "../../lib/transaction-code";
+import * as dashboard from "../../../data/dashboard/dashboard";
+import { getTransactionCode } from "../../../lib/transaction-code";
+import { getDashboardById } from "../dashboardService";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -13,13 +14,78 @@ export default function Dashboard() {
   const newUser = location?.state?.newUser ?? false;
   const authUser = location?.state?.user ?? null;
 
+  const { _id } = JSON.parse(localStorage.getItem('user_info')) || {};
+
   const [show, setShow] = useState(newUser);
   const [code, setCode] = useState("");
+
+  const [balance, setBalance] = useState(0);
+  const [exposure, setExposure] = useState(0);
+  const [allPts, setAllPts] = useState(0);
+  const [creditPts, setCreditPts] = useState(0);
+  const [settlementPts, setSettlementPts] = useState(0);
+  const [upPts, setUpPts] = useState(0);
+  const [downPts, setDownPts] = useState(0);
+
+  const dashboardGraph = {
+    options: {
+      chart: {
+        type: 'bar',
+        height: 350
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          distributed: true,
+          dataLabels: {
+            position: 'top'
+          }
+        }
+      },
+      dataLabels: {
+        enabled: false,
+        style: {
+          colors: ['#000']
+        }
+      },
+      xaxis: {
+        categories: ['Credit pts', 'All pts', 'Settlement pts', 'Upper pts', 'Down pts'],
+        labels: {
+          show: true,
+          style: {
+            colors: ['#000']
+          }
+        }
+      },
+      colors: ['#556ee6', '#f1b44c', '#50a5f1', '#128412', '#343a40'] // Array of colors for each category
+    },
+    series: [
+      {
+        name: 'Series-1',
+        data: [creditPts, allPts, settlementPts, upPts, downPts],
+      }
+    ]
+
+  };
 
   useEffect(() => {
     if (newUser && authUser) {
       setCode(getTransactionCode(authUser.transactionCode));
     }
+
+    const fetchData = async () => {
+      if (_id) {
+        const response = await getDashboardById(_id);
+        if (response.result && response.result.length > 0) {
+          setBalance(response.result[0].balance)
+          setExposure(response.result[0].totalExposure)
+          setCreditPts(response.result[0].creditPoints)
+          setAllPts(response.result[0].totalPoint)
+          setSettlementPts(response.result[0].settlementPoint)
+        }
+      }
+    };
+    fetchData();
     return () => {
       setCode("");
       setShow(false);
@@ -51,7 +117,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Balance</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={34516} separator="," start={0} duration={2.94} />
+                        <CountUp end={balance} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-primary me-1">
@@ -77,7 +143,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Exposure</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={56992} separator="," start={0} duration={2.94} />
+                        <CountUp end={exposure} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-secondary me-1">
@@ -103,7 +169,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Credit Pts</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={42567} separator="," start={0} duration={2.94} />
+                        <CountUp end={creditPts} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-success me-1">
@@ -129,7 +195,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">All Pts</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={34789} separator="," start={0} duration={2.94} />
+                        <CountUp end={allPts} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -156,7 +222,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Settlement Pts</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={34789} separator="," start={0} duration={2.94} />
+                        <CountUp end={settlementPts} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -183,7 +249,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Upper Pts</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={34789} separator="," start={0} duration={2.94} />
+                        <CountUp end={upPts} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -209,7 +275,7 @@ export default function Dashboard() {
                     <div className="col">
                       <h6 className="">Down Pts</h6>
                       <h3 className="mb-2 number-font">
-                        <CountUp end={34789} separator="," start={0} duration={2.94} />
+                        <CountUp end={downPts} separator="," start={0} duration={2.94} />
                       </h3>
                       {/* <p className="text-muted mb-0">
                         <span className="text-danger me-1">
@@ -240,8 +306,8 @@ export default function Dashboard() {
             <Card.Body className="card-body pb-0">
               <div id="chartArea" className="chart-donut">
                 <ReactApexChart
-                  options={dashboard.dashboardGraph.options}
-                  series={dashboard.dashboardGraph.series}
+                  options={dashboardGraph.options}
+                  series={dashboardGraph.series}
                   type="bar"
                   height={300}
                 />
@@ -251,31 +317,31 @@ export default function Dashboard() {
                   <p className="mb-2 font-size-11">
                     <i className="mdi mdi-circle align-middle font-size-10 me-2 text-primary"></i> Credit pts
                   </p>
-                  <h5>1,00,000</h5>
+                  <h5>{creditPts}</h5>
                 </Col>
                 <Col xs={6} sm>
                   <p className="mb-2 font-size-11">
                     <i className="mdi mdi-circle align-middle font-size-10 me-2 text-warning"></i> All pts
                   </p>
-                  <h5>1,00,000</h5>
+                  <h5>{allPts}</h5>
                 </Col>
                 <Col xs={4} sm>
                   <p className="mb-2 font-size-11">
                     <i className="mdi mdi-circle align-middle font-size-10 me-2 text-info"></i> Settlement pts
                   </p>
-                  <h5>0</h5>
+                  <h5>{settlementPts}</h5>
                 </Col>
                 <Col xs={4} sm>
                   <p className="mb-2 font-size-11">
                     <i className="mdi mdi-circle align-middle font-size-10 me-2 text-success"></i> Upper pts
                   </p>
-                  <h5>0</h5>
+                  <h5>{upPts}</h5>
                 </Col>
                 <Col xs={4} sm>
                   <p className="mb-2 font-size-11">
                     <i className="mdi mdi-circle align-middle font-size-10 me-2 text-dark"></i> Down pts
                   </p>
-                  <h5>0</h5>
+                  <h5>{downPts}</h5>
                 </Col>
               </Row>
             </Card.Body>

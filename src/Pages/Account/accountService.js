@@ -74,3 +74,8 @@ export const getPermissionsById = async (id) => {
   }
   return [];
 };
+
+export const createTransaction = async (request) => {
+  const result = await postData("transactionActivity/createTransaction", request);
+  return result;
+};

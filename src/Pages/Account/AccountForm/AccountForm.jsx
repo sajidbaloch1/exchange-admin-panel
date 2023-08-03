@@ -198,7 +198,7 @@ export default function AccountForm() {
           ...prevValues,
           username: result.username || '',
           fullName: result.fullName || '',
-          password: result.password || '',
+          password: '',
           city: result.city || '',
           mobileNumber: result.mobileNumber || '',
           creditPoints: result.creditPoints || '',
