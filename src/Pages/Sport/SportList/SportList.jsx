@@ -1,94 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { CSpinner } from "@coreui/react";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllSport, deleteSport, changeStatus } from "../sportService";
-import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils/alertUtils';
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { showAlert } from "../../../utils/alertUtils";
+import { downloadCSV } from "../../../utils/csvUtils";
+import { changeStatus, deleteSport, getAllSport } from "../sportService";
 
 export default function SportList() {
-
   const Export = ({ onExport }) => (
-    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
+    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
+      Export
+    </Button>
   );
 
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [direction, setDirection] = useState('desc');
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [direction, setDirection] = useState("desc");
+  const [sportStatus, setSportStatus] = useState({}); // status and loading state of each sport
+
+  const updateSportStatus = (id, key, value) => {
+    setSportStatus((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [key]: value,
+      },
+    }));
+  };
 
   const toggleHighlight = async (id, isActive) => {
-    setLoading(true);
+    updateSportStatus(id, "loading", true);
     try {
-      const newStatus = !isActive; // Toggle the isActive status
-      const request = { _id: id, status: newStatus.toString() };
-      const success = await changeStatus(request);
-      if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery);
-        setLoading(false);
+      const newStatus = !isActive;
+      const result = await changeStatus({ _id: id, status: newStatus.toString() });
+      if (result.success) {
+        toast.success("Status updated successfully");
+        updateSportStatus(id, "isActive", result.data.details.isActive);
       }
     } catch (error) {
-      // Handle error
       console.error("Error removing :", error);
-      // Display error message or show notification to the user
-      // Set the state to indicate the error condition
-      setLoading(false);
     }
+    updateSportStatus(id, "loading", false);
   };
 
   const columns = [
     {
       name: "SR.NO",
-      selector: (row, index) => ((currentPage - 1) * perPage) + (index + 1),
+      selector: (row, index) => (currentPage - 1) * perPage + (index + 1),
       sortable: false,
     },
     {
       name: "NAME",
       selector: (row) => [row.name],
       sortable: true,
-      sortField: 'name'
+      sortField: "name",
     },
     {
       name: "TOTAL BET CATEGORY",
       selector: (row) => [row.betCategoryCount],
       sortable: false,
-      cell: row => (
-        <span className="ms-2"> {row.betCategoryCount}</span>
-      ),
+      cell: (row) => <span className="ms-2"> {row.betCategoryCount}</span>,
     },
     {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
-      cell: row => (
+      cell: (row) => (
         <div className="material-switch mt-4">
-          <input
-            id={`highlightSwitch_${row._id}`}
-            name={`notes[${row._id}].highlight`}
-            onChange={() => toggleHighlight(row._id, row.isActive)}
-            checked={row.isActive}
-            type="checkbox"
-          />
-          <label
-            htmlFor={`highlightSwitch_${row._id}`}
-            className="label-primary"
-          ></label>
+          {console.log(sportStatus[row._id]?.isActive)}
+          {sportStatus[row._id]?.loading ? (
+            <div className="pb-1 pl-2">
+              <CSpinner size="sm" />
+            </div>
+          ) : (
+            <>
+              <input
+                id={`highlightSwitch_${row._id}`}
+                name={`notes[${row._id}].highlight`}
+                onChange={() => toggleHighlight(row._id, sportStatus[row._id]?.isActive)}
+                checked={sportStatus[row._id]?.isActive}
+                type="checkbox"
+              />
+              <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
+            </>
+          )}
         </div>
-
       ),
     },
     {
-      name: 'ACTION',
-      cell: row => (
+      name: "ACTION",
+      cell: (row) => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+            <i className="fa fa-edit"></i>
+          </Link>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
           <Link
             to={{
@@ -137,6 +152,12 @@ export default function SportList() {
       const result = await getAllSport(page, perPage, sortBy, direction, searchQuery);
       setData(result.records);
       setTotalRows(result.totalRecords);
+      setSportStatus(
+        result.records.reduce((acc, sport) => {
+          acc[sport._id] = { isActive: sport.isActive, loading: false };
+          return acc;
+        }, {})
+      );
       setLoading(false);
     } catch (error) {
       // Handle error
@@ -173,7 +194,7 @@ export default function SportList() {
     setLoading(false);
   };
 
-  const handlePageChange = page => {
+  const handlePageChange = (page) => {
     setCurrentPage(page);
     fetchData(page, sortBy, direction, searchQuery);
   };
@@ -185,7 +206,7 @@ export default function SportList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('sport/getAllSport', searchQuery, 'sports.csv');
+    await downloadCSV("sport/getAllSport", searchQuery, "sports.csv");
   };
 
   const handleDelete = (id) => {
@@ -193,10 +214,10 @@ export default function SportList() {
   };
 
   useEffect(() => {
-    if (searchQuery !== '') {
+    if (searchQuery !== "") {
       fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, ""); // fetch page 1 of users
     }
   }, [perPage, searchQuery]);
 
@@ -233,13 +254,8 @@ export default function SportList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
-
             <Card.Body>
-              <SearchInput
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                loading={loading}
-              />
+              <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}
