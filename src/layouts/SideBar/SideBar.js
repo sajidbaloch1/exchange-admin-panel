@@ -96,15 +96,15 @@ const Sidebar = () => {
             },
           ],
         }, {
-        menutitle: "API EVENT",
+        menutitle: "ADD EVENT",
         Items: [
           {
             path: `${process.env.PUBLIC_URL}/api-event-list`,
             icon: "layers",
             type: "link",
             active: false,
-            title: "API Event",
-            allRouet: ['event-form', 'event-list']
+            title: "Add Event",
+            allRouet: ['api-event-list']
           },
         ],
       },
