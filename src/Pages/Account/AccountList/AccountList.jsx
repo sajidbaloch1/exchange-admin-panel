@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -8,6 +8,7 @@ import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
+import { Notify } from "../../../utils/notify";
 
 export default function AccountList() {
   const location = useLocation();
@@ -116,61 +117,79 @@ export default function AccountList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
-            D
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => handleWithdrawClick(row)}
-            className="btn btn-lg ms-2 me-2"
-            title="Withdraw"
-          >
-            W
-          </Button>
-          {row.role === "super_admin" && (
-            <Link
-              to={`${process.env.PUBLIC_URL}/super-admin-form`}
-              state={{ id: row._id }}
-              className="btn btn-primary btn-lg"
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to deposit</Tooltip>}>
+            <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
+              D
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to withdrw</Tooltip>}>
+            <Button
+              variant="danger"
+              onClick={() => handleWithdrawClick(row)}
+              className="btn btn-lg ms-2 me-2"
+              title="Withdraw"
             >
-              <i className="fa fa-edit"></i>
-            </Link>
+              W
+            </Button>
+          </OverlayTrigger>
+
+          {row.role === "super_admin" && (
+            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+              <Link
+                to={`${process.env.PUBLIC_URL}/super-admin-form`}
+                state={{ id: row._id }}
+                className="btn btn-primary btn-lg"
+              >
+                <i className="fa fa-edit"></i>
+              </Link>
+            </OverlayTrigger>
+
           )}
           {row.role === "admin" && (
-            <Link
-              to={`${process.env.PUBLIC_URL}/admin-form`}
-              state={{ id: row._id }}
-              className="btn btn-primary btn-lg"
-            >
-              <i className="fa fa-edit"></i>
-            </Link>
+            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+              <Link
+                to={`${process.env.PUBLIC_URL}/admin-form`}
+                state={{ id: row._id }}
+                className="btn btn-primary btn-lg"
+              >
+                <i className="fa fa-edit"></i>
+              </Link>
+            </OverlayTrigger>
+
           )}
           {row.role === "super_master" && (
-            <Link
-              to={`${process.env.PUBLIC_URL}/super-master-form`}
-              state={{ id: row._id }}
-              className="btn btn-primary btn-lg"
-            >
-              <i className="fa fa-edit"></i>
-            </Link>
+            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+              <Link
+                to={`${process.env.PUBLIC_URL}/super-master-form`}
+                state={{ id: row._id }}
+                className="btn btn-primary btn-lg"
+              >
+                <i className="fa fa-edit"></i>
+              </Link>
+            </OverlayTrigger>
           )}
           {row.role === "master" && (
-            <Link
-              to={`${process.env.PUBLIC_URL}/master-form`}
-              state={{ id: row._id }}
-              className="btn btn-primary btn-lg"
-            >
-              <i className="fa fa-edit"></i>
-            </Link>
+            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+              <Link
+                to={`${process.env.PUBLIC_URL}/master-form`}
+                state={{ id: row._id }}
+                className="btn btn-primary btn-lg"
+              >
+                <i className="fa fa-edit"></i>
+              </Link>
+            </OverlayTrigger>
           )}
           {row.role === "agent" && (
-            <Link
-              to={`${process.env.PUBLIC_URL}/agent-form`}
-              state={{ id: row._id }}
-              className="btn btn-primary btn-lg"
-            >
-              <i className="fa fa-edit"></i>
-            </Link>
+            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+              <Link
+                to={`${process.env.PUBLIC_URL}/agent-form`}
+                state={{ id: row._id }}
+                className="btn btn-primary btn-lg"
+              >
+                <i className="fa fa-edit"></i>
+              </Link>
+            </OverlayTrigger>
           )}
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
@@ -289,20 +308,16 @@ export default function AccountList() {
         transactionCode: transactionCode,
       });
       if (!result.success) {
-        setServerError(result.message);
+        throw new Error(result.message);
       } else {
+        Notify.success("Transaction Done!!!.");
         setShowTransactionModal(false);
         fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
       }
-      // Close the modal after handling the submission
     } catch (error) {
-      // Handle any errors that occurred during the transaction submission
-      console.error("Error submitting transaction:", error);
-      // Optionally, set a state to show an error message to the user
+      Notify.error(error.message);
+      setServerError(error.message);
     }
-    // Handle Deposit form submission here, using depositAmount and depositRemarks
-    // Close the modal after handling the submission
-    //setShowTransactionModal(false);
   };
 
   const handleDepositClick = (row) => {

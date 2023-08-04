@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormMultiSelect from "../../../components/Common/FormComponents/FormMultiSelect";
 import { getAllBetCategory } from "../../BetCategory/betcategoryService";
+import { Notify } from "../../../utils/notify";
 import { addSport, getSportDetailByID, updateSport } from "../sportService";
 
 export default function SportForm() {
@@ -51,18 +52,15 @@ export default function SportForm() {
           });
         }
         if (response.success) {
+          Notify.success("Sports updated.");
           navigate("/sport-list");
         } else {
-          setServerError(response.message);
+          throw new Error(response.message);
         }
       } catch (error) {
-        //console.log(error);
-        if (error.response && error.response.status === 500) {
-          // Server-side error occurred
-          setServerError(error.response.data.message); // Set the server error message
-        } else {
-          // Handle other errors
-        }
+
+        Notify.error(error.message);
+        setServerError(error.message);
       } finally {
         setLoading(false); // Set loading state to false
       }

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Form, Modal, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation, useParams } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 import { showAlert } from "../../../utils/alertUtils";
 import { deleteThemeUser, getAllThemeUsers } from "../themeUserService";
+import { Notify } from "../../../utils/notify";
 
 export default function ThemeUserList() {
   const location = useLocation();
@@ -51,14 +52,15 @@ export default function ThemeUserList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          <Link
-            to={`${process.env.PUBLIC_URL}/theme-user-form`}
-            state={{ id: row._id }}
-            className="btn btn-primary btn-lg"
-          >
-            <i className="fa fa-edit"></i>
-          </Link>
-
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link
+              to={`${process.env.PUBLIC_URL}/theme-user-form`}
+              state={{ id: row._id }}
+              className="btn btn-primary btn-lg"
+            >
+              <i className="fa fa-edit"></i>
+            </Link>
+          </OverlayTrigger>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),

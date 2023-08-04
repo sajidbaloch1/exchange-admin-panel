@@ -3,6 +3,7 @@ import { Nav, TabContainer, Tabs, Tab, Breadcrumb, Row, Card, Col } from "react-
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
 import { getDetailByID, updateData } from "../accountService";
+import { Notify } from "../../../utils/notify";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 
@@ -128,12 +129,14 @@ export default function UserEditForm() {
         ...values,
       });
       if (response.success) {
+        Notify.success("User updated.");
         navigate("/user-list/");
       } else {
         throw new Error(response.message);
       }
     } catch (error) {
       // Handle error
+      Notify.error(error.message);
       setServerError(error.message);
     } finally {
       setLoading(false); // Set loading state to false

@@ -5,6 +5,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
+import { Notify } from "../../../utils/notify";
 import { addCurrency, getCurrencyDetailByID, updateCurrency } from "../currencyService";
 
 export default function CurrencyForm() {
@@ -46,12 +47,15 @@ export default function CurrencyForm() {
           });
         }
         if (response.success) {
+          Notify.success("Currency updated.");
           navigate("/currency-list/");
         } else {
-          setServerError(response.message);
+          throw new Error(response.message);
         }
       } catch (error) {
         // Handle error
+        Notify.error(error.message);
+        setServerError(error.message);
       } finally {
         setLoading(false); // Set loading state to false
       }

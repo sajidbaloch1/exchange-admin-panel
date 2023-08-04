@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput";
 import { decryptUserPermissions, getAllData, user } from "../accountService";
 
+
 const generateTableColumns = (moduleList) => {
   const columns = [
     {
