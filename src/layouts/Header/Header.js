@@ -143,10 +143,10 @@ export function Header() {
 
                   <Dropdown className=" d-md-flex profile-1">
                     <Dropdown.Toggle className="nav-link profile leading-none d-flex px-1 pt-2" variant="">
-                      <span className="dark-layout h6 mb-0 text-uppercase">
+                      <span className="dark-layout h6 mb-0">
                         {user.username} <i className=" fe fe-chevron-down"></i>
                       </span>
-                      <span className="light-layout text-light h6 mb-0 text-uppercase">
+                      <span className="light-layout text-light h6 mb-0">
                         {user.username} <i className=" fe fe-chevron-down"></i>
                       </span>
                     </Dropdown.Toggle>
