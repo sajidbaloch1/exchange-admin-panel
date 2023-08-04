@@ -13,9 +13,10 @@ const FormInput = ({
   width,
   disabled = false,
   autoComplete = true,
+  className = "",
 }) => {
   return (
-    <CCol md={width}>
+    <CCol md={width} className={className}>
       <CFormLabel htmlFor={name}>
         {label} {isRequired === "true" && <span className="text-red">*</span>}
       </CFormLabel>
