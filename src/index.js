@@ -178,7 +178,6 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-list`} element={<ThemeUserList />} />
                   </Route>
 
-
                   {/* Accounts route  */}
                   <Route
                     path="/"

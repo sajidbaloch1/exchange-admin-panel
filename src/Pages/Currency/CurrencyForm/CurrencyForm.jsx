@@ -1,25 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { Breadcrumb, Card, Row, Col } from "react-bootstrap";
-import { useFormik } from 'formik';
-import { getCurrencyDetailByID, addCurrency, updateCurrency } from "../currencyService";
+import { CButton, CCol, CForm, CSpinner } from "@coreui/react";
+import { useFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
-import * as Yup from 'yup';
-import {
-  CForm,
-  CCol,
-  CFormLabel,
-  CFormInput,
-  CButton,
-  CSpinner
-} from "@coreui/react";
+import { addCurrency, getCurrencyDetailByID, updateCurrency } from "../currencyService";
 
 export default function CurrencyForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : '';
-  //id get from url 
+  const id = location.state ? location.state.id : "";
+  //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,12 +20,12 @@ export default function CurrencyForm() {
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      multiplier: ''
+      name: "",
+      multiplier: "",
     },
     validationSchema: Yup.object({
-      name: Yup.string().required('Name is required'),
-      multiplier: Yup.number().required('Multiplier must be a number'),
+      name: Yup.string().required("Name is required"),
+      multiplier: Yup.number().min(0).required("Multiplier must be a number"),
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
@@ -40,17 +33,16 @@ export default function CurrencyForm() {
       setLoading(true); // Set loading state to true
       try {
         let response = null;
-        if (id !== '' && id !== undefined) {
+        if (id !== "" && id !== undefined) {
           response = await updateCurrency({
             _id: id,
             name: values.name,
-            multiplier: values.multiplier
+            multiplier: values.multiplier,
           });
-
         } else {
           response = await addCurrency({
             name: values.name,
-            multiplier: values.multiplier
+            multiplier: values.multiplier,
           });
         }
         if (response.success) {
@@ -63,7 +55,7 @@ export default function CurrencyForm() {
       } finally {
         setLoading(false); // Set loading state to false
       }
-    }
+    },
   });
 
   useEffect(() => {
@@ -72,13 +64,14 @@ export default function CurrencyForm() {
         const result = await getCurrencyDetailByID(id);
         formik.setValues((prevValues) => ({
           ...prevValues,
-          name: result.name || '',
-          multiplier: result.multiplier || '',
+          name: result.name || "",
+          multiplier: result.multiplier || "",
         }));
       }
     };
     fetchData();
-  }, [id, getCurrencyDetailByID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const formTitle = id ? "UPDATE CURRENCY" : "CREATE CURRENCY";
 
@@ -120,7 +113,7 @@ export default function CurrencyForm() {
                 <FormInput
                   label="Conversion rate (INR)"
                   name="multiplier"
-                  type="text"
+                  type="number"
                   value={formik.values.multiplier}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -134,7 +127,10 @@ export default function CurrencyForm() {
                     <CButton color="primary" type="submit" className="me-3">
                       {loading ? <CSpinner size="sm" /> : "Save"}
                     </CButton>
-                    <Link to={`${process.env.PUBLIC_URL}/currency-list`} className="btn btn-danger btn-icon text-white ">
+                    <Link
+                      to={`${process.env.PUBLIC_URL}/currency-list`}
+                      className="btn btn-danger btn-icon text-white "
+                    >
                       Cancel
                     </Link>
                   </div>
@@ -144,6 +140,6 @@ export default function CurrencyForm() {
           </Card>
         </Col>
       </Row>
-    </div >
+    </div>
   );
 }
