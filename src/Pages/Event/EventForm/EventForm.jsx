@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch"; // Import the FormSelect component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
-import { getAllCompetition } from "../../Competition/competitionService";
+import { getAllCompetitionOptions } from "../../Competition/competitionService";
 import { addEvent, getEventDetailByID, updateEvent } from "../eventService";
 
 export default function EventForm() {
@@ -92,6 +92,7 @@ export default function EventForm() {
 
   useEffect(() => {
     const fetchData = async () => {
+      const competitionBody = { fields: { name: 1 }, sortBy: "name", direction: "asc" };
       if (id) {
         const result = await getEventDetailByID(id);
 
@@ -112,10 +113,12 @@ export default function EventForm() {
           completed: result.completed || false,
           betDeleted: result.betDeleted || false,
         }));
+
+        competitionBody.competitionId = result.competitionId;
       }
 
       setCompetitionLoading(true);
-      const competitionData = await getAllCompetition({});
+      const competitionData = await getAllCompetitionOptions(competitionBody);
       const dropdownOptions = competitionData.records.map((option) => ({
         value: option._id,
         label: option.name,
