@@ -1,15 +1,7 @@
-import React from "react";
-import { Modal, Button, Form } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
 
-const TransactionModal = ({
-  show,
-  onHide,
-  handleTransactionSubmit,
-  rowData,
-  transactionType
-}) => {
-
+const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, transactionType }) => {
   const [fromId, setfromId] = useState();
   const [userId, setUserId] = useState();
 
@@ -27,29 +19,30 @@ const TransactionModal = ({
   const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
-    console.log(rowData)
+    console.log(rowData);
     if (rowData) {
       setParentName(rowData.parentUser.username);
-      setClickedUserName(rowData.username)
-      setClickedUserBalance(rowData.balance)
-      setUserId(rowData._id)
+      setClickedUserName(rowData.username);
+      setClickedUserBalance(rowData.balance);
+      setUserId(rowData._id);
       // Set other initial values here based on the rowData prop...
     }
-    setClickedUserNewProfit(0)
-    setClickedUserNewBalance(0)
-    setParentNewBalance(0)
-    setAmount('')
-    setRemarks('')
-    setTransactionCode('')
+    setClickedUserNewProfit(0);
+    setClickedUserNewBalance(0);
+    setParentNewBalance(0);
+    setAmount("");
+    setRemarks("");
+    setTransactionCode("");
   }, [rowData, transactionType]);
 
   const handleAmountChange = (event) => {
-    const Amount = parseFloat(event.target.value) || 0;
+    const { value } = event.target;
+    const Amount = parseFloat(value) && parseFloat(value) > 0 ? parseFloat(value) : 0;
     let newParentBalance = 0;
     let clickedUserNewBalance = 0;
     let clickedUserNewProfit = 0;
     // Calculate the new parent balance and profit
-    if (transactionType === 'credit') {
+    if (transactionType === "credit") {
       newParentBalance = parentBalance - Amount;
       clickedUserNewBalance = clickedUserBalance + Amount;
       clickedUserNewProfit = clickedUserProfit + Amount;
@@ -62,8 +55,8 @@ const TransactionModal = ({
     setAmount(Amount);
     setParentNewBalance(newParentBalance);
     setClickedUserNewBalance(clickedUserNewBalance);
-    setClickedUserNewProfit(clickedUserNewProfit)
-  }
+    setClickedUserNewProfit(clickedUserNewProfit);
+  };
   const modalHeaderClass = transactionType === "credit" ? "bg-success" : "bg-danger";
   const transactionText = transactionType === "credit" ? "DEPOSIT" : "WITHDRAW";
   return (
@@ -145,11 +138,7 @@ const TransactionModal = ({
               Amount
             </Form.Label>
             <div className="col-md-8">
-              <Form.Control
-                type="number"
-                value={amount}
-                onChange={handleAmountChange}
-              />
+              <Form.Control type="number" value={amount} onChange={handleAmountChange} />
             </div>
           </div>
 
@@ -158,12 +147,7 @@ const TransactionModal = ({
               Remarks
             </Form.Label>
             <div className="col-md-8">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              />
+              <Form.Control as="textarea" rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
             </div>
           </div>
 
@@ -185,7 +169,10 @@ const TransactionModal = ({
         <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => handleTransactionSubmit(amount, remarks, transactionCode, transactionType, userId)}>
+        <Button
+          variant="primary"
+          onClick={() => handleTransactionSubmit(amount, remarks, transactionCode, transactionType, userId)}
+        >
           {transactionText}
         </Button>
       </Modal.Footer>
