@@ -76,24 +76,20 @@ export default function SportList() {
       selector: (row) => [row.betCategory],
       sortable: false,
       cell: (row) => (
-        <div className="material-switch mt-4">
-          {console.log(sportStatus[row._id]?.isActive)}
+        <div className="material-switch mt-4 d-flex align-items-center" key={row._id}>
+          <input
+            id={`highlightSwitch_${row._id}`}
+            name={`notes[${row._id}].highlight`}
+            onChange={() => toggleHighlight(row._id, sportStatus[row._id]?.isActive)}
+            checked={sportStatus[row._id]?.isActive}
+            type="checkbox"
+          />
+          <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
           {sportStatus[row._id]?.loading ? (
-            <div className="pb-1 pl-2">
+            <div className="pb-2 ps-4">
               <CSpinner size="sm" />
             </div>
-          ) : (
-            <>
-              <input
-                id={`highlightSwitch_${row._id}`}
-                name={`notes[${row._id}].highlight`}
-                onChange={() => toggleHighlight(row._id, sportStatus[row._id]?.isActive)}
-                checked={sportStatus[row._id]?.isActive}
-                type="checkbox"
-              />
-              <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
-            </>
-          )}
+          ) : null}
         </div>
       ),
     },
