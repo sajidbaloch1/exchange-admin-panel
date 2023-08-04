@@ -9,7 +9,7 @@ import "./index.scss";
 const App = React.lazy(() => import("./components/app"));
 
 //Dashboard
-const Dashboard = React.lazy(() => import("./Pages/Dashboard/Dashboard"));
+const Dashboard = React.lazy(() => import("./Pages/Dashboard/Dashboard/Dashboard"));
 
 //Sport module
 const SportList = React.lazy(() => import("./Pages/Sport/SportList/SportList"));
@@ -32,6 +32,10 @@ const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEven
 
 // Theme Setting
 const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
+
+// Theme User
+const ThemeUserList = React.lazy(() => import("./Pages/ThemeUser/ThemeUserList/ThemeUserList"));
+const ThemeUserForm = React.lazy(() => import("./Pages/ThemeUser/ThemeUserForm/ThemeUserForm"));
 
 // All User Accounts
 const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
@@ -164,6 +168,16 @@ const Root = () => {
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/theme-setting`} element={<ThemeSettingForm />} />
                   </Route>
+
+                  {/* Theme User route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/theme-user-form`} element={<ThemeUserForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/theme-user-list`} element={<ThemeUserList />} />
+                  </Route>
+
 
                   {/* Accounts route  */}
                   <Route

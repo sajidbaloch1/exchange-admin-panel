@@ -5,108 +5,157 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 import { addData, getDetailByID, updateData } from "../accountService";
-
 import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
 import * as Yup from "yup";
+
+const validationSchemaForCreate = Yup.object({
+  username: Yup.string()
+    .required("Username is required")
+    .test("no-spaces", "Spaces are not allowed in the username", (value) => {
+      if (value) {
+        return !/\s/.test(value); // Check if there are no spaces in the username
+      }
+      return true;
+    }),
+  fullName: Yup.string().required("Full name is required"),
+  password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm Password is required"),
+  mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
+  creditPoints: Yup.number()
+    .required("Credit amount is required")
+    .test("creditPoints", "Credit amount exceeds available balance", function (value) {
+      // Access the user's role and creditPoints
+      const user = JSON.parse(localStorage.getItem("user_info"));
+      const creditPoints = user?.balance || 0;
+
+      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
+      if (user?.role !== "system_owner" && value > creditPoints) {
+        return false; // Validation failed
+      }
+      return true; // Validation passed
+    }),
+  rate: Yup.number()
+    .required("Rate is required")
+    .max(100, "Rate cannot exceed 100")
+    .test("rate", "Rate exceeds available rate", function (value) {
+      // Access the user's role and rate
+      const user = JSON.parse(localStorage.getItem("user_info"));
+      const rate = user?.rate || 0;
+
+      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
+      if (user?.role !== "system_owner" && value > rate) {
+        return false; // Validation failed
+      }
+      return true; // Validation passed
+    }),
+});
+
+const validationSchemaForUpdate = Yup.object({
+  username: Yup.string()
+    .required("Username is required")
+    .test("no-spaces", "Spaces are not allowed in the username", (value) => {
+      if (value) {
+        return !/\s/.test(value); // Check if there are no spaces in the username
+      }
+      return true;
+    }),
+  fullName: Yup.string().required("Full name is required"),
+  password: Yup.string().nullable(true).min(6, "Password must be at least 6 characters long"),
+  confirmPassword: Yup.string()
+    .nullable(true)
+    .test("passwords-match", "Passwords must match", function (value) {
+      return this.parent.password === value;
+    }),
+  mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
+  creditPoints: Yup.number()
+    .required("Credit amount is required")
+    .test("creditPoints", "Credit amount exceeds available balance", function (value) {
+      // Access the user's role and creditPoints
+      const user = JSON.parse(localStorage.getItem("user_info"));
+      const creditPoints = user?.balance || 0;
+
+      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
+      if (user?.role !== "system_owner" && value > creditPoints) {
+        return false; // Validation failed
+      }
+      return true; // Validation passed
+    }),
+  rate: Yup.number()
+    .required("Rate is required")
+    .max(100, "Rate cannot exceed 100")
+    .test("rate", "Rate exceeds available rate", function (value) {
+      // Access the user's role and rate
+      const user = JSON.parse(localStorage.getItem("user_info"));
+      const rate = user?.rate || 0;
+
+      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
+      if (user?.role !== "system_owner" && value > rate) {
+        return false; // Validation failed
+      }
+      return true; // Validation passed
+    }),
+});
 
 export default function AgentForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : "";
+  const id = location.state ? location.state.id : null;
+  const editMode = !!id;
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
   const [serverError, setServerError] = useState(null); // State to hold the server error message
-  const formik = useFormik({
-    initialValues: {
-      username: "",
-      fullName: "",
-      password: "",
-      confirmPassword: "",
-      city: "",
-      mobileNumber: "",
-      creditPoints: "",
-      role: "agent",
-      rate: "",
-      isBetLock: false,
-      isActive: true,
-      forcePasswordChange: true,
-    },
-    validationSchema: Yup.object({
-      username: Yup.string()
-        .required("Username is required")
-        .test("no-spaces", "Spaces are not allowed in the username", (value) => {
-          if (value) {
-            return !/\s/.test(value); // Check if there are no spaces in the username
-          }
-          return true;
-        }),
-      fullName: Yup.string().required("Full name is required"),
-      password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
-      confirmPassword: Yup.string()
-        .oneOf([Yup.ref("password"), null], "Passwords must match")
-        .required("Confirm Password is required"),
-      mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
-      creditPoints: Yup.number()
-        .required("Credit amount is required")
-        .test("creditPoints", "Credit amount exceeds available balance", function (value) {
-          // Access the user's role and creditPoints
-          const user = JSON.parse(localStorage.getItem("user_info"));
-          const creditPoints = user?.balance || 0;
 
-          // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-          if (user?.role !== "system_owner" && value > creditPoints) {
-            return false; // Validation failed
-          }
-          return true; // Validation passed
-        }),
-      rate: Yup.number()
-        .required("Rate is required")
-        .max(100, "Rate cannot exceed 100")
-        .test("rate", "Rate exceeds available rate", function (value) {
-          // Access the user's role and rate
-          const user = JSON.parse(localStorage.getItem("user_info"));
-          const rate = user?.rate || 0;
+  const initialUserValue = {
+    username: "",
+    fullName: "",
+    password: "",
+    confirmPassword: "",
+    city: "",
+    mobileNumber: "",
+    creditPoints: "",
+    role: "agent",
+    rate: "",
+    isBetLock: false,
+    isActive: true,
+    forcePasswordChange: true,
+  };
 
-          // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-          if (user?.role !== "system_owner" && value > rate) {
-            return false; // Validation failed
-          }
-          return true; // Validation passed
-        }),
-    }),
-    onSubmit: async (values) => {
-      console.log("Submitting form with values:", values);
-      // Perform form submission logic
-      setServerError(null); // Reset server error state
-      setLoading(true); // Set loading state to true
-      try {
-        let response = null;
-        if (id !== "" && id !== undefined) {
-          response = await updateData({
-            _id: id,
-            ...values,
-          });
-        } else {
-          response = await addData({
-            ...values,
-          });
-        }
-        if (response.success) {
-          navigate("/account-list/");
-        } else {
-          setServerError(response.message);
-        }
-      } catch (error) {
-        // Handle error
-      } finally {
-        setLoading(false); // Set loading state to false
+  const submitForm = async (values) => {
+    setServerError(null); // Reset server error state
+    setLoading(true); // Set loading state to true
+    try {
+      let response = null;
+      if (editMode) {
+        response = await updateData({
+          _id: id,
+          ...values,
+        });
+      } else {
+        response = await addData({
+          ...values,
+        });
       }
-      //console.log('Form submitted successfully:', values);
-    },
+      if (response.success) {
+        navigate("/account-list/");
+      } else {
+        setServerError(response.message);
+      }
+    } catch (error) {
+      // Handle error
+    } finally {
+      setLoading(false); // Set loading state to false
+    }
+  };
+  const formik = useFormik({
+    initialValues: initialUserValue,
+    validationSchema: editMode ? validationSchemaForUpdate : validationSchemaForCreate,
+    onSubmit: submitForm,
   });
 
   useEffect(() => {
@@ -118,7 +167,7 @@ export default function AgentForm() {
           ...prevValues,
           username: result.username || "",
           fullName: result.fullName || "",
-          password: result.password || "",
+          password: "",
           city: result.city || "",
           mobileNumber: result.mobileNumber || "",
           creditPoints: result.creditPoints || "",
@@ -201,7 +250,7 @@ export default function AgentForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.mobileNumber && formik.errors.mobileNumber}
-                  isRequired="true"
+                  isRequired="false"
                   width={3}
                 />
 
@@ -213,7 +262,7 @@ export default function AgentForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.password && formik.errors.password}
-                  isRequired="true"
+                  isRequired={editMode ? "false" : "true"}
                   width={3}
                 />
 
@@ -225,7 +274,7 @@ export default function AgentForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                  isRequired="true"
+                  isRequired={editMode ? "false" : "true"}
                   width={3}
                 />
 

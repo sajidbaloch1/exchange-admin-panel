@@ -7,11 +7,14 @@ import { getAllTransactionActivity, deleteCurrency } from "../accountStatementSe
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+
+import { getAllData } from "../../Account/accountService";
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker } from 'react-date-range';
-import { CCol } from "@coreui/react";
-
+import { CCol, CButton, CSpinner } from "@coreui/react";
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
+import FormInput from "../../../components/Common/FormComponents/FormInput";
 
 
 export default function AccountStatementList() {
@@ -21,7 +24,6 @@ export default function AccountStatementList() {
   );
 
   const [searchQuery, setSearchQuery] = React.useState('');
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
@@ -29,6 +31,18 @@ export default function AccountStatementList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
+
+  const [userList, setuserList] = useState([]);
+  const [startDateValue, setStartDateValue] = useState('');
+  const [endDateValue, setEndDateValue] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
+  const [filters, setFilters] = useState({
+    userId: "",
+    starDate: "",
+    endDate: "",
+    // Add more filters here if needed
+  });
+  const [formSelectKey, setFormSelectKey] = useState(0);
 
   const columns = [
     {
@@ -98,16 +112,19 @@ export default function AccountStatementList() {
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
 
-  const fetchData = async (page, sortBy, direction, searchQuery) => {
+  const fetchData = async (page, sortBy, direction, searchQuery, filters) => {
     setLoading(true);
     try {
+      const { userId, fromDate, toDate } = filters;
       const result = await getAllTransactionActivity({
         page: page,
         perPage: perPage,
         sortBy: sortBy,
         direction: direction,
         searchQuery: searchQuery,
-        userId: '64c13adae05c20941879553a'
+        userId: userId,
+        fromDate: fromDate,
+        toDate: toDate
       });
 
       setData(result.records);
@@ -127,13 +144,13 @@ export default function AccountStatementList() {
     setSortBy(column.sortField);
     setDirection(sortDirection);
     setCurrentPage(1);
-    fetchData(currentPage, sortBy, direction, searchQuery);
+    fetchData(currentPage, sortBy, direction, searchQuery, filters);
     setLoading(false);
   };
 
   const handlePageChange = page => {
     setCurrentPage(page);
-    fetchData(page, sortBy, direction, searchQuery);
+    fetchData(page, sortBy, direction, searchQuery, filters);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
@@ -162,12 +179,50 @@ export default function AccountStatementList() {
     // }
   }
 
+  const handleFilterClick = () => {
+    const newFilters = {
+      userId: selectedUser,
+      fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
+      toDate: endDateValue, // Replace endDateValue with the actual state value for end date
+    };
+    setFilters(newFilters);
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, newFilters);
+  };
+
+  const resetFilters = () => {
+    // Clear the filter values
+    setSelectedUser("");
+    setStartDateValue("");
+    setEndDateValue("");
+    // Add more filter states if needed
+    setFormSelectKey(formSelectKey + 1);
+
+    // Fetch data with the updated filters object
+    fetchData(currentPage, sortBy, direction, searchQuery, {
+      sportId: "",
+      startDate: "",
+      endDate: "",
+      // Add more filters here if needed
+    });
+  };
+
+  const filterData = async () => {
+    const userData = await getAllData();
+    const dropdownOptions = userData.records.map(option => ({
+      value: option._id,
+      label: option.username,
+    }));
+    setuserList(dropdownOptions);
+  };
+
   useEffect(() => {
     if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, searchQuery, filters); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, '', filters); // fetch page 1 of users
     }
+    filterData()
   }, [perPage, searchQuery]);
 
   return (
@@ -181,7 +236,53 @@ export default function AccountStatementList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
+            <Card.Header>
+              <FormSelectWithSearch
+                key={formSelectKey} // Add the key prop here
+                label="Client name"
+                name="sportId"
+                value={selectedUser} // Set the selectedUser as the value
+                onChange={(name, selectedValue) => setSelectedUser(selectedValue)} // Update the selectedUser
+                onBlur={() => { }} // Add an empty function as onBlur prop
+                error=""
+                width={2}
+                options={userList}
+              />
 
+              <FormInput
+                label="Start Date"
+                name="startDate"
+                type="date"
+                value={startDateValue}
+                onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => { }}
+                width={2}
+              />
+
+              <FormInput
+                label="End Date"
+                name="endDate"
+                type="date"
+                value={endDateValue}
+                onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => { }}
+                width={2}
+              />
+
+              <CCol xs={12}>
+                <div className="d-grid gap-2 d-md-block">
+                  <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
+                    {loading ? <CSpinner size="sm" /> : "Filter"}
+                  </CButton>
+                  <button
+                    onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
+                    className="btn btn-danger btn-icon text-white mt-6"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </CCol>
+            </Card.Header>
             <Card.Body>
               <SearchInput
                 searchQuery={searchQuery}

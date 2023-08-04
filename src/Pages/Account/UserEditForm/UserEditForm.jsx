@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Nav, TabContainer, Tabs, Tab, Breadcrumb, Row, Card, Col } from "react-bootstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
-import { getDetailByID, addData, updateData } from "../accountService";
+import { getDetailByID, updateData } from "../accountService";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 
 import * as Yup from 'yup';
@@ -21,7 +20,6 @@ export default function UserEditForm() {
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null); // State to hold the server error message
-  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem('user_info')) || {};
   const [activeTab, setActiveTab] = useState('tab5');
   const { id } = useParams();
 
@@ -96,56 +94,57 @@ export default function UserEditForm() {
     }),
   });
 
+  const initialUserValue = {
+    username: '',
+    fullName: '',
+    password: '',
+    confirmPassword: '',
+    city: '',
+    mobileNumber: '',
+    creditPoints: '',
+    role: 'user',
+    isBetLock: false,
+    isActive: true,
+    forcePasswordChange: true,
+    exposureLimit: '',
+    exposurePercentage: '',
+    stakeLimit: '',
+    maxProfit: '',
+    maxLoss: '',
+    bonus: '',
+    maxStake: ''
+  };
+
+  const submitForm = async (values) => {
+    setServerError(null); // Reset server error state
+    setLoading(true); // Set loading state to true
+    try {
+      let response = null;
+      if (!values.password) {
+        delete values.password
+      }
+      response = await updateData({
+        _id: id,
+        ...values,
+      });
+      if (response.success) {
+        navigate("/user-list/");
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      // Handle error
+      setServerError(error.message);
+    } finally {
+      setLoading(false); // Set loading state to false
+    }
+  };
+
   const [validationSchema, setValidationSchema] = useState(profileValidationSchema);
   const formik = useFormik({
-    initialValues: {
-      username: '',
-      fullName: '',
-      password: '',
-      confirmPassword: '',
-      city: '',
-      mobileNumber: '',
-      creditPoints: '',
-      role: 'user',
-      isBetLock: false,
-      isActive: true,
-      forcePasswordChange: true,
-      exposureLimit: '',
-      exposurePercentage: '',
-      stakeLimit: '',
-      maxProfit: '',
-      maxLoss: '',
-      bonus: '',
-      maxStake: ''
-    },
+    initialValues: initialUserValue,
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
-
-      //console.log(values);
-      setServerError(null);
-      setLoading(true);
-
-      try {
-        let response = null;
-        // If validation passes, perform form submission logic for the active tab
-        if (!values.password) {
-          delete values.password
-        }
-        response = await updateData({
-          _id: id,
-          ...values,
-        });
-        if (response.success) {
-          navigate("/user-list/");
-        } else {
-          setServerError(response.message);
-        }
-      } catch (error) {
-        // Handle validation errors (if any)
-      } finally {
-        setLoading(false);
-      }
-    }
+    onSubmit: submitForm,
   });
 
   useEffect(() => {
@@ -158,7 +157,7 @@ export default function UserEditForm() {
           ...prevValues,
           username: result.username || '',
           fullName: result.fullName || '',
-          password: result.password || '',
+          password: "",
           city: result.city || '',
           mobileNumber: result.mobileNumber || '',
           creditPoints: result.creditPoints || '',
@@ -206,9 +205,9 @@ export default function UserEditForm() {
       <Row>
         <Col md={12} lg={12}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <h3 className="card-title">User Information</h3>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body className="p-6">
               <div className="panel panel-primary">
                 <div className="tab-menu-heading border">
@@ -233,7 +232,9 @@ export default function UserEditForm() {
                               validated={validated}
                               onSubmit={formik.handleSubmit}
                             >
+                              {serverError && <p className="text-danger">{serverError}</p>}
                               <FormInput
+                                disabled={true}
                                 label="Username"
                                 name="username"
                                 type="text"
@@ -309,6 +310,7 @@ export default function UserEditForm() {
                               validated={validated}
                               onSubmit={formik.handleSubmit}
                             >
+                              {serverError && <p className="text-danger">{serverError}</p>}
                               <FormInput
                                 label="Password"
                                 name="password"
@@ -359,6 +361,7 @@ export default function UserEditForm() {
                               validated={validated}
                               onSubmit={formik.handleSubmit}
                             >
+                              {serverError && <p className="text-danger">{serverError}</p>}
                               <CCol md="1">
                                 <CFormLabel htmlFor="isBetLock">Bet Lock</CFormLabel>
                                 <FormToggleSwitch
@@ -410,7 +413,7 @@ export default function UserEditForm() {
                               validated={validated}
                               onSubmit={formik.handleSubmit}
                             >
-
+                              {serverError && <p className="text-danger">{serverError}</p>}
                               <CCol md="2">
                                 <CFormLabel htmlFor="forcePasswordChange">Force Password change</CFormLabel>
                                 <FormToggleSwitch
