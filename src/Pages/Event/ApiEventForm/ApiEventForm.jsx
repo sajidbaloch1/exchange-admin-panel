@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Accordion, Card, Row, Col } from "react-bootstrap";
-import { useFormik } from "formik";
-import { getEventDetailByID, addEvent, updateEvent, getAllCompetionByEvent, activeAllEvent, activeAllCompetition } from "../eventService";
+import { getAllCompetionByEvent, activeAllEvent, activeAllCompetition } from "../eventService";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
-import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
-import * as Yup from "yup";
-import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import { CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
 
 export default function EventForm() {
   const navigate = useNavigate();
@@ -19,6 +15,7 @@ export default function EventForm() {
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null); // State to hold the server error message
+  const [serverSuccess, setServerSuccess] = useState(null); // State to hold the server error message
   const [sportList, setSportList] = useState([]);
 
   const [selectedSport, setSelectedSport] = useState(null);
@@ -26,83 +23,13 @@ export default function EventForm() {
   const [selectedCompetition, setSelectedCompetition] = useState(null);
   const [addedEventIds, setAddedEventIds] = useState([]);
   const [searchText, setSearchText] = useState("");
-
   const [eventSettingData, setEventSettingData] = useState(null);
-
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      competitionId: "",
-      sportId: "",
-      oddsLimit: "",
-      volumeLimit: "",
-      minStackSession: "",
-      maxStack: "",
-      maxStackSession: "",
-      minStack: "",
-      betDeleted: false,
-      hardBetDeleted: false,
-      completed: false,
-      isActive: false,
-
-    },
-    validationSchema: Yup.object({
-      name: Yup.string().required("Name is required"),
-      competitionId: Yup.string().required('Competition is required'),
-      oddsLimit: Yup.number().required("Odds Limit is required"),
-      volumeLimit: Yup.number().required("Odds Limit is required"),
-      minStackSession: Yup.number().required("Odds Limit is required"),
-      maxStack: Yup.number().required("Odds Limit is required"),
-      maxStackSession: Yup.number().required("Odds Limit is required"),
-      minStack: Yup.number().required("Odds Limit is required"),
-    }),
-    onSubmit: async (values) => {
-      // Perform form submission logic
-      setServerError(null); // Reset server error state
-      setLoading(true); // Set loading state to true
-      try {
-
-        if (id !== "" && id !== undefined) {
-
-          const response = await updateEvent({
-            _id: id,
-            ...values,
-          });
-          if (response.success) {
-            navigate("/event-list/");
-          } else {
-            setServerError(response.message);
-          }
-        } else {
-          const response = await addEvent({
-            ...values,
-          });
-          if (response.success) {
-            navigate("/event-list/");
-          } else {
-            setServerError(response.message);
-          }
-        }
-      } catch (error) {
-        //console.log(error);
-        if (error.response && error.response.status === 500) {
-          // Server-side error occurred
-          setServerError(error.response.data.message); // Set the server error message
-        } else {
-          // Handle other errors
-        }
-      } finally {
-        setLoading(false); // Set loading state to false
-      }
-    },
-  });
 
   const toggleCompetitionStatus = (competition) => {
     const updatedCompetitions = addedCompetitionIds.includes(competition._id)
       ? addedCompetitionIds.filter((id) => id !== competition._id)
       : [...addedCompetitionIds, competition._id];
     setAddedCompetitionIds(updatedCompetitions);
-
   };
 
   const toggleEventStatus = (event) => {
@@ -124,27 +51,27 @@ export default function EventForm() {
   };
 
   const updateCompetition = async (e) => {
-    console.log(addedCompetitionIds);
+
     // API here
     const response = await activeAllCompetition({
       competitionIds: addedCompetitionIds,
       sportId: selectedSport._id
     });
     if (response.success) {
-      navigate("/event-list/");
+      setServerSuccess('Updated Successfully');
     } else {
       setServerError(response.message);
     }
   }
 
   const updateEvent = async (e) => {
-    console.log(addedEventIds);
+
     const response = await activeAllEvent({
       eventIds: addedEventIds,
       competitionId: selectedCompetition._id
     });
     if (response.success) {
-      navigate("/event-list/");
+      setServerSuccess('Updated Successfully');
     } else {
       setServerError(response.message);
     }
@@ -152,27 +79,6 @@ export default function EventForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (id) {
-        const result = await getEventDetailByID(id);
-
-        formik.setValues((prevValues) => ({
-          ...prevValues,
-          name: result.name || "",
-          competitionId: result.competitionId || "",
-          sportId: result.sportId || "",
-          oddsLimit: result.oddsLimit || "",
-          minStackSession: result.minStackSession || "",
-          maxStack: result.maxStack || "",
-          maxStackSession: result.maxStackSession || "",
-          minStack: result.minStack || "",
-          volumeLimit: result.volumeLimit || "",
-          betDeleted: result.betDeleted || false,
-          hardBetDeleted: result.hardBetDeleted || false,
-          completed: result.completed || false,
-          isActive: result.isActive || false,
-        }));
-      }
-
       const sportData = await getAllCompetionByEvent();
       setSportList(sportData);
 
@@ -187,16 +93,9 @@ export default function EventForm() {
     fetchData();
   }, [id]);
 
-  const formTitle = id ? "UPDATE EVENT" : "CREATE EVENT";
 
   return (
     <div>
-      {/* <div className="page-header">
-        <div>
-          <h1 className="page-title"> {formTitle}</h1>
-        </div>
-      </div> */}
-
       <Row className="mt-5">
         <Col md={12} lg={12}>
           <Card>
@@ -208,7 +107,7 @@ export default function EventForm() {
                 <CCol lg={4}>
                   <Accordion defaultActiveKey="0">
                     {sportList.map((sport, index) => (
-                      <Accordion.Item key={index} eventKey={index} className="mb-1">
+                      <Accordion.Item key={sport._id} eventKey={sport._id} className="mb-1">
                         <Accordion.Header className="panel-heading1 style3" onClick={() => {
                           setSelectedCompetition(null); // Make selectedCompetition blank on sport click
                           setEventSettingData(null)
@@ -224,7 +123,7 @@ export default function EventForm() {
                             {sport.competitions.map((competition, competition_index) => (
 
                               competition.isActive === true && (
-                                < Accordion.Item key={competition_index} eventKey={competition_index} className="mb-1" >
+                                < Accordion.Item key={competition._id} eventKey={competition._id} className="mb-1" >
                                   <Accordion.Header className="panel-heading1 style3" onClick={() => {
                                     setSelectedCompetition(competition); // Make selectedCompetition blank on sport click
                                     setSelectedSport(null);
@@ -246,13 +145,15 @@ export default function EventForm() {
                                       <ul className="list-group">
                                         {competition.events.map((event, event_index) => (
                                           event.isActive == true &&
-                                          <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: event._id }} >
-                                            <li className="listunorder" key={event._id}>{event.name}
-                                              <span className="badgetext badge bg-default rounded-pill">
-                                                <i className="fa fa-edit"></i>
-                                              </span>
-                                            </li>
-                                          </Link>
+                                          <div key={event._id}>
+                                            <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: event._id }} >
+                                              <li className="listunorder" key={event._id + '_list'}>{event.name}
+                                                <span className="badgetext badge bg-default rounded-pill">
+                                                  <i className="fa fa-edit"></i>
+                                                </span>
+                                              </li>
+                                            </Link>
+                                          </div>
                                         ))}
                                       </ul>
                                     </div>
@@ -269,11 +170,11 @@ export default function EventForm() {
                 </CCol>
                 <CCol lg={8}>
                   {serverError && <p className="text-red">{serverError}</p>}
+                  {serverSuccess && <p className="text-green">{serverSuccess}</p>}
                   {/* Display server error message */}
 
                   {selectedSport && (
                     <Row>
-
                       <div>
                         <h4>{selectedSport.name}</h4>
                         {/* Display other competition data here */}
@@ -295,9 +196,9 @@ export default function EventForm() {
                         <CCol lg={10}>
                           <div className="">
                             <ul className="list-group">
-                              {selectedSport.competitions.map((competition, event_index) =>
+                              {selectedSport.competitions.map((competition, competition_index) =>
                                 addedCompetitionIds.includes(competition._id) ? (
-                                  <li className="listunorder" key={competition._id} onClick={() => toggleCompetitionStatus(competition)}>
+                                  <li className="listunorder" key={competition._id + '_already_added'} onClick={() => toggleCompetitionStatus(competition)} style={{ cursor: "pointer" }} >
                                     {competition.name}
                                   </li>
                                 ) : null
@@ -314,13 +215,13 @@ export default function EventForm() {
                         <CCol lg={10}>
                           <div className="">
                             <ul className="list-group">
-                              {selectedSport.competitions.map((event, event_index) => {
-                                const eventName = event.name.toLowerCase();
+                              {selectedSport.competitions.map((competition, competition_index) => {
+                                const eventName = competition.name.toLowerCase();
                                 const searchQuery = searchText.toLowerCase();
-                                if (!addedCompetitionIds.includes(event._id) && eventName.includes(searchQuery)) {
+                                if (!addedCompetitionIds.includes(competition._id) && eventName.includes(searchQuery)) {
                                   return (
-                                    <li className="listunorder" key={event._id} onClick={() => toggleCompetitionStatus(event)}>
-                                      {event.name}
+                                    <li className="listunorder" key={competition._id + '_all'} onClick={() => toggleCompetitionStatus(competition)} style={{ cursor: "pointer" }}>
+                                      {competition.name}
                                     </li>
                                   );
                                 }
@@ -371,7 +272,7 @@ export default function EventForm() {
                             <ul className="list-group">
                               {selectedCompetition.events.map((event, event_index) =>
                                 addedEventIds.includes(event._id) ? (
-                                  <li className="listunorder" key={event._id} onClick={() => toggleEventStatus(event)}>
+                                  <li className="listunorder" key={event._id + '_already__added'} onClick={() => toggleEventStatus(event)} style={{ cursor: "pointer" }} >
                                     {event.name}
                                   </li>
                                 ) : null
@@ -393,7 +294,7 @@ export default function EventForm() {
                                 const searchQuery = searchText.toLowerCase();
                                 if (!addedEventIds.includes(event._id) && eventName.includes(searchQuery)) {
                                   return (
-                                    <li className="listunorder" key={event._id} onClick={() => toggleEventStatus(event)}>
+                                    <li className="listunorder" key={event._id + '_all'} onClick={() => toggleEventStatus(event)} style={{ cursor: "pointer" }}>
                                       {event.name}
                                     </li>
                                   );

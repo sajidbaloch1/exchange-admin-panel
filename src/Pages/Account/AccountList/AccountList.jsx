@@ -377,27 +377,28 @@ export default function AccountList() {
               </Dropdown.Toggle>
               <Dropdown.Menu className="dropdown-menu">
                 {allowedRoles.includes("admin") && (
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/admin-form`}>Admin</Link>
+                  <Dropdown.Item className="dropdown-item" as={Link} to={`${process.env.PUBLIC_URL}/admin-form`}>
+                    Admin
                   </Dropdown.Item>
                 )}
 
                 {allowedRoles.includes("super_master") && (
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/super-master-form`}>Super Master</Link>
+                  <Dropdown.Item className="dropdown-item" as={Link} to={`${process.env.PUBLIC_URL}/super-master-form`}>
+                    Super Master
                   </Dropdown.Item>
                 )}
 
                 {allowedRoles.includes("master") && (
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/master-form`}>Master</Link>
+                  <Dropdown.Item className="dropdown-item" as={Link} to={`${process.env.PUBLIC_URL}/master-form`}>
+                    Master
                   </Dropdown.Item>
                 )}
 
                 {allowedRoles.includes("agent") && (
-                  <Dropdown.Item className="dropdown-item">
-                    <Link to={`${process.env.PUBLIC_URL}/agent-form`}>Agent</Link>
+                  <Dropdown.Item className="dropdown-item" as={Link} to={`${process.env.PUBLIC_URL}/agent-form`}>
+                    Agent
                   </Dropdown.Item>
+
                 )}
               </Dropdown.Menu>
             </Dropdown>

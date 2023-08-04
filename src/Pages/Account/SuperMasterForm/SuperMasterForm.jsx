@@ -8,96 +8,6 @@ import FormInput from "../../../components/Common/FormComponents/FormInput"; // 
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 import { addData, getDetailByID, updateData } from "../accountService";
 
-const validationSchemaForCreate = Yup.object({
-  username: Yup.string()
-    .required("Username is required")
-    .test("no-spaces", "Spaces are not allowed in the username", (value) => {
-      if (value) {
-        return !/\s/.test(value); // Check if there are no spaces in the username
-      }
-      return true;
-    }),
-  fullName: Yup.string().required("Full name is required"),
-  password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Confirm Password is required"),
-  mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
-  creditPoints: Yup.number()
-    .required("Credit amount is required")
-    .test("creditPoints", "Credit amount exceeds available balance", function (value) {
-      // Access the user's role and creditPoints
-      const user = JSON.parse(localStorage.getItem("user_info"));
-      const creditPoints = user?.balance || 0;
-
-      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-      if (user?.role !== "system_owner" && value > creditPoints) {
-        return false; // Validation failed
-      }
-      return true;
-    }),
-  rate: Yup.number()
-    .required("Rate is required")
-    .max(100, "Rate cannot exceed 100")
-    .test("rate", "Rate exceeds available rate", function (value) {
-      // Access the user's role and rate
-      const user = JSON.parse(localStorage.getItem("user_info"));
-      const rate = user?.rate || 0;
-
-      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-      if (user?.role !== "system_owner" && value > rate) {
-        return false; // Validation failed
-      }
-      return true; // Validation passed
-    }),
-});
-
-const validationSchemaForUpdate = Yup.object({
-  username: Yup.string()
-    .required("Username is required")
-    .test("no-spaces", "Spaces are not allowed in the username", (value) => {
-      if (value) {
-        return !/\s/.test(value); // Check if there are no spaces in the username
-      }
-      return true;
-    }),
-  fullName: Yup.string().required("Full name is required"),
-  password: Yup.string().nullable(true).min(6, "Password must be at least 6 characters long"),
-  confirmPassword: Yup.string()
-    .nullable(true)
-    .test("passwords-match", "Passwords must match", function (value) {
-      return this.parent.password === value;
-    }),
-  mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
-  creditPoints: Yup.number()
-    .required("Credit amount is required")
-    .test("creditPoints", "Credit amount exceeds available balance", function (value) {
-      // Access the user's role and creditPoints
-      const user = JSON.parse(localStorage.getItem("user_info"));
-      const creditPoints = user?.balance || 0;
-
-      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-      if (user?.role !== "system_owner" && value > creditPoints) {
-        return false; // Validation failed
-      }
-      return true; // Validation passed
-    }),
-  rate: Yup.number()
-    .required("Rate is required")
-    .max(100, "Rate cannot exceed 100")
-    .test("rate", "Rate exceeds available rate", function (value) {
-      // Access the user's role and rate
-      const user = JSON.parse(localStorage.getItem("user_info"));
-      const rate = user?.rate || 0;
-
-      // Check if the user's role is not 'system_owner' and credit amount exceeds creditPoints
-      if (user?.role !== "system_owner" && value > rate) {
-        return false; // Validation failed
-      }
-      return true; // Validation passed
-    }),
-});
-
 export default function SuperMasterForm() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,9 +18,87 @@ export default function SuperMasterForm() {
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
+  const loginUserDetail = JSON.parse(localStorage.getItem("user_info")) || {};
+  const [loginUserData, setLoginUserData] = useState({});
   const [serverError, setServerError] = useState(null); // State to hold the server error message
 
+  const validationSchemaForCreate = Yup.object({
+    username: Yup.string()
+      .required("Username is required")
+      .test("no-spaces", "Spaces are not allowed in the username", (value) => {
+        if (value) {
+          return !/\s/.test(value); // Check if there are no spaces in the username
+        }
+        return true;
+      }),
+    fullName: Yup.string().required("Full name is required"),
+    password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Confirm Password is required"),
+    mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
+    creditPoints: Yup.number()
+      .required("Credit amount is required")
+      .test("creditPoints", "Credit amount exceeds available balance " + loginUserData.balance, function (value) {
+        const user = loginUserData;
+        const creditPoints = user?.balance || 0;
+        if (user?.role !== "system_owner" && value > creditPoints) {
+          return false; // Validation failed
+        }
+        return true;
+      }),
+    rate: Yup.number()
+      .required("Rate is required")
+      .max(100, "Rate cannot exceed 100")
+      .test("rate", "Rate exceeds available rate " + loginUserData.rate, function (value) {
+        const user = loginUserData;
+        const rate = user?.rate || 0;
+        if (user?.role !== "system_owner" && value > rate) {
+          return false; // Validation failed
+        }
+        return true; // Validation passed
+      }),
+  });
+
+  const validationSchemaForUpdate = Yup.object({
+    username: Yup.string()
+      .required("Username is required")
+      .test("no-spaces", "Spaces are not allowed in the username", (value) => {
+        if (value) {
+          return !/\s/.test(value); // Check if there are no spaces in the username
+        }
+        return true;
+      }),
+    fullName: Yup.string().required("Full name is required"),
+    password: Yup.string().nullable(true).min(6, "Password must be at least 6 characters long"),
+    confirmPassword: Yup.string()
+      .nullable(true)
+      .test("passwords-match", "Passwords must match", function (value) {
+        return this.parent.password === value;
+      }),
+    mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
+    creditPoints: Yup.number()
+      .required("Credit amount is required")
+      .test("creditPoints", "Credit amount exceeds available balance " + loginUserData.balance, function (value) {
+        const user = loginUserData;
+        const creditPoints = user?.balance || 0;
+        if (user?.role !== "system_owner" && value > creditPoints) {
+          return false; // Validation failed
+        }
+        return true; // Validation passed
+      }),
+    rate: Yup.number()
+      .required("Rate is required")
+      .max(100, "Rate cannot exceed 100")
+      .test("rate", "Rate exceeds available rate " + loginUserData.rate, function (value) {
+        const user = loginUserData;
+        const rate = user?.rate || 0;
+        if (user?.role !== "system_owner" && value > rate) {
+          return false; // Validation failed
+        }
+        return true; // Validation passed
+      }),
+  });
   const initialUserValue = {
     username: "",
     fullName: "",
@@ -159,29 +147,61 @@ export default function SuperMasterForm() {
     onSubmit: submitForm,
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (id) {
-        const result = await getDetailByID(id);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (id) {
+  //       const result = await getDetailByID(id);
 
-        formik.setValues((prevValues) => ({
-          ...prevValues,
-          username: result.username || "",
-          fullName: result.fullName || "",
-          password: "",
-          city: result.city || "",
-          mobileNumber: result.mobileNumber || "",
-          creditPoints: result.creditPoints || "",
-          rate: result.rate || "",
-          role: result.role || "",
-          isBetLock: result.isBetLock || false,
-          isActive: result.isActive || false,
-          forcePasswordChange: result.forcePasswordChange || false,
-        }));
-      }
+  //       formik.setValues((prevValues) => ({
+  //         ...prevValues,
+  //         username: result.username || "",
+  //         fullName: result.fullName || "",
+  //         password: "",
+  //         city: result.city || "",
+  //         mobileNumber: result.mobileNumber || "",
+  //         creditPoints: result.creditPoints || "",
+  //         rate: result.rate || "",
+  //         role: result.role || "",
+  //         isBetLock: result.isBetLock || false,
+  //         isActive: result.isActive || false,
+  //         forcePasswordChange: result.forcePasswordChange || false,
+  //       }));
+  //     }
+  //   };
+  //   fetchData();
+  // }, [id, getDetailByID]);
+
+  useEffect(() => {
+    Promise.all([getDetailByID(id), getDetailByID(loginUserDetail._id)])
+      .then(([result, loginUserData]) => {
+        if (result) {
+          formik.setValues((prevValues) => ({
+            ...prevValues,
+            username: result.username || "",
+            fullName: result.fullName || "",
+            password: "",
+            city: result.city || "",
+            mobileNumber: result.mobileNumber || "",
+            creditPoints: result.creditPoints || "",
+            rate: result.rate || "",
+            role: result.role || "",
+            isBetLock: result.isBetLock || false,
+            isActive: result.isActive || false,
+            forcePasswordChange: result.forcePasswordChange || false,
+          }));
+        }
+        setLoginUserData(loginUserData)
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    return () => {
+      formik.resetForm();
     };
-    fetchData();
-  }, [id, getDetailByID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, loginUserDetail._id]);
+
 
   const formTitle = id ? "UPDATE SUPER MASTER" : "CREATE SUPER MASTER";
 
