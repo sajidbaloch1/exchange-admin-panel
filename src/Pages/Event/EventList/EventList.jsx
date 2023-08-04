@@ -120,7 +120,7 @@ export default function EventList() {
             id={`highlightSwitch_${row._id}`}
             name={`notes[${row._id}].highlight`}
             onChange={() => toggleHighlight(row._id, eventStatus[row._id]?.isActive)}
-            checked={eventStatus[row._id]?.isActive}
+            checked={eventStatus[row._id]?.isActive || false}
             type="checkbox"
           />
           <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
