@@ -1,14 +1,29 @@
+import { CCol, CFormLabel } from "@coreui/react";
 import React from "react";
 import Select from "react-select";
-import { CCol, CFormLabel } from "@coreui/react";
 
-const FormSelectWithSearch = ({ label, name, value, onChange, onBlur, error, options, isRequired, width, disabled = false }) => {
+const FormSelectWithSearch = ({
+  label,
+  name,
+  value,
+  onChange,
+  onBlur,
+  error,
+  options,
+  isRequired,
+  width,
+  disabled = false,
+  isLoading = false,
+  placeholder = "Select",
+}) => {
   return (
     <CCol md={width}>
       <CFormLabel htmlFor={name}>
         {label} {isRequired === "true" && <span className="text-red">*</span>}
       </CFormLabel>
       <Select
+        placeholder={placeholder}
+        isLoading={isLoading}
         isDisabled={disabled}
         id={name}
         name={name}

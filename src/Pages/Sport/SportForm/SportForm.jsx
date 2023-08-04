@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
+import { CButton, CCol, CForm, CSpinner } from "@coreui/react";
 import { useFormik } from "formik";
-import { getSportDetailByID, addSport, updateSport } from "../sportService";
-import { getAllBetCategory } from '../../BetCategory/betcategoryService'
+import React, { useEffect, useState } from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormMultiSelect from "../../../components/Common/FormComponents/FormMultiSelect";
-import * as Yup from "yup";
-import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import { getAllBetCategory } from "../../BetCategory/betcategoryService";
+import { addSport, getSportDetailByID, updateSport } from "../sportService";
 
 export default function SportForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : '';
+  const id = location.state ? location.state.id : "";
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
@@ -29,7 +29,6 @@ export default function SportForm() {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
-      apiSportId: Yup.number().required("SPORT API ID is required"),
       betCategory: Yup.array()
         .min(1, "At least one option must be selected")
         .required("At least one option must be selected"),
@@ -84,11 +83,11 @@ export default function SportForm() {
       }
 
       const betCategoryData = await getAllBetCategory();
-      const dropdownOptions = betCategoryData.records.map(option => ({
+      const dropdownOptions = betCategoryData.records.map((option) => ({
         value: option._id,
-        label: option.name
+        label: option.name,
       }));
-      setBetCategoryList(dropdownOptions)
+      setBetCategoryList(dropdownOptions);
     };
     fetchData();
   }, [id]);
@@ -139,7 +138,6 @@ export default function SportForm() {
                   onBlur={formik.handleBlur}
                   error={formik.touched.apiSportId && formik.errors.apiSportId}
                   width={3}
-                  isRequired="true"
                 />
 
                 <FormMultiSelect
@@ -159,10 +157,7 @@ export default function SportForm() {
                     <CButton color="primary" type="submit" className="me-3">
                       {loading ? <CSpinner size="sm" /> : "Save"}
                     </CButton>
-                    <Link
-                      to={`${process.env.PUBLIC_URL}/sport-list`}
-                      className="btn btn-danger btn-icon text-white "
-                    >
+                    <Link to={`${process.env.PUBLIC_URL}/sport-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel
                     </Link>
                   </div>
