@@ -133,16 +133,20 @@ export function Header() {
                     </Link>
                   </div>
                   {user.role !== "system_owner" && (
-                    <div className="dropdown d-md-flex ms-3 me-3">
-                      <Link to="#" className=" theme-layout nav-link-bg layout-setting" onClick={() => Darkmode()}>
-                        <span className="dark-layout">Pts: {user.balance}</span>
-                      </Link>
+                    <div className="dropdown d-md-flex mx-4">
+                      <div className="theme-layout nav-link-bg layout-setting pt-1">
+                        <span className="dark-layout fw-semibold">PTS: {user.balance}</span>
+                        <span className="light-layout fw-semibold text-light">PTS: {user.balance}</span>
+                      </div>
                     </div>
                   )}
 
                   <Dropdown className=" d-md-flex profile-1">
-                    <Dropdown.Toggle className="nav-link profile leading-none d-flex px-1" variant="">
-                      <span>
+                    <Dropdown.Toggle className="nav-link profile leading-none d-flex px-1 pt-2" variant="">
+                      <span className="dark-layout h6 mb-0 text-uppercase">
+                        {user.username} <i className=" fe fe-chevron-down"></i>
+                      </span>
+                      <span className="light-layout text-light h6 mb-0 text-uppercase">
                         {user.username} <i className=" fe fe-chevron-down"></i>
                       </span>
                     </Dropdown.Toggle>
