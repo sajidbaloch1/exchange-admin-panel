@@ -116,10 +116,15 @@ export default function AccountList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg ">
+          <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
             D
           </Button>
-          <Button variant="danger" onClick={() => handleWithdrawClick(row)} className="btn btn-lg ms-2 me-2">
+          <Button
+            variant="danger"
+            onClick={() => handleWithdrawClick(row)}
+            className="btn btn-lg ms-2 me-2"
+            title="Withdraw"
+          >
             W
           </Button>
           {row.role === "super_admin" && (
