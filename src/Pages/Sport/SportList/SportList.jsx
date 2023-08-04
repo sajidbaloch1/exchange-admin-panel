@@ -4,10 +4,10 @@ import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
+import { Notify } from "../../../utils/notify";
 import { changeStatus, deleteSport, getAllSport } from "../sportService";
 
 export default function SportList() {
@@ -29,13 +29,7 @@ export default function SportList() {
   const [sportStatus, setSportStatus] = useState({}); // status and loading state of each sport
 
   const updateSportStatus = (id, key, value) => {
-    setSportStatus((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        [key]: value,
-      },
-    }));
+    setSportStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
   };
 
   const toggleHighlight = async (id, isActive) => {
@@ -44,7 +38,7 @@ export default function SportList() {
       const newStatus = !isActive;
       const result = await changeStatus({ _id: id, status: newStatus.toString() });
       if (result.success) {
-        toast.success("Status updated successfully");
+        Notify.success("Status updated successfully");
         updateSportStatus(id, "isActive", result.data.details.isActive);
       }
     } catch (error) {
