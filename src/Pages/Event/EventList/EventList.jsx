@@ -1,81 +1,90 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { CButton, CCol, CSpinner } from "@coreui/react";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllEvent, deleteEvent, changeStatus } from "../eventService";
-import { getAllCompetition } from "../../Competition/competitionService";
-import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils/alertUtils';
-import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
-import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
-import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import { Link, useLocation } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
+import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { showAlert } from "../../../utils/alertUtils";
+import { downloadCSV } from "../../../utils/csvUtils";
+import { Notify } from "../../../utils/notify";
+import { getAllCompetitionOptions } from "../../Competition/competitionService";
+import { changeStatus, deleteEvent, getAllEvent } from "../eventService";
 
 export default function EventList() {
-
   const Export = ({ onExport }) => (
-    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
+    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
+      Export
+    </Button>
   );
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [direction, setDirection] = useState('desc');
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [direction, setDirection] = useState("desc");
   const [competitionList, setCompetitionList] = useState([]);
+  const [competitionLoading, setCompetitionLoading] = useState(false);
+  const [eventStatus, setEventStatus] = useState({});
   //Filter Param
-  const [startDateValue, setStartDateValue] = useState('');
-  const [endDateValue, setEndDateValue] = useState('');
-  const [selectedCompetition, setSelectedCompetition] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [startDateValue, setStartDateValue] = useState("");
+  const [endDateValue, setEndDateValue] = useState("");
+  const [selectedCompetition, setSelectedCompetition] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const updateEventStatus = (id, key, value) => {
+    setEventStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
+  };
 
   const toggleHighlight = async (id, isActive) => {
-    setLoading(true);
+    updateEventStatus(id, "loading", true);
     try {
-      const newStatus = !isActive; // Toggle the isActive status
-      const request = { _id: id, fieldName: 'isActive', status: newStatus.toString() };
-      const success = await changeStatus(request);
-      if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery, filters);
-        setLoading(false);
+      const newStatus = !isActive;
+      const request = { _id: id, fieldName: "isActive", status: newStatus.toString() };
+      const result = await changeStatus(request);
+      if (result.success) {
+        Notify.success("Status updated successfully");
+        updateEventStatus(id, "isActive", result.data.details.isActive);
       }
     } catch (error) {
-      // Handle error
       console.error("Error removing :", error);
-      // Display error message or show notification to the user
-      // Set the state to indicate the error condition
-      setLoading(false);
     }
+    updateEventStatus(id, "loading", false);
   };
 
   const location = useLocation();
-  const competitionId = location.state ? location.state.competitionId : '';
-  const competitionName = location.state ? location.state.competitionName : '';
+  const competitionId = location.state ? location.state.competitionId : "";
+  const competitionName = location.state ? location.state.competitionName : "";
   const [filters, setFilters] = useState({
-    competitionId: location.state ? location.state.competitionId : '',
+    competitionId: location.state ? location.state.competitionId : "",
     starDate: "",
     endDate: "",
-    status: ""
+    status: "",
     // Add more filters here if needed
   });
 
-  const statusList = [{ id: '', lable: 'All' }, { id: true, lable: 'Active' }, { id: false, lable: 'Inactive' }]
+  const statusList = [
+    { id: "", lable: "All" },
+    { id: true, lable: "Active" },
+    { id: false, lable: "Inactive" },
+  ];
   const columns = [
     {
       name: "SR.NO",
-      selector: (row, index) => ((currentPage - 1) * perPage) + (index + 1),
+      selector: (row, index) => (currentPage - 1) * perPage + (index + 1),
       sortable: false,
     },
     {
       name: "NAME",
       selector: (row) => [row.name],
       sortable: true,
-      sortField: 'name'
+      sortField: "name",
     },
     {
       name: "COMPETITION",
@@ -85,50 +94,52 @@ export default function EventList() {
     {
       name: "SPORT",
       selector: (row) => [row.sportsName],
-      sortable: true
+      sortable: true,
     },
     {
       name: "MATCH DATE",
       selector: (row) => {
         const originalDate = new Date(row.matchDate);
-        const formattedDate = originalDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+        const formattedDate = originalDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
         return formattedDate;
       },
       sortable: true,
-      sortField: 'matchDate',
+      sortField: "matchDate",
     },
     {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
-      cell: row => (
-        <div className="material-switch mt-4">
+      cell: (row) => (
+        <div className="material-switch mt-4 d-flex align-items-center" key={row._id}>
           <input
             id={`highlightSwitch_${row._id}`}
             name={`notes[${row._id}].highlight`}
-            onChange={() => toggleHighlight(row._id, row.isActive)}
-            checked={row.isActive}
+            onChange={() => toggleHighlight(row._id, eventStatus[row._id]?.isActive)}
+            checked={eventStatus[row._id]?.isActive}
             type="checkbox"
           />
-          <label
-            htmlFor={`highlightSwitch_${row._id}`}
-            className="label-primary"
-          ></label>
+          <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
+          {eventStatus[row._id]?.loading ? (
+            <div className="pb-2 ps-4">
+              <CSpinner size="sm" />
+            </div>
+          ) : null}
         </div>
-
       ),
     },
     {
-      name: 'ACTION',
-      cell: row => (
+      name: "ACTION",
+      cell: (row) => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+            <i className="fa fa-edit"></i>
+          </Link>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
-
         </div>
       ),
     },
@@ -174,10 +185,16 @@ export default function EventList() {
         competitionId: competitionId,
         fromDate: fromDate,
         toDate: toDate,
-        status: status
+        status: status,
       });
       setData(result.records);
       setTotalRows(result.totalRecords);
+      setEventStatus(
+        result.records.reduce((acc, event) => {
+          acc[event._id] = { isActive: event.isActive, loading: false };
+          return acc;
+        }, {})
+      );
       setLoading(false);
     } catch (error) {
       // Handle error
@@ -214,7 +231,7 @@ export default function EventList() {
     setLoading(false);
   };
 
-  const handlePageChange = page => {
+  const handlePageChange = (page) => {
     setCurrentPage(page);
     fetchData(page, sortBy, direction, searchQuery, filters);
   };
@@ -226,7 +243,7 @@ export default function EventList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('event/getAllEvent', searchQuery, 'events.csv');
+    await downloadCSV("event/getAllEvent", searchQuery, "events.csv");
   };
 
   const handleDelete = (id) => {
@@ -238,7 +255,7 @@ export default function EventList() {
       competitionId: selectedCompetition,
       fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
       toDate: endDateValue, // Replace endDateValue with the actual state value for end date
-      status: selectedStatus
+      status: selectedStatus,
     };
     setFilters(newFilters);
     // Fetch data with the updated filters object
@@ -263,44 +280,41 @@ export default function EventList() {
   };
 
   const filterData = async () => {
-    const competitionData = await getAllCompetition();
-    const dropdownOptions = competitionData.records.map(option => ({
+    setCompetitionLoading(true);
+    const competitionData = await getAllCompetitionOptions({ fields: { name: 1 }, sortBy: "name", direction: "asc" });
+    const dropdownOptions = competitionData.records.map((option) => ({
       value: option._id,
       label: option.name,
     }));
     setCompetitionList(dropdownOptions);
+    setCompetitionLoading(false);
   };
 
   useEffect(() => {
-
-    if (searchQuery !== '') {
+    if (searchQuery !== "") {
       fetchData(currentPage, sortBy, direction, searchQuery, filters); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, '', filters); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, "", filters); // fetch page 1 of users
     }
     filterData();
-
   }, [perPage, searchQuery, filters]);
 
   useEffect(() => {
     return () => {
-      setFilters(
-        {
-          competitionId: '',
-          starDate: "",
-          endDate: ""
-          // Add more filters here if needed
-        }
-      )
-    }
-
+      setFilters({
+        competitionId: "",
+        starDate: "",
+        endDate: "",
+        // Add more filters here if needed
+      });
+    };
   }, [location]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title"> {(competitionName !== '') ? competitionName + "'s Events" : "ALL EVENTS"}</h1>
+          <h1 className="page-title"> {competitionName !== "" ? competitionName + "'s Events" : "ALL EVENTS"}</h1>
           {/* <Breadcrumb className="breadcrumb">
             <Breadcrumb.Item className="breadcrumb-item" href="#">
               Category
@@ -311,14 +325,14 @@ export default function EventList() {
           </Breadcrumb> */}
         </div>
         <div className="ms-auto pageheader-btn">
-          {competitionName === '' &&
+          {competitionName === "" && (
             <Link to={`${process.env.PUBLIC_URL}/event-form`} className="btn btn-primary btn-icon text-white me-3">
               <span>
                 <i className="fe fe-plus"></i>&nbsp;
               </span>
               CREATE EVENT
             </Link>
-          }
+          )}
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;
@@ -334,11 +348,13 @@ export default function EventList() {
             {competitionName === "" && (
               <Card.Header>
                 <FormSelectWithSearch
+                  isLoading={competitionLoading}
+                  placeholder={competitionLoading ? "Loading..." : "Select Competition"}
                   label="Competition"
                   name="sportId"
                   value={selectedCompetition} // Set the selectedCompetition as the value
                   onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
-                  onBlur={() => { }} // Add an empty function as onBlur prop
+                  onBlur={() => {}} // Add an empty function as onBlur prop
                   error=""
                   width={2}
                   options={competitionList}
@@ -350,7 +366,7 @@ export default function EventList() {
                   type="date"
                   value={startDateValue}
                   onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => { }}
+                  onBlur={() => {}}
                   width={2}
                 />
 
@@ -360,7 +376,7 @@ export default function EventList() {
                   type="date"
                   value={endDateValue}
                   onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => { }}
+                  onBlur={() => {}}
                   width={2}
                 />
 
@@ -369,7 +385,7 @@ export default function EventList() {
                   name="status"
                   value={selectedStatus}
                   onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => { }}
+                  onBlur={() => {}}
                   width={2}
                 >
                   {statusList.map((status, index) => (
@@ -395,11 +411,7 @@ export default function EventList() {
               </Card.Header>
             )}
             <Card.Body>
-              <SearchInput
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                loading={loading}
-              />
+              <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}
