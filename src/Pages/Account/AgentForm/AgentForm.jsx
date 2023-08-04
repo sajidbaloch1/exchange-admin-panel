@@ -4,11 +4,10 @@ import { Card, Col, Row } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { Notify } from "../../../utils/notify";
 import { addData, getDetailByID, updateData } from "../accountService";
 import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
 import * as Yup from "yup";
-
-
 
 export default function AgentForm() {
   const navigate = useNavigate();
@@ -55,12 +54,15 @@ export default function AgentForm() {
         });
       }
       if (response.success) {
+        Notify.success("Agent updated.");
         navigate("/account-list/");
       } else {
-        setServerError(response.message);
+        throw new Error(response.message);
       }
     } catch (error) {
       // Handle error
+      Notify.error(error.message);
+      setServerError(error.message);
     } finally {
       setLoading(false); // Set loading state to false
     }

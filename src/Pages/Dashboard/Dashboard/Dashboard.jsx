@@ -79,8 +79,10 @@ export default function Dashboard() {
           setBalance(response.result[0].balance);
           setExposure(response.result[0].totalExposure);
           setCreditPts(response.result[0].creditPoints);
-          setAllPts(response.result[0].totalPoint);
+          setAllPts(response.result[0].AllPts);
           setSettlementPts(response.result[0].settlementPoint);
+          setUpPts(response.result[0].upperPoint)
+          setDownPts(response.result[0].downPoint)
         }
       }
     };

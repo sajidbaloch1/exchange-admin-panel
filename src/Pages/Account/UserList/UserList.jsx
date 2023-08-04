@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
-import { Row, Card, Col, Button, Dropdown } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllData, deleteData, updateUserStatus } from "../accountService";
@@ -147,8 +147,9 @@ export default function UserList() {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
-
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          </OverlayTrigger>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import { useFormik } from "formik";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getBetCategorySettingByID, updateBetCategorySetting } from "../sportService";
-
+import { Notify } from "../../../utils/notify";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect";
 import FormTextarea from "../../../components/Common/FormComponents/FormTextarea";
@@ -58,28 +58,25 @@ export default function BetCategorySettingForm(props) {
     }),
     onSubmit: async (values) => {
       try {
-
         if (id) {
           await updateBetCategorySetting({
             _id: id,
             ...values,
           });
         }
-
+        Notify.success("Bet Category Rule and Setting updated.");
         navigate("/bet-category-list", { state: { sportId: sportId } });
       } catch (error) {
         // Handle error
       }
-      console.log("Form submitted successfully:", values);
     },
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      //console.log(location.state);
       if (id) {
         const result = await getBetCategorySettingByID(id);
-        console.log(result);
+
         formik.setValues((prevValues) => ({
           ...prevValues,
           ...result,
@@ -219,13 +216,16 @@ export default function BetCategorySettingForm(props) {
 
                       <Col md={2}>
                         {index !== 0 && (
-                          <CButton
-                            className="mt-6"
-                            color="danger"
-                            onClick={() => handleRemoveNote(index)}
-                          >
-                            <i className="fa fa-close"></i>
-                          </CButton>
+                          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to remove</Tooltip>}>
+                            <CButton
+                              className="mt-6"
+                              color="danger"
+                              onClick={() => handleRemoveNote(index)}
+                            >
+                              <i className="fa fa-close"></i>
+                            </CButton>
+                          </OverlayTrigger>
+
                         )}
                       </Col>
                     </Row>
@@ -233,13 +233,15 @@ export default function BetCategorySettingForm(props) {
 
                   <CCol xs={12}>
                     <div className="d-grid gap-2 d-md-block">
-                      <CButton
-                        color="warning"
-                        type="button"
-                        onClick={handleAddNote}
-                      >
-                        <i className="fa fa-plus"></i>
-                      </CButton>
+                      <OverlayTrigger placement="top" overlay={<Tooltip > Click here to add new</Tooltip>}>
+                        <CButton
+                          color="warning"
+                          type="button"
+                          onClick={handleAddNote}
+                        >
+                          <i className="fa fa-plus"></i>
+                        </CButton>
+                      </OverlayTrigger>
                     </div>
                   </CCol>
                 </CContainer>

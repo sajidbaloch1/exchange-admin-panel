@@ -6,6 +6,7 @@ import FormInput from "../../../components/Common/FormComponents/FormInput"; // 
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 import { addData } from "../accountService";
 import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
+import { Notify } from "../../../utils/notify";
 import * as Yup from "yup";
 
 const validationSchemaForCreate = Yup.object({
@@ -117,12 +118,14 @@ export default function UserForm() {
         ...values,
       });
       if (response.success) {
+        Notify.success("User updated.");
         navigate("/user-list/");
       } else {
         throw new Error(response.message);
       }
     } catch (error) {
       // Handle error
+      Notify.error(error.message);
       setServerError(error.message);
     } finally {
       setLoading(false); // Set loading state to false
@@ -374,7 +377,7 @@ export default function UserForm() {
                     <CButton color="primary" type="submit" className="me-3">
                       {loading ? <CSpinner size="sm" /> : "Save"}
                     </CButton>
-                    <Link to={`${process.env.PUBLIC_URL}/account-list`} className="btn btn-danger btn-icon text-white ">
+                    <Link to={`${process.env.PUBLIC_URL}/user-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel
                     </Link>
                   </div>

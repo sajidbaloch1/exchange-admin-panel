@@ -8,6 +8,7 @@ import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import * as Yup from "yup";
 import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import { Notify } from "../../../utils/notify";
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 
 export default function CompetitionForm() {
@@ -52,18 +53,15 @@ export default function CompetitionForm() {
           });
         }
         if (response.success) {
+          Notify.success("Competition updated.");
           navigate("/competition-list/");
         } else {
-          setServerError(response.message);
+          throw new Error(response.message);
         }
       } catch (error) {
         //console.log(error);
-        if (error.response && error.response.status === 500) {
-          // Server-side error occurred
-          setServerError(error.response.data.message); // Set the server error message
-        } else {
-          // Handle other errors
-        }
+        Notify.error(error.message);
+        setServerError(error.message);
       } finally {
         setLoading(false); // Set loading state to false
       }

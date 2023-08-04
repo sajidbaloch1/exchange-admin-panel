@@ -6,7 +6,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { Notify } from "../../../utils/notify";
 import { addData, getDetailByID, updateData } from "../accountService";
+
 
 export default function SuperMasterForm() {
   const navigate = useNavigate();
@@ -130,12 +132,14 @@ export default function SuperMasterForm() {
         });
       }
       if (response.success) {
+        Notify.success("Super master updated.");
         navigate("/account-list/");
       } else {
-        setServerError(response.message);
+        throw new Error(response.message);
       }
     } catch (error) {
-      // Handle error
+      Notify.error(error.message);
+      setServerError(error.message);
     } finally {
       setLoading(false); // Set loading state to false
     }
@@ -146,30 +150,6 @@ export default function SuperMasterForm() {
     validationSchema: editMode ? validationSchemaForUpdate : validationSchemaForCreate,
     onSubmit: submitForm,
   });
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (id) {
-  //       const result = await getDetailByID(id);
-
-  //       formik.setValues((prevValues) => ({
-  //         ...prevValues,
-  //         username: result.username || "",
-  //         fullName: result.fullName || "",
-  //         password: "",
-  //         city: result.city || "",
-  //         mobileNumber: result.mobileNumber || "",
-  //         creditPoints: result.creditPoints || "",
-  //         rate: result.rate || "",
-  //         role: result.role || "",
-  //         isBetLock: result.isBetLock || false,
-  //         isActive: result.isActive || false,
-  //         forcePasswordChange: result.forcePasswordChange || false,
-  //       }));
-  //     }
-  //   };
-  //   fetchData();
-  // }, [id, getDetailByID]);
 
   useEffect(() => {
     Promise.all([getDetailByID(id), getDetailByID(loginUserDetail._id)])

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getAllCompetition, deleteCompetition, changeStatus } from "../competitionService";
@@ -143,7 +143,9 @@ export default function CompetitionList() {
       name: 'TOTAL EVENTS',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/competition-event-list`} state={{ competitionId: row._id, competitionName: row.name }} className="btn btn-info btn-lg ms-2">{row.totalEvent}</Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to see events</Tooltip>}>
+            <Link to={`${process.env.PUBLIC_URL}/competition-event-list`} state={{ competitionId: row._id, competitionName: row.name }} className="btn btn-info btn-lg ms-2">{row.totalEvent}</Link>
+          </OverlayTrigger>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
@@ -152,7 +154,10 @@ export default function CompetitionList() {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/competition-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link to={`${process.env.PUBLIC_URL}/competition-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          </OverlayTrigger>
+
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
@@ -383,7 +388,7 @@ export default function CompetitionList() {
                 width={2}
               >
                 {statusList.map((status, index) => (
-                  <option key={status.index} value={status.id}>
+                  <option key={index} value={status.id}>
                     {status.lable.toUpperCase()}
                   </option>
                 ))}

@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Accordion, Card, Row, Col } from "react-bootstrap";
 import { getAllCompetionByEvent, activeAllEvent, activeAllCompetition } from "../eventService";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
+import { Notify } from "../../../utils/notify";
 import { CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
 
 export default function EventForm() {
@@ -14,8 +15,6 @@ export default function EventForm() {
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState(null); // State to hold the server error message
-  const [serverSuccess, setServerSuccess] = useState(null); // State to hold the server error message
   const [sportList, setSportList] = useState([]);
 
   const [selectedSport, setSelectedSport] = useState(null);
@@ -58,22 +57,21 @@ export default function EventForm() {
       sportId: selectedSport._id
     });
     if (response.success) {
-      setServerSuccess('Updated Successfully');
+      Notify.success("Updated Successfully");
     } else {
-      setServerError(response.message);
+      Notify.error(response.message);
     }
   }
 
   const updateEvent = async (e) => {
-
     const response = await activeAllEvent({
       eventIds: addedEventIds,
       competitionId: selectedCompetition._id
     });
     if (response.success) {
-      setServerSuccess('Updated Successfully');
+      Notify.success("Updated Successfully");
     } else {
-      setServerError(response.message);
+      Notify.error(response.message);
     }
   }
 
@@ -169,8 +167,7 @@ export default function EventForm() {
                   </Accordion>
                 </CCol>
                 <CCol lg={8}>
-                  {serverError && <p className="text-red">{serverError}</p>}
-                  {serverSuccess && <p className="text-green">{serverSuccess}</p>}
+
                   {/* Display server error message */}
 
                   {selectedSport && (

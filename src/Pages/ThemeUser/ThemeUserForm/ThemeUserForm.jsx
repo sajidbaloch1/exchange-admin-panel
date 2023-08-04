@@ -5,6 +5,7 @@ import { Card } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
+import { Notify } from "../../../utils/notify";
 import { createThemeUser, getThemeUserById, updateThemeUser } from "../themeUserService";
 
 
@@ -70,12 +71,13 @@ export default function SuperAdminForm() {
       }
 
       if (response.success) {
+        Notify.success("Theme user updated.");
         navigate("/theme-user-list/");
       } else {
         throw new Error(response.message);
       }
     } catch (error) {
-      setServerError(error.message);
+      Notify.error(error.message);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 import { CSpinner } from "@coreui/react";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link } from "react-router-dom";
@@ -75,7 +75,7 @@ export default function SportList() {
             id={`highlightSwitch_${row._id}`}
             name={`notes[${row._id}].highlight`}
             onChange={() => toggleHighlight(row._id, sportStatus[row._id]?.isActive)}
-            checked={sportStatus[row._id]?.isActive}
+            checked={sportStatus[row._id]?.isActive || false}
             type="checkbox"
           />
           <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
@@ -91,20 +91,25 @@ export default function SportList() {
       name: "ACTION",
       cell: (row) => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
-            <i className="fa fa-edit"></i>
-          </Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+              <i className="fa fa-edit"></i>
+            </Link>
+          </OverlayTrigger>
+
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
-          <Link
-            to={{
-              pathname: `${process.env.PUBLIC_URL}/bet-category-list`,
-            }}
-            // Pass the sportId as state
-            state={{ sportId: row._id }}
-            className="btn btn-info btn-lg ms-2"
-          >
-            <i className="fa fa-file"></i>
-          </Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to update rule</Tooltip>}>
+            <Link
+              to={{
+                pathname: `${process.env.PUBLIC_URL}/bet-category-list`,
+              }}
+              state={{ sportId: row._id }}
+              className="btn btn-info btn-lg ms-2"
+            >
+              <i className="fa fa-file"></i>
+            </Link>
+          </OverlayTrigger>
+
         </div>
       ),
     },
@@ -140,14 +145,16 @@ export default function SportList() {
     setLoading(true);
     try {
       const result = await getAllSport(page, perPage, sortBy, direction, searchQuery);
+
+
+      const initialSportStatus = result.records.reduce((acc, sport) => {
+        acc[sport._id] = { isActive: sport.isActive, loading: false };
+        return acc;
+      }, {});
+      setSportStatus(initialSportStatus);
       setData(result.records);
       setTotalRows(result.totalRecords);
-      setSportStatus(
-        result.records.reduce((acc, sport) => {
-          acc[sport._id] = { isActive: sport.isActive, loading: false };
-          return acc;
-        }, {})
-      );
+
       setLoading(false);
     } catch (error) {
       // Handle error
