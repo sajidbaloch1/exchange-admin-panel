@@ -14,7 +14,7 @@ export default function Dashboard() {
   const newUser = location?.state?.newUser ?? false;
   const authUser = location?.state?.user ?? null;
 
-  const { _id } = JSON.parse(localStorage.getItem('user_info')) || {};
+  const { _id } = JSON.parse(localStorage.getItem("user_info")) || {};
 
   const [show, setShow] = useState(newUser);
   const [code, setCode] = useState("");
@@ -30,42 +30,41 @@ export default function Dashboard() {
   const dashboardGraph = {
     options: {
       chart: {
-        type: 'bar',
-        height: 350
+        type: "bar",
+        height: 350,
       },
       plotOptions: {
         bar: {
           horizontal: true,
           distributed: true,
           dataLabels: {
-            position: 'top'
-          }
-        }
+            position: "top",
+          },
+        },
       },
       dataLabels: {
         enabled: false,
         style: {
-          colors: ['#000']
-        }
+          colors: ["#000"],
+        },
       },
       xaxis: {
-        categories: ['Credit pts', 'All pts', 'Settlement pts', 'Upper pts', 'Down pts'],
+        categories: ["Credit pts", "All pts", "Settlement pts", "Upper pts", "Down pts"],
         labels: {
           show: true,
           style: {
-            colors: ['#000']
-          }
-        }
+            colors: ["#000"],
+          },
+        },
       },
-      colors: ['#556ee6', '#f1b44c', '#50a5f1', '#128412', '#343a40'] // Array of colors for each category
+      colors: ["#556ee6", "#f1b44c", "#50a5f1", "#128412", "#343a40"], // Array of colors for each category
     },
     series: [
       {
-        name: 'Series-1',
+        name: "Series-1",
         data: [creditPts, allPts, settlementPts, upPts, downPts],
-      }
-    ]
-
+      },
+    ],
   };
 
   useEffect(() => {
@@ -77,11 +76,11 @@ export default function Dashboard() {
       if (_id) {
         const response = await getDashboardById(_id);
         if (response.result && response.result.length > 0) {
-          setBalance(response.result[0].balance)
-          setExposure(response.result[0].totalExposure)
-          setCreditPts(response.result[0].creditPoints)
-          setAllPts(response.result[0].totalPoint)
-          setSettlementPts(response.result[0].settlementPoint)
+          setBalance(response.result[0].balance);
+          setExposure(response.result[0].totalExposure);
+          setCreditPts(response.result[0].creditPoints);
+          setAllPts(response.result[0].totalPoint);
+          setSettlementPts(response.result[0].settlementPoint);
         }
       }
     };
