@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Form, Modal, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation, useParams } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
-import { deleteData, getAllData, createTransaction } from "../accountService";
-import FormSelect from "../../../components/Common/FormComponents/FormSelect";
-import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
 import TransactionModal from "../TransactionModal";
+import { createTransaction, deleteData, getAllData } from "../accountService";
 
 export default function AccountList() {
   const location = useLocation();
@@ -39,13 +37,13 @@ export default function AccountList() {
   const [serverError, setServerError] = useState(null);
 
   // popup fields
-  const [rowData, setRowData] = useState('');
-  const [transactionType, setTransactionType] = useState('');
+  const [rowData, setRowData] = useState("");
+  const [transactionType, setTransactionType] = useState("");
 
   const [showTransactionModal, setShowTransactionModal] = useState(false);
 
   const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRole, setSelectedRole] = useState("");
   const [filters, setFilters] = useState({
     role: "",
     // Add more filters here if needed
@@ -215,7 +213,7 @@ export default function AccountList() {
         direction: direction,
         searchQuery: searchQuery,
         parentId: parentId,
-        role: allowedRoles
+        role: allowedRoles,
       });
 
       setData(result.records);
@@ -283,7 +281,7 @@ export default function AccountList() {
         points: amount,
         type: transactionType,
         remark: remarks,
-        transactionCode: transactionCode
+        transactionCode: transactionCode,
       });
       if (!result.success) {
         setServerError(result.message);
@@ -292,7 +290,6 @@ export default function AccountList() {
         fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
       }
       // Close the modal after handling the submission
-
     } catch (error) {
       // Handle any errors that occurred during the transaction submission
       console.error("Error submitting transaction:", error);
@@ -306,21 +303,20 @@ export default function AccountList() {
   const handleDepositClick = (row) => {
     // Set initial values for the Deposit modal based on the row data
     setShowTransactionModal(true);
-    setRowData(row)
-    setTransactionType('credit')
+    setRowData(row);
+    setTransactionType("credit");
   };
 
   const handleWithdrawClick = (row) => {
     // Set initial values for the Withdraw modal based on the row data
     setShowTransactionModal(true);
-    setRowData(row)
-    setTransactionType('debit')
+    setRowData(row);
+    setTransactionType("debit");
   };
 
   const handleFilterClick = () => {
     const newFilters = {
       role: selectedRole !== "" ? selectedRole : null,
-
     };
     setFilters(newFilters);
     // Fetch data with the updated filters object
@@ -475,7 +471,6 @@ export default function AccountList() {
         rowData={rowData}
         transactionType={transactionType}
       />
-
     </div>
   );
 }
