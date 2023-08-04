@@ -112,6 +112,8 @@ export default function SuperAdminForm() {
     settlementDate: null,
     settlementDay: null,
     settlementTime: null,
+    isCasinoAvailable: false,
+    isAutoSettlement: false,
   };
 
   const submitForm = async (values) => {
@@ -402,13 +404,33 @@ export default function SuperAdminForm() {
                 />
               </div>
 
-              <div>
+              <div className="pe-6">
                 <CFormLabel htmlFor="forcePasswordChange">Force Password change</CFormLabel>
                 <FormToggleSwitch
                   id="forcePasswordChange"
                   name="forcePasswordChange"
                   checked={formik.values.forcePasswordChange}
                   onChange={() => formik.setFieldValue("forcePasswordChange", !formik.values.forcePasswordChange)}
+                />
+              </div>
+
+              <div className="pe-6">
+                <CFormLabel htmlFor="isCasinoAvailable">Casino Available</CFormLabel>
+                <FormToggleSwitch
+                  id="isCasinoAvailable"
+                  name="isCasinoAvailable"
+                  checked={formik.values.isCasinoAvailable}
+                  onChange={() => formik.setFieldValue("isCasinoAvailable", !formik.values.isCasinoAvailable)}
+                />
+              </div>
+
+              <div>
+                <CFormLabel htmlFor="isAutoSettlement">Auto Settlement</CFormLabel>
+                <FormToggleSwitch
+                  id="isAutoSettlement"
+                  name="isAutoSettlement"
+                  checked={formik.values.isAutoSettlement}
+                  onChange={() => formik.setFieldValue("isAutoSettlement", !formik.values.isAutoSettlement)}
                 />
               </div>
             </CCol>
@@ -474,7 +496,6 @@ export default function SuperAdminForm() {
               error={formik.touched.settlementTime && formik.errors.settlementTime}
               isRequired="false"
               width={3}
-              disabled={!formik.values.settlementDurationType || formik.values.settlementDurationType !== "daily"}
             />
 
             <CCol xs={12} className="pt-3">
