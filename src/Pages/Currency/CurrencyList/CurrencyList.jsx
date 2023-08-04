@@ -1,52 +1,59 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllCurrency, deleteCurrency } from "../currencyService";
-import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils/alertUtils';
+import { Link } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { showAlert } from "../../../utils/alertUtils";
+import { downloadCSV } from "../../../utils/csvUtils";
+import { deleteCurrency, getAllCurrency } from "../currencyService";
 
 export default function CurrencyList() {
-
   const Export = ({ onExport }) => (
-    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
+    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
+      Export
+    </Button>
   );
 
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [direction, setDirection] = useState('desc');
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [direction, setDirection] = useState("desc");
 
   const columns = [
     {
       name: "SR.NO",
-      selector: (row, index) => ((currentPage - 1) * perPage) + (index + 1),
+      selector: (row, index) => (currentPage - 1) * perPage + (index + 1),
       sortable: false,
     },
     {
       name: "CURRENCY",
-      selector: (row) => [row.name],
+      selector: (row) => [row.name.toUpperCase()],
       sortable: true,
-      sortField: 'name'
+      sortField: "name",
     },
     {
       name: "CONVERSION RATE (INR)",
       selector: (row) => [row.multiplier],
       sortable: true,
-      sortField: 'multiplier'
+      sortField: "multiplier",
     },
     {
-      name: 'ACTION',
-      cell: row => (
+      name: "ACTION",
+      cell: (row) => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/currency-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <Link
+            to={`${process.env.PUBLIC_URL}/currency-form`}
+            state={{ id: row._id }}
+            className="btn btn-primary btn-lg"
+          >
+            <i className="fa fa-edit"></i>
+          </Link>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
@@ -113,7 +120,6 @@ export default function CurrencyList() {
     }
   };
 
-
   const handleSort = (column, sortDirection) => {
     // simulate server sort
     setSortBy(column.sortField);
@@ -123,7 +129,7 @@ export default function CurrencyList() {
     setLoading(false);
   };
 
-  const handlePageChange = page => {
+  const handlePageChange = (page) => {
     setCurrentPage(page);
     fetchData(page, sortBy, direction, searchQuery);
   };
@@ -135,7 +141,7 @@ export default function CurrencyList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('currencies/getAllCurrency', searchQuery, 'currency.csv');
+    await downloadCSV("currencies/getAllCurrency", searchQuery, "currency.csv");
   };
 
   const handleDelete = (id) => {
@@ -143,10 +149,10 @@ export default function CurrencyList() {
   };
 
   useEffect(() => {
-    if (searchQuery !== '') {
+    if (searchQuery !== "") {
       fetchData(currentPage, sortBy, direction, searchQuery); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, ''); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, ""); // fetch page 1 of users
     }
   }, [perPage, searchQuery]);
 
@@ -155,7 +161,6 @@ export default function CurrencyList() {
       <div className="page-header">
         <div>
           <h1 className="page-title">ALL CURRENCIES</h1>
-
         </div>
         <div className="ms-auto pageheader-btn">
           <Link to={`${process.env.PUBLIC_URL}/currency-form`} className="btn btn-primary btn-icon text-white me-3">
@@ -176,13 +181,8 @@ export default function CurrencyList() {
       <Row className=" row-sm">
         <Col lg={12}>
           <Card>
-
             <Card.Body>
-              <SearchInput
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                loading={loading}
-              />
+              <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}
