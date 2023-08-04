@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link } from "react-router-dom";
@@ -16,7 +16,6 @@ export default function CurrencyList() {
   );
 
   const [searchQuery, setSearchQuery] = React.useState("");
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
@@ -47,13 +46,15 @@ export default function CurrencyList() {
       name: "ACTION",
       cell: (row) => (
         <div>
-          <Link
-            to={`${process.env.PUBLIC_URL}/currency-form`}
-            state={{ id: row._id }}
-            className="btn btn-primary btn-lg"
-          >
-            <i className="fa fa-edit"></i>
-          </Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link
+              to={`${process.env.PUBLIC_URL}/currency-form`}
+              state={{ id: row._id }}
+              className="btn btn-primary btn-lg"
+            >
+              <i className="fa fa-edit"></i>
+            </Link>
+          </OverlayTrigger>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),

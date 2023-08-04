@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import { createCloneUser, getAppModuleListing, getDetailByID, getPermissionsById, updateData } from "../accountService";
 import MultiLoginListing from "./MultiLoginListing";
+import { Notify } from "../../../utils/notify";
 
 const multiLoginCreateSchema = Yup.object({
   username: Yup.string()
@@ -84,11 +85,14 @@ export default function MultiLogin() {
 
         if (response.success) {
           formik.resetForm();
+          Notify.success("User updated.");
           navigate("/multi-login", {});
           window.location.reload();
+        } else {
+          throw new Error(response.message);
         }
       } catch (error) {
-        console.log(error.message);
+        Notify.error(error.message);
       } finally {
         setLoading(false);
       }

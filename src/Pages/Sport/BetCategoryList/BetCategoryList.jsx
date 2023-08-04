@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { getBetCategoryListBySportID, deleteSport } from "../sportService";
@@ -44,12 +44,15 @@ export default function BetCategoryList(props) {
       name: 'ACTION',
       cell: row => (
         <div>
-          <Link
-            to={`${process.env.PUBLIC_URL}/bet-category-setting`}
-            state={{ id: row._id, sportId: row.sportsId, betCatId: row.betCatId, betCatName: row.betCatName, sportsName: row.sportsName }}
-            className="btn btn-primary btn-lg">
-            <i className="fa fa-edit"></i>
-          </Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link
+              to={`${process.env.PUBLIC_URL}/bet-category-setting`}
+              state={{ id: row._id, sportId: row.sportsId, betCatId: row.betCatId, betCatName: row.betCatName, sportsName: row.sportsName }}
+              className="btn btn-primary btn-lg">
+              <i className="fa fa-edit"></i>
+            </Link>
+          </OverlayTrigger>
+
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button>
           <Link
             to={{
@@ -99,7 +102,7 @@ export default function BetCategoryList(props) {
       const requestParameter = {
         sportId: sportId
       }
-      console.log(requestParameter);
+
       const result = await getBetCategoryListBySportID(requestParameter);
       setData(result.records);
       setTotalRows(result.totalRecords);

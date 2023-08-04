@@ -14,12 +14,10 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
   const [clickedUserProfit, setClickedUserProfit] = useState(0);
   const [clickedUserNewProfit, setClickedUserNewProfit] = useState(0);
   const [transactionCode, setTransactionCode] = useState("");
-
   const [amount, setAmount] = useState("");
   const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
-    console.log(rowData);
     if (rowData) {
       setParentName(rowData.parentUser.username);
       setClickedUserName(rowData.username);
