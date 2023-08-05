@@ -1,6 +1,6 @@
 import { CButton, CCol, CSpinner } from "@coreui/react";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Button, Card, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation } from "react-router-dom";
@@ -12,6 +12,7 @@ import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { getAllCompetitionOptions } from "../../Competition/competitionService";
+import { getAllSport } from "../../Sport/sportService";
 import { changeStatus, deleteEvent, getAllEvent } from "../eventService";
 
 export default function EventList() {
@@ -27,7 +28,7 @@ export default function EventList() {
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortBy, setSortBy] = useState("isActive");
   const [direction, setDirection] = useState("desc");
   const [competitionList, setCompetitionList] = useState([]);
   const [competitionLoading, setCompetitionLoading] = useState(false);
@@ -37,6 +38,9 @@ export default function EventList() {
   const [endDateValue, setEndDateValue] = useState("");
   const [selectedCompetition, setSelectedCompetition] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [sportLoading, setSportLoading] = useState(false);
+  const [selectedSport, setSelectedSport] = useState("");
+  const [sportList, setSportList] = useState([]);
 
   const updateEventStatus = (id, key, value) => {
     setEventStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
@@ -136,8 +140,12 @@ export default function EventList() {
       name: "ACTION",
       cell: (row) => (
         <div>
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
-            <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
+            <Link
+              to={`${process.env.PUBLIC_URL}/event-form`}
+              state={{ id: row._id }}
+              className="btn btn-primary btn-lg"
+            >
               <i className="fa fa-edit"></i>
             </Link>
           </OverlayTrigger>
@@ -185,6 +193,7 @@ export default function EventList() {
         direction: direction,
         searchQuery: searchQuery,
         competitionId: competitionId,
+        sportId: selectedSport,
         fromDate: fromDate,
         toDate: toDate,
         status: status,
@@ -281,7 +290,18 @@ export default function EventList() {
     });
   };
 
-  const filterData = async () => {
+  const fetchSportList = async () => {
+    setSportLoading(true);
+    const sportData = await getAllSport();
+    const dropdownOptions = sportData.records.map((option) => ({
+      value: option._id,
+      label: option.name,
+    }));
+    setSportList(dropdownOptions);
+    setSportLoading(false);
+  };
+
+  const fetchCompetitionList = async () => {
     setCompetitionLoading(true);
     const competitionData = await getAllCompetitionOptions({ fields: { name: 1 }, sortBy: "name", direction: "asc" });
     const dropdownOptions = competitionData.records.map((option) => ({
@@ -290,6 +310,9 @@ export default function EventList() {
     }));
     setCompetitionList(dropdownOptions);
     setCompetitionLoading(false);
+  };
+  const filterData = async () => {
+    Promise.all([fetchSportList(), fetchCompetitionList()]);
   };
 
   useEffect(() => {
@@ -344,100 +367,115 @@ export default function EventList() {
         </div>
       </div>
 
-      <Row className=" row-sm">
-        <Col lg={12}>
-          <Card>
-            {competitionName === "" && (
-              <Card.Header>
-                <FormSelectWithSearch
-                  isLoading={competitionLoading}
-                  placeholder={competitionLoading ? "Loading..." : "Select Competition"}
-                  label="Competition"
-                  name="sportId"
-                  value={selectedCompetition} // Set the selectedCompetition as the value
-                  onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
-                  onBlur={() => { }} // Add an empty function as onBlur prop
-                  error=""
-                  width={2}
-                  options={competitionList}
-                />
+      <Card>
+        {competitionName === "" && (
+          <Card.Header className="d-block">
+            <Row className="w-100">
+              <FormSelectWithSearch
+                isLoading={competitionLoading}
+                placeholder={competitionLoading ? "Loading..." : "Select Competition"}
+                label="Competition"
+                name="sportId"
+                value={selectedCompetition} // Set the selectedCompetition as the value
+                onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
+                onBlur={() => {}} // Add an empty function as onBlur prop
+                error=""
+                width={3}
+                options={competitionList}
+              />
 
-                <FormInput
-                  label="Start Date"
-                  name="startDate"
-                  type="date"
-                  value={startDateValue}
-                  onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => { }}
-                  width={2}
-                />
+              <FormSelectWithSearch
+                key={formSelectKey} // Add the key prop here
+                isLoading={sportLoading}
+                placeholder={sportLoading ? "Loading Sports..." : "Select Sport"}
+                label="Sport"
+                name="sportId"
+                value={selectedSport} // Set the selectedSport as the value
+                onChange={(name, selectedValue) => setSelectedSport(selectedValue)} // Update the selectedSport
+                onBlur={() => {}} // Add an empty function as onBlur prop
+                error=""
+                width={3}
+                options={sportList}
+              />
+            </Row>
 
-                <FormInput
-                  label="End Date"
-                  name="endDate"
-                  type="date"
-                  value={endDateValue}
-                  onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => { }}
-                  width={2}
-                />
+            <Row className="mt-2">
+              <FormInput
+                label="Start Date"
+                name="startDate"
+                type="date"
+                value={startDateValue}
+                onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => {}}
+                width={3}
+              />
 
-                <FormSelect
-                  label="Status"
-                  name="status"
-                  value={selectedStatus}
-                  onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => { }}
-                  width={2}
-                >
-                  {statusList.map((status, index) => (
-                    <option key={index} value={status.id}>
-                      {status.lable.toUpperCase()}
-                    </option>
-                  ))}
-                </FormSelect>
+              <FormInput
+                label="End Date"
+                name="endDate"
+                type="date"
+                value={endDateValue}
+                onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => {}}
+                width={3}
+              />
 
-                <CCol xs={12}>
-                  <div className="d-grid gap-2 d-md-block">
-                    <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
-                      {loading ? <CSpinner size="sm" /> : "Filter"}
-                    </CButton>
-                    <button
-                      onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
-                      className="btn btn-danger btn-icon text-white mt-6"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </CCol>
-              </Card.Header>
-            )}
-            <Card.Body>
-              <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
-              <div className="table-responsive export-table">
-                <DataTable
-                  columns={columns}
-                  data={data}
-                  // actions={actionsMemo}
-                  // contextActions={contextActions}
-                  // onSelectedRowsChange={handleRowSelected}
-                  clearSelectedRows={toggleCleared}
-                  //selectableRows
-                  pagination
-                  highlightOnHover
-                  progressPending={loading}
-                  paginationServer
-                  paginationTotalRows={totalRows}
-                  onChangeRowsPerPage={handlePerRowsChange}
-                  onChangePage={handlePageChange}
-                  sortServer
-                  onSort={handleSort}
-                />
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+              <FormSelect
+                label="Status"
+                name="status"
+                value={selectedStatus}
+                onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => {}}
+                width={3}
+              >
+                {statusList.map((status, index) => (
+                  <option key={index} value={status.id}>
+                    {status.lable.toUpperCase()}
+                  </option>
+                ))}
+              </FormSelect>
+
+              <CCol md="3">
+                <div className="d-grid gap-2 d-md-block">
+                  <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
+                    {loading ? <CSpinner size="sm" /> : "Filter"}
+                  </CButton>
+                  <button
+                    onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
+                    className="btn btn-danger btn-icon text-white mt-6"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </CCol>
+            </Row>
+          </Card.Header>
+        )}
+
+        <Card.Body>
+          <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
+          <div className="table-responsive export-table">
+            <DataTable
+              columns={columns}
+              data={data}
+              // actions={actionsMemo}
+              // contextActions={contextActions}
+              // onSelectedRowsChange={handleRowSelected}
+              clearSelectedRows={toggleCleared}
+              //selectableRows
+              pagination
+              highlightOnHover
+              progressPending={loading}
+              paginationServer
+              paginationTotalRows={totalRows}
+              onChangeRowsPerPage={handlePerRowsChange}
+              onChangePage={handlePageChange}
+              sortServer
+              onSort={handleSort}
+            />
+          </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 }

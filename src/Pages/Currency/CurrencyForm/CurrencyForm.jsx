@@ -124,7 +124,7 @@ export default function CurrencyForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.multiplier && formik.errors.multiplier}
-                  width={2}
+                  width={3}
                   isRequired="true"
                 />
 

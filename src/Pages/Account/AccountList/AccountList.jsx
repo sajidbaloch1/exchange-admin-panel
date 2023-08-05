@@ -19,6 +19,23 @@ export default function AccountList() {
   const { id } = useParams();
   const initialParentId = id ? id : login_user_id;
   const parentId = initialParentId;
+  const { role } = JSON.parse(localStorage.getItem("user_info")) || {};
+
+  const roleHierarchy = {
+    system_owner: ["super_admin"],
+    super_admin: ["admin", "super_master", "master", "agent"],
+    admin: ["super_master", "master", "agent"],
+    super_master: ["master", "agent"],
+    master: ["agent"],
+  };
+  const allowedRoles = roleHierarchy[role] || [];
+  const allowedRoleOptions = ["all", ...allowedRoles].map((role) => ({
+    label: role
+      .split("_")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" "),
+    value: role,
+  }));
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
@@ -41,29 +58,10 @@ export default function AccountList() {
   const [transactionType, setTransactionType] = useState("");
   const [showTransactionModal, setShowTransactionModal] = useState(false);
 
-  const { role } = JSON.parse(localStorage.getItem("user_info")) || {};
-
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState("all");
   const [filters, setFilters] = useState({
     role: "",
   });
-
-  const roleHierarchy = {
-    system_owner: ["super_admin"],
-    super_admin: ["admin", "super_master", "master", "agent"],
-    admin: ["super_master", "master", "agent"],
-    super_master: ["master", "agent"],
-    master: ["agent"],
-  };
-
-  const allowedRoles = roleHierarchy[role] || [];
-  const allowedRoleOptions = ["none", ...allowedRoles].map((role) => ({
-    label: role
-      .split("_")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" "),
-    value: role === "none" ? "" : role,
-  }));
 
   const columns = [
     {
@@ -202,7 +200,7 @@ export default function AccountList() {
   ];
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
-  const [selectedRows, setSelectedRows] = React.useState([]);
+  const [selectedRows, setSelectedRows] = React.useState(["all"]);
   const [toggleCleared, setToggleCleared] = React.useState(false);
   let selectdata = [];
   // const handleRowSelected = React.useCallback((state) => {
@@ -241,7 +239,7 @@ export default function AccountList() {
         direction: direction,
         searchQuery: searchQuery,
         parentId: parentId,
-        role: [selectedRole],
+        role: selectedRole === "all" ? allowedRoles : [selectedRole],
       });
 
       setData(result.records);

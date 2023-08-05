@@ -6,9 +6,9 @@ import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
+import { Notify } from "../../../utils/notify";
 import { createCloneUser, getAppModuleListing, getDetailByID, getPermissionsById, updateData } from "../accountService";
 import MultiLoginListing from "./MultiLoginListing";
-import { Notify } from "../../../utils/notify";
 
 const multiLoginCreateSchema = Yup.object({
   username: Yup.string()
@@ -78,7 +78,7 @@ export default function MultiLogin() {
 
         if (id) {
           body._id = id;
-          response = await updateData(body);
+          response = await updateData({ ...body, isTransactionCode: true });
         } else {
           response = await createCloneUser(body);
         }

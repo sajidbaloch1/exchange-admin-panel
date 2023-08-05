@@ -139,7 +139,7 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
       <Modal.Body>
         {loading ? (
           <div className="w-100 d-flex justify-content-center align-items-center" style={{ height: "400px" }}>
-            <CSpinner size="md" />
+            <CSpinner />
           </div>
         ) : (
           <Form className="form-horizontal">
