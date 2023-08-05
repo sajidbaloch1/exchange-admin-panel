@@ -181,7 +181,24 @@ const Sidebar = () => {
             },
           ],
         },
-
+        {
+          menutitle: "REPORTS",
+          Items: [
+            {
+              title: "Reports",
+              icon: "file-text",
+              type: "sub",
+              active: false,
+              children: [
+                {
+                  path: `${process.env.PUBLIC_URL}/account-statement`,
+                  title: "Account statement",
+                  type: "link",
+                },
+              ],
+            },
+          ],
+        },
       );
     }
     else if (userRole === "super_master") {
@@ -198,7 +215,24 @@ const Sidebar = () => {
             },
           ],
         },
-
+        {
+          menutitle: "REPORTS",
+          Items: [
+            {
+              title: "Reports",
+              icon: "file-text",
+              type: "sub",
+              active: false,
+              children: [
+                {
+                  path: `${process.env.PUBLIC_URL}/account-statement`,
+                  title: "Account statement",
+                  type: "link",
+                },
+              ],
+            },
+          ],
+        },
       );
     }
     else if (userRole === "master") {
@@ -215,7 +249,24 @@ const Sidebar = () => {
             },
           ],
         },
-
+        {
+          menutitle: "REPORTS",
+          Items: [
+            {
+              title: "Reports",
+              icon: "file-text",
+              type: "sub",
+              active: false,
+              children: [
+                {
+                  path: `${process.env.PUBLIC_URL}/account-statement`,
+                  title: "Account statement",
+                  type: "link",
+                },
+              ],
+            },
+          ],
+        },
       );
     } else if (userRole === "agent") {
       menuItems.push(
@@ -231,7 +282,24 @@ const Sidebar = () => {
             },
           ],
         },
-
+        {
+          menutitle: "REPORTS",
+          Items: [
+            {
+              title: "Reports",
+              icon: "file-text",
+              type: "sub",
+              active: false,
+              children: [
+                {
+                  path: `${process.env.PUBLIC_URL}/account-statement`,
+                  title: "Account statement",
+                  type: "link",
+                },
+              ],
+            },
+          ],
+        },
       );
     }
 

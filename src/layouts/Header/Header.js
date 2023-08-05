@@ -177,14 +177,14 @@ export function Header() {
                         </div>
                       </div>
                       <div className="dropdown-divider m-0"></div>
-                      <Dropdown.Item href={`${process.env.PUBLIC_URL}/pages/profile/`}>
+                      {/* <Dropdown.Item href={`${process.env.PUBLIC_URL}/pages/profile/`}>
                         <i className="dropdown-icon fe fe-user"></i> Profile
                       </Dropdown.Item>
 
                       <Dropdown.Item href={`${process.env.PUBLIC_URL}/pages/mailCompose/`}>
                         <i className="dropdown-icon fe fe-settings"></i>
                         Settings
-                      </Dropdown.Item>
+                      </Dropdown.Item> */}
                       {/* <Dropdown.Item
                         href={`${process.env.PUBLIC_URL}/pages/faqs/`}
                       >

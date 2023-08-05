@@ -23,6 +23,7 @@ export default function EventForm() {
   const [addedEventIds, setAddedEventIds] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [eventSettingData, setEventSettingData] = useState(null);
+  const [activeEventsForCompetition, setActiveEventsForCompetition] = useState([]);
 
   const toggleCompetitionStatus = (competition) => {
     const updatedCompetitions = addedCompetitionIds.includes(competition._id)
@@ -49,30 +50,39 @@ export default function EventForm() {
     //setSelectedCompetition(null); // Hide the selectedCompetition when the event is edited
   };
 
-  const updateCompetition = async (e) => {
+  const fetchSportData = async () => {
+    const sportData = await getAllCompetionByEvent();
+    setSportList(sportData);
+  };
 
-    // API here
+  const updateCompetition = async (e) => {
+    setLoading(true);
     const response = await activeAllCompetition({
       competitionIds: addedCompetitionIds,
       sportId: selectedSport._id
     });
     if (response.success) {
       Notify.success("Updated Successfully");
+      fetchSportData();
     } else {
       Notify.error(response.message);
     }
+    setLoading(false);
   }
 
   const updateEvent = async (e) => {
+    setLoading(true);
     const response = await activeAllEvent({
       eventIds: addedEventIds,
       competitionId: selectedCompetition._id
     });
     if (response.success) {
       Notify.success("Updated Successfully");
+      fetchSportData();
     } else {
       Notify.error(response.message);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -90,6 +100,22 @@ export default function EventForm() {
     };
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    // Find the selected competition from the sportList based on selectedCompetition
+    const selectedCompetitionData = sportList.find((sport) =>
+      sport.competitions.some((competition) => competition._id === selectedCompetition?._id)
+    );
+
+    // Get the active events for the selected competition
+    const activeEvents = selectedCompetitionData
+      ? selectedCompetitionData.competitions.flatMap((comp) => comp.events)
+        .filter((event) => event.isActive)
+        .map((event) => event._id)
+      : [];
+
+    setActiveEventsForCompetition(activeEvents);
+  }, [selectedCompetition, sportList]);
 
 
   return (
@@ -269,7 +295,7 @@ export default function EventForm() {
                             <ul className="list-group">
                               {selectedCompetition.events.map((event, event_index) =>
                                 addedEventIds.includes(event._id) ? (
-                                  <li className="listunorder" key={event._id + '_already__added'} onClick={() => toggleEventStatus(event)} style={{ cursor: "pointer" }} >
+                                  <li className="listunorder" key={event._id + '_already_added'} onClick={() => toggleEventStatus(event)} style={{ cursor: "pointer" }} >
                                     {event.name}
                                   </li>
                                 ) : null
