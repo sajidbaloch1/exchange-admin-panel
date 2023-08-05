@@ -92,7 +92,7 @@ export default function EventForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const competitionBody = { fields: { name: 1 }, sortBy: "name", direction: "asc" };
+      const competitionBody = { fields: { name: 1, sportId: 1 }, sortBy: "name", direction: "asc" };
       if (id) {
         const result = await getEventDetailByID(id);
 
@@ -288,45 +288,46 @@ export default function EventForm() {
                   />
                 </Row>
 
-                {id && (
-                  <Row className="pt-4 pb-3">
-                    <CCol sm="4" md="2" lg="1">
-                      <CFormLabel htmlFor="isActive">Active</CFormLabel>
-                      <FormToggleSwitch
-                        id="isActive"
-                        name="isActive"
-                        checked={formik.values.isActive}
-                        onChange={() => {
-                          formik.setFieldValue("isActive", !formik.values.isActive);
-                        }}
-                      />
-                    </CCol>
+                <Row className="pt-4 pb-3">
+                  <CCol sm="4" md="2" lg="1">
+                    <CFormLabel htmlFor="isActive">Active</CFormLabel>
+                    <FormToggleSwitch
+                      id="isActive"
+                      name="isActive"
+                      checked={formik.values.isActive}
+                      onChange={() => {
+                        formik.setFieldValue("isActive", !formik.values.isActive);
+                      }}
+                    />
+                  </CCol>
 
-                    <CCol sm="4" md="2" lg="1">
-                      <CFormLabel htmlFor="completed">Completed</CFormLabel>
-                      <FormToggleSwitch
-                        id="completed"
-                        name="completed"
-                        checked={formik.values.completed}
-                        onChange={() => {
-                          formik.setFieldValue("completed", !formik.values.completed);
-                        }}
-                      />
-                    </CCol>
-
-                    <CCol sm="4" md="2" lg="1">
-                      <CFormLabel htmlFor="betDeleted">Bet Delete</CFormLabel>
-                      <FormToggleSwitch
-                        id="betDeleted"
-                        name="betDeleted"
-                        checked={formik.values.betDeleted}
-                        onChange={() => {
-                          formik.setFieldValue("betDeleted", !formik.values.betDeleted);
-                        }}
-                      />
-                    </CCol>
-                  </Row>
-                )}
+                  {id && (
+                    <>
+                      <CCol sm="4" md="2" lg="1">
+                        <CFormLabel htmlFor="completed">Completed</CFormLabel>
+                        <FormToggleSwitch
+                          id="completed"
+                          name="completed"
+                          checked={formik.values.completed}
+                          onChange={() => {
+                            formik.setFieldValue("completed", !formik.values.completed);
+                          }}
+                        />
+                      </CCol>
+                      <CCol sm="4" md="2" lg="1">
+                        <CFormLabel htmlFor="betDeleted">Bet Delete</CFormLabel>
+                        <FormToggleSwitch
+                          id="betDeleted"
+                          name="betDeleted"
+                          checked={formik.values.betDeleted}
+                          onChange={() => {
+                            formik.setFieldValue("betDeleted", !formik.values.betDeleted);
+                          }}
+                        />
+                      </CCol>
+                    </>
+                  )}
+                </Row>
 
                 <div className="mt-5">
                   <CButton color="primary" type="submit" className="me-2">

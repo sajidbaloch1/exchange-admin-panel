@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
+import { Notify } from "../../../utils/notify";
 import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
-import { Notify } from "../../../utils/notify";
 
 export default function AccountList() {
-  const location = useLocation();
   let login_user_id = "";
   const user = JSON.parse(localStorage.getItem("user_info"));
-  if (user.role !== "system_owner") {
-    login_user_id = user._id;
-  }
+  login_user_id = user._id;
 
   const { id } = useParams();
   const initialParentId = id ? id : login_user_id;
-  const [parentId, setParentId] = useState(initialParentId);
+  const parentId = initialParentId;
+
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
       Export
@@ -40,15 +39,15 @@ export default function AccountList() {
   // popup fields
   const [rowData, setRowData] = useState("");
   const [transactionType, setTransactionType] = useState("");
-
   const [showTransactionModal, setShowTransactionModal] = useState(false);
 
-  const { creditPoints, role, rate, _id } = JSON.parse(localStorage.getItem("user_info")) || {};
+  const { role } = JSON.parse(localStorage.getItem("user_info")) || {};
+
   const [selectedRole, setSelectedRole] = useState("");
   const [filters, setFilters] = useState({
     role: "",
-    // Add more filters here if needed
   });
+
   const roleHierarchy = {
     system_owner: ["super_admin"],
     super_admin: ["admin", "super_master", "master", "agent"],
@@ -58,6 +57,13 @@ export default function AccountList() {
   };
 
   const allowedRoles = roleHierarchy[role] || [];
+  const allowedRoleOptions = ["none", ...allowedRoles].map((role) => ({
+    label: role
+      .split("_")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" "),
+    value: role === "none" ? "" : role,
+  }));
 
   const columns = [
     {
@@ -117,13 +123,13 @@ export default function AccountList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to deposit</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to deposit</Tooltip>}>
             <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
               D
             </Button>
           </OverlayTrigger>
 
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to withdrw</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to withdrw</Tooltip>}>
             <Button
               variant="danger"
               onClick={() => handleWithdrawClick(row)}
@@ -135,7 +141,7 @@ export default function AccountList() {
           </OverlayTrigger>
 
           {row.role === "super_admin" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/super-admin-form`}
                 state={{ id: row._id }}
@@ -144,10 +150,9 @@ export default function AccountList() {
                 <i className="fa fa-edit"></i>
               </Link>
             </OverlayTrigger>
-
           )}
           {row.role === "admin" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/admin-form`}
                 state={{ id: row._id }}
@@ -156,10 +161,9 @@ export default function AccountList() {
                 <i className="fa fa-edit"></i>
               </Link>
             </OverlayTrigger>
-
           )}
           {row.role === "super_master" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/super-master-form`}
                 state={{ id: row._id }}
@@ -170,7 +174,7 @@ export default function AccountList() {
             </OverlayTrigger>
           )}
           {row.role === "master" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/master-form`}
                 state={{ id: row._id }}
@@ -181,7 +185,7 @@ export default function AccountList() {
             </OverlayTrigger>
           )}
           {row.role === "agent" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/agent-form`}
                 state={{ id: row._id }}
@@ -237,7 +241,7 @@ export default function AccountList() {
         direction: direction,
         searchQuery: searchQuery,
         parentId: parentId,
-        role: allowedRoles,
+        role: [selectedRole],
       });
 
       setData(result.records);
@@ -366,7 +370,7 @@ export default function AccountList() {
     return () => {
       setData([]);
     };
-  }, [perPage, searchQuery, parentId]);
+  }, [perPage, searchQuery, parentId, selectedRole]);
 
   return (
     <div>
@@ -414,7 +418,6 @@ export default function AccountList() {
                   <Dropdown.Item className="dropdown-item" as={Link} to={`${process.env.PUBLIC_URL}/agent-form`}>
                     Agent
                   </Dropdown.Item>
-
                 )}
               </Dropdown.Menu>
             </Dropdown>
@@ -428,38 +431,22 @@ export default function AccountList() {
         </div>
       </div>
 
-      <Row className=" row-sm">
+      <Row className="row-sm">
         <Col lg={12}>
           <Card>
-            {/* <Card.Header>
-
-              <FormSelect
-                label="Role"
-                name="sportId"
-                value={selectedRole} // Set the selectedRole as the value
-                onChange={(name, selectedValue) => setSelectedRole(selectedValue)} // Update the selectedSport
-                onBlur={() => { }} // Add an empty function as onBlur prop
-                error=""
-                width={2}
-                options={allowedRoles}
+            <Card.Header className="px-3">
+              <FormSelectWithSearch
+                placeholder="Select Role"
+                value={selectedRole}
+                onChange={(name, selectedValue) => setSelectedRole(selectedValue)}
+                width={3}
+                options={allowedRoleOptions}
               />
+            </Card.Header>
 
-              <CCol xs={12}>
-                <div className="d-grid gap-2 d-md-block">
-                  <CButton color="primary" type="submit" onClick={handleFilterClick} className="me-3 mt-6">
-                    {loading ? <CSpinner size="sm" /> : "Filter"}
-                  </CButton>
-                  <button
-                    onClick={resetFilters} // Call the resetFilters function when the "Reset" button is clicked
-                    className="btn btn-danger btn-icon text-white mt-6"
-                  >
-                    Reset
-                  </button>
-                </div>
-              </CCol>
-            </Card.Header> */}
             <Card.Body>
               <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
+
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}

@@ -8,9 +8,9 @@ import FormInput from "../../../components/Common/FormComponents/FormInput"; // 
 import FormMultiSelect from "../../../components/Common/FormComponents/FormMultiSelect";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { Notify } from "../../../utils/notify";
 import { getAllCurrency } from "../../Currency/currencyService";
 import { getAllSport } from "../../Sport/sportService";
-import { Notify } from "../../../utils/notify";
 import { addData, getDetailByID, updateData } from "../accountService";
 
 const settlementDurationOptions = [
@@ -136,8 +136,7 @@ export default function SuperAdminForm() {
       }
 
       if (response.success) {
-        let msg = editMode ? "Super Admin Updated Successfully" : "Super Admin added Successfully";
-        Notify.success(msg);
+        Notify.success(editMode ? "Super admin updated successfully" : "Super admin added successfully");
         navigate("/account-list/");
       } else {
         throw new Error(response.message);
@@ -179,12 +178,14 @@ export default function SuperAdminForm() {
             isActive: result.isActive || false,
             forcePasswordChange: result.forcePasswordChange || false,
             availableSports: result.availableSports || [],
-            settlementDurationType: result.settlementDurationType || '',
+            settlementDurationType: result.settlementDurationType || "",
             settlementDate: result.settlementDate || "",
             settlementDay: result.settlementDay || "",
             settlementTime: result.settlementTime || "",
             isAutoSettlement: result.isAutoSettlement || "",
             isCasinoAvailable: result.isCasinoAvailable || "",
+            isCasinoAvailable: result.isCasinoAvailable || false,
+            isAutoSettlement: result.isAutoSettlement || false,
           }));
         }
 

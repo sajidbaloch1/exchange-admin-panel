@@ -9,7 +9,6 @@ import FormToggleSwitch from "../../../components/Common/FormComponents/FormTogg
 import { Notify } from "../../../utils/notify";
 import { addData, getDetailByID, updateData } from "../accountService";
 
-
 export default function SuperMasterForm() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -132,7 +131,7 @@ export default function SuperMasterForm() {
         });
       }
       if (response.success) {
-        Notify.success("Super master updated.");
+        Notify.success(editMode ? "Super master updated successfully" : "Super master added successfully");
         navigate("/account-list/");
       } else {
         throw new Error(response.message);
@@ -170,7 +169,7 @@ export default function SuperMasterForm() {
             forcePasswordChange: result.forcePasswordChange || false,
           }));
         }
-        setLoginUserData(loginUserData)
+        setLoginUserData(loginUserData);
       })
       .catch((e) => {
         console.log(e);
@@ -181,7 +180,6 @@ export default function SuperMasterForm() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, loginUserDetail._id]);
-
 
   const formTitle = id ? "UPDATE SUPER MASTER" : "CREATE SUPER MASTER";
 

@@ -15,12 +15,13 @@ export const deleteData = async (id) => {
   return result.success;
 };
 
-export const getDetailByID = async (id) => {
+export const getDetailByID = async (id, fields = null) => {
   if (!id) {
     return null;
   }
   const result = await postData("users/getUserById", {
     _id: id,
+    fields,
   });
   return result.success ? result.data.details : {};
 };
