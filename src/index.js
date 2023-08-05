@@ -254,7 +254,7 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/multi-login`} element={<MultiLogin />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
                   </Route>
                 </Route>
