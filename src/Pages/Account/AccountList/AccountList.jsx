@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation, useParams } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
+import { Notify } from "../../../utils/notify";
 import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
-import { Notify } from "../../../utils/notify";
 
 export default function AccountList() {
   const location = useLocation();
@@ -117,13 +117,13 @@ export default function AccountList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to deposit</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to deposit</Tooltip>}>
             <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
               D
             </Button>
           </OverlayTrigger>
 
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to withdrw</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to withdrw</Tooltip>}>
             <Button
               variant="danger"
               onClick={() => handleWithdrawClick(row)}
@@ -135,7 +135,7 @@ export default function AccountList() {
           </OverlayTrigger>
 
           {row.role === "super_admin" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/super-admin-form`}
                 state={{ id: row._id }}
@@ -144,10 +144,9 @@ export default function AccountList() {
                 <i className="fa fa-edit"></i>
               </Link>
             </OverlayTrigger>
-
           )}
           {row.role === "admin" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/admin-form`}
                 state={{ id: row._id }}
@@ -156,10 +155,9 @@ export default function AccountList() {
                 <i className="fa fa-edit"></i>
               </Link>
             </OverlayTrigger>
-
           )}
           {row.role === "super_master" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/super-master-form`}
                 state={{ id: row._id }}
@@ -170,7 +168,7 @@ export default function AccountList() {
             </OverlayTrigger>
           )}
           {row.role === "master" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/master-form`}
                 state={{ id: row._id }}
@@ -181,7 +179,7 @@ export default function AccountList() {
             </OverlayTrigger>
           )}
           {row.role === "agent" && (
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/agent-form`}
                 state={{ id: row._id }}
@@ -414,7 +412,6 @@ export default function AccountList() {
                   <Dropdown.Item className="dropdown-item" as={Link} to={`${process.env.PUBLIC_URL}/agent-form`}>
                     Agent
                   </Dropdown.Item>
-
                 )}
               </Dropdown.Menu>
             </Dropdown>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 
 const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, transactionType }) => {
-  const [fromId, setfromId] = useState();
   const [userId, setUserId] = useState();
 
   const [parentName, setParentName] = useState();
@@ -16,6 +15,11 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
   const [transactionCode, setTransactionCode] = useState("");
   const [amount, setAmount] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [errors, setErrors] = useState({
+    amount: "",
+    remarks: "",
+    transactionCode: "",
+  });
 
   useEffect(() => {
     if (rowData) {
@@ -56,17 +60,64 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
     setClickedUserNewProfit(clickedUserNewProfit);
   };
   const modalHeaderClass = transactionType === "credit" ? "bg-success" : "bg-danger";
-  const transactionText = transactionType === "credit" ? "DEPOSIT" : "WITHDRAW";
+  const transactionText = transactionType === "credit" ? "Deposit" : "Withdraw";
+
+  const validateForm = () => {
+    let hasErrors = false;
+    const currentErrors = { ...errors };
+
+    if (!amount) {
+      currentErrors.amount = "Amount is required";
+      hasErrors = true;
+    } else {
+      currentErrors.amount = "";
+    }
+
+    if (!remarks) {
+      currentErrors.remarks = "Remarks is required";
+      hasErrors = true;
+    } else {
+      currentErrors.remarks = "";
+    }
+
+    if (!transactionCode) {
+      currentErrors.transactionCode = "Transaction Code is required";
+      hasErrors = true;
+    } else {
+      currentErrors.transactionCode = "";
+    }
+
+    setErrors(currentErrors);
+
+    return hasErrors;
+  };
+
+  const handleModalClose = () => {
+    setAmount("");
+    setRemarks("");
+    setTransactionCode("");
+    setErrors({ amount: "", remarks: "", transactionCode: "" });
+    onHide();
+  };
+
+  const handleSubmit = () => {
+    const hasErrors = validateForm();
+    if (hasErrors) {
+      return;
+    }
+    handleTransactionSubmit(amount, remarks, transactionCode, transactionType, userId);
+  };
+
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal size="md" show={show} onHide={onHide}>
       <Modal.Header closeButton className={`text-white ${modalHeaderClass}`}>
-        <Modal.Title>{transactionText}</Modal.Title>
+        <Modal.Title className="mb-0">{transactionText}</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
-        {/* Add your Withdraw form fields here */}
         <Form className="form-horizontal">
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label">
+          <div className="row mb-4">
+            <Form.Label htmlFor="inputName" className="col-md-4 form-label fw-semibold text-end">
               {parentName}
             </Form.Label>
             <div className="col-md-4">
@@ -87,8 +138,8 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
             </div>
           </div>
 
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label">
+          <div className="row mb-4">
+            <Form.Label htmlFor="inputName" className="col-md-4 form-label fw-semibold text-end">
               {clickedUserName}
             </Form.Label>
             <div className="col-md-4">
@@ -110,7 +161,7 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
           </div>
 
           <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label">
+            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
               Profit/Loss
             </Form.Label>
             <div className="col-md-4">
@@ -132,45 +183,53 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
           </div>
 
           <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label">
-              Amount
+            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+              Amount <span className="text-danger">*</span>
             </Form.Label>
             <div className="col-md-8">
-              <Form.Control type="number" value={amount} onChange={handleAmountChange} />
+              <Form.Control type="number" value={amount} onChange={handleAmountChange} autoComplete="off" />
+              {errors.amount && <p className="text-danger">{errors.amount}</p>}
             </div>
           </div>
 
           <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label">
-              Remarks
-            </Form.Label>
-            <div className="col-md-8">
-              <Form.Control as="textarea" rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
-            </div>
-          </div>
-
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label">
-              Transaction Code
+            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+              Remarks <span className="text-danger">*</span>
             </Form.Label>
             <div className="col-md-8">
               <Form.Control
-                type="number"
+                as="textarea"
+                rows={3}
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+                style={{ resize: "none" }}
+              />
+              {errors.remarks && <p className="text-danger">{errors.remarks}</p>}
+            </div>
+          </div>
+
+          <div className=" row mb-4">
+            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+              Transaction Code <span className="text-danger">*</span>
+            </Form.Label>
+            <div className="col-md-8">
+              <Form.Control
+                type="password"
                 value={transactionCode}
                 onChange={(e) => setTransactionCode(e.target.value)}
+                autoComplete="off"
               />
+              {errors.transactionCode && <p className="text-danger">{errors.transactionCode}</p>}
             </div>
           </div>
         </Form>
       </Modal.Body>
+
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
+        <Button variant="secondary" onClick={() => handleModalClose()}>
           Close
         </Button>
-        <Button
-          variant="primary"
-          onClick={() => handleTransactionSubmit(amount, remarks, transactionCode, transactionType, userId)}
-        >
+        <Button variant="primary" onClick={() => handleSubmit()}>
           {transactionText}
         </Button>
       </Modal.Footer>
