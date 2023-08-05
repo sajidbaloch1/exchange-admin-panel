@@ -1,6 +1,6 @@
 import { CButton, CCol, CSpinner } from "@coreui/react";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link, useLocation } from "react-router-dom";
@@ -136,9 +136,11 @@ export default function EventList() {
       name: "ACTION",
       cell: (row) => (
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
-            <i className="fa fa-edit"></i>
-          </Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+            <Link to={`${process.env.PUBLIC_URL}/event-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+              <i className="fa fa-edit"></i>
+            </Link>
+          </OverlayTrigger>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
@@ -354,7 +356,7 @@ export default function EventList() {
                   name="sportId"
                   value={selectedCompetition} // Set the selectedCompetition as the value
                   onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
-                  onBlur={() => {}} // Add an empty function as onBlur prop
+                  onBlur={() => { }} // Add an empty function as onBlur prop
                   error=""
                   width={2}
                   options={competitionList}
@@ -366,7 +368,7 @@ export default function EventList() {
                   type="date"
                   value={startDateValue}
                   onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => {}}
+                  onBlur={() => { }}
                   width={2}
                 />
 
@@ -376,7 +378,7 @@ export default function EventList() {
                   type="date"
                   value={endDateValue}
                   onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => {}}
+                  onBlur={() => { }}
                   width={2}
                 />
 
@@ -385,11 +387,11 @@ export default function EventList() {
                   name="status"
                   value={selectedStatus}
                   onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                  onBlur={() => {}}
+                  onBlur={() => { }}
                   width={2}
                 >
                   {statusList.map((status, index) => (
-                    <option key={status.index} value={status.id}>
+                    <option key={index} value={status.id}>
                       {status.lable.toUpperCase()}
                     </option>
                   ))}

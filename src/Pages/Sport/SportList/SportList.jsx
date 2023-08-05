@@ -98,7 +98,7 @@ export default function SportList() {
           </OverlayTrigger>
 
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to update rule</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip > Bet Categories and Rules</Tooltip>}>
             <Link
               to={{
                 pathname: `${process.env.PUBLIC_URL}/bet-category-list`,

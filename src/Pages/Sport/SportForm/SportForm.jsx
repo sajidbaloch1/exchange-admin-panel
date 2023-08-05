@@ -14,7 +14,9 @@ export default function SportForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : "";
+
+  const id = location.state ? location.state.id : null;
+  const editMode = !!id;
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
@@ -41,7 +43,7 @@ export default function SportForm() {
       try {
         let response = null;
         const { name, betCategory, apiSportId } = values;
-        if (id !== "" && id !== undefined) {
+        if (editMode) {
           response = await updateSport({
             _id: id,
             ...values,
@@ -52,7 +54,8 @@ export default function SportForm() {
           });
         }
         if (response.success) {
-          Notify.success("Sports updated.");
+          let msg = editMode ? "Sport Updated Successfully" : "Sport added Successfully";
+          Notify.success(msg);
           navigate("/sport-list");
         } else {
           throw new Error(response.message);
