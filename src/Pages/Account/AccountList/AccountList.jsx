@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Dropdown, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
@@ -11,12 +11,9 @@ import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
 
 export default function AccountList() {
-  const location = useLocation();
   let login_user_id = "";
   const user = JSON.parse(localStorage.getItem("user_info"));
-  if (user.role !== "system_owner") {
-    login_user_id = user._id;
-  }
+  login_user_id = user._id;
 
   const { id } = useParams();
   const initialParentId = id ? id : login_user_id;

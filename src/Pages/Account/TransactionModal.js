@@ -1,5 +1,7 @@
+import { CSpinner } from "@coreui/react";
 import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { getDetailByID } from "./accountService";
 
 const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, transactionType }) => {
   const [userId, setUserId] = useState();
@@ -15,19 +17,38 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
   const [transactionCode, setTransactionCode] = useState("");
   const [amount, setAmount] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
     amount: "",
     remarks: "",
     transactionCode: "",
   });
 
+  const fetchParent = async () => {
+    if (!rowData) return {};
+    const user = await getDetailByID(rowData.parentId, { balance: 1 });
+    return user;
+  };
+
+  const fetchUser = async () => {
+    if (!rowData) return {};
+    const user = await getDetailByID(rowData._id, { balance: 1 });
+    return user;
+  };
+
   useEffect(() => {
     if (rowData) {
       setParentName(rowData.parentUser.username);
       setClickedUserName(rowData.username);
-      setClickedUserBalance(rowData.balance);
       setUserId(rowData._id);
-      // Set other initial values here based on the rowData prop...
+      setLoading(true);
+      Promise.all([fetchParent(), fetchUser()])
+        .then(([parent, user]) => {
+          setParentBalance(parent.balance);
+          setClickedUserBalance(user.balance);
+          setClickedUserProfit(user.profit);
+        })
+        .finally(() => setLoading(false));
     }
     setClickedUserNewProfit(0);
     setClickedUserNewBalance(0);
@@ -35,6 +56,7 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
     setAmount("");
     setRemarks("");
     setTransactionCode("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowData, transactionType]);
 
   const handleAmountChange = (event) => {
@@ -115,114 +137,120 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
       </Modal.Header>
 
       <Modal.Body>
-        <Form className="form-horizontal">
-          <div className="row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label fw-semibold text-end">
-              {parentName}
-            </Form.Label>
-            <div className="col-md-4">
-              <Form.Control
-                type="number"
-                value={parentBalance}
-                onChange={(e) => setParentBalance(e.target.value)}
-                readOnly
-              />
-            </div>
-            <div className="col-md-4">
-              <Form.Control
-                type="number"
-                value={parentNewBalance}
-                onChange={(e) => setParentNewBalance(e.target.value)}
-                readOnly
-              />
-            </div>
+        {loading ? (
+          <div className="w-100 d-flex justify-content-center align-items-center" style={{ height: "400px" }}>
+            <CSpinner size="md" />
           </div>
+        ) : (
+          <Form className="form-horizontal">
+            <div className="row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label fw-semibold text-end">
+                {parentName}
+              </Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={parentBalance}
+                  onChange={(e) => setParentBalance(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={parentNewBalance}
+                  onChange={(e) => setParentNewBalance(e.target.value)}
+                  readOnly
+                />
+              </div>
+            </div>
 
-          <div className="row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label fw-semibold text-end">
-              {clickedUserName}
-            </Form.Label>
-            <div className="col-md-4">
-              <Form.Control
-                type="number"
-                value={clickedUserBalance}
-                onChange={(e) => setClickedUserBalance(e.target.value)}
-                readOnly
-              />
+            <div className="row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label fw-semibold text-end">
+                {clickedUserName}
+              </Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={clickedUserBalance}
+                  onChange={(e) => setClickedUserBalance(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={clickedUserNewBalance}
+                  onChange={(e) => setClickedUserNewBalance(e.target.value)}
+                  readOnly
+                />
+              </div>
             </div>
-            <div className="col-md-4">
-              <Form.Control
-                type="number"
-                value={clickedUserNewBalance}
-                onChange={(e) => setClickedUserNewBalance(e.target.value)}
-                readOnly
-              />
-            </div>
-          </div>
 
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
-              Profit/Loss
-            </Form.Label>
-            <div className="col-md-4">
-              <Form.Control
-                type="number"
-                value={clickedUserProfit}
-                onChange={(e) => setClickedUserProfit(e.target.value)}
-                readOnly
-              />
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+                Profit/Loss
+              </Form.Label>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={clickedUserProfit}
+                  onChange={(e) => setClickedUserProfit(e.target.value)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-4">
+                <Form.Control
+                  type="number"
+                  value={clickedUserNewProfit}
+                  onChange={(e) => setClickedUserNewProfit(e.target.value)}
+                  readOnly
+                />
+              </div>
             </div>
-            <div className="col-md-4">
-              <Form.Control
-                type="number"
-                value={clickedUserNewProfit}
-                onChange={(e) => setClickedUserNewProfit(e.target.value)}
-                readOnly
-              />
-            </div>
-          </div>
 
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
-              Amount <span className="text-danger">*</span>
-            </Form.Label>
-            <div className="col-md-8">
-              <Form.Control type="number" value={amount} onChange={handleAmountChange} autoComplete="off" />
-              {errors.amount && <p className="text-danger">{errors.amount}</p>}
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+                Amount <span className="text-danger">*</span>
+              </Form.Label>
+              <div className="col-md-8">
+                <Form.Control type="number" value={amount} onChange={handleAmountChange} autoComplete="off" />
+                {errors.amount && <p className="text-danger">{errors.amount}</p>}
+              </div>
             </div>
-          </div>
 
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
-              Remarks <span className="text-danger">*</span>
-            </Form.Label>
-            <div className="col-md-8">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-                style={{ resize: "none" }}
-              />
-              {errors.remarks && <p className="text-danger">{errors.remarks}</p>}
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+                Remarks <span className="text-danger">*</span>
+              </Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  style={{ resize: "none" }}
+                />
+                {errors.remarks && <p className="text-danger">{errors.remarks}</p>}
+              </div>
             </div>
-          </div>
 
-          <div className=" row mb-4">
-            <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
-              Transaction Code <span className="text-danger">*</span>
-            </Form.Label>
-            <div className="col-md-8">
-              <Form.Control
-                type="password"
-                value={transactionCode}
-                onChange={(e) => setTransactionCode(e.target.value)}
-                autoComplete="off"
-              />
-              {errors.transactionCode && <p className="text-danger">{errors.transactionCode}</p>}
+            <div className=" row mb-4">
+              <Form.Label htmlFor="inputName" className="col-md-4 form-label text-end">
+                Transaction Code <span className="text-danger">*</span>
+              </Form.Label>
+              <div className="col-md-8">
+                <Form.Control
+                  type="password"
+                  value={transactionCode}
+                  onChange={(e) => setTransactionCode(e.target.value)}
+                  autoComplete="off"
+                />
+                {errors.transactionCode && <p className="text-danger">{errors.transactionCode}</p>}
+              </div>
             </div>
-          </div>
-        </Form>
+          </Form>
+        )}
       </Modal.Body>
 
       <Modal.Footer>
