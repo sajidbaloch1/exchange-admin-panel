@@ -180,6 +180,8 @@ export default function SuperAdminForm() {
             settlementDate: result.settlementDate || null,
             settlementDay: result.settlementDay || null,
             settlementTime: result.settlementTime || null,
+            isCasinoAvailable: result.isCasinoAvailable || false,
+            isAutoSettlement: result.isAutoSettlement || false,
           }));
         }
 
