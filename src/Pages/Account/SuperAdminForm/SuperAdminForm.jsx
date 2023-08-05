@@ -8,6 +8,7 @@ import FormInput from "../../../components/Common/FormComponents/FormInput"; // 
 import FormMultiSelect from "../../../components/Common/FormComponents/FormMultiSelect";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { Notify } from "../../../utils/notify";
 import { getAllCurrency } from "../../Currency/currencyService";
 import { getAllSport } from "../../Sport/sportService";
 import { addData, getDetailByID, updateData } from "../accountService";
@@ -135,6 +136,7 @@ export default function SuperAdminForm() {
       }
 
       if (response.success) {
+        Notify.success(editMode ? "Super admin updated successfully" : "Super admin added successfully");
         navigate("/account-list/");
       } else {
         throw new Error(response.message);

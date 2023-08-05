@@ -15,6 +15,7 @@ const FormSelectWithSearch = ({
   disabled = false,
   isLoading = false,
   placeholder = "Select",
+  ...props
 }) => {
   return (
     <CCol md={width}>
@@ -22,6 +23,7 @@ const FormSelectWithSearch = ({
         {label} {isRequired === "true" && <span className="text-red">*</span>}
       </CFormLabel>
       <Select
+        {...props}
         placeholder={placeholder}
         isLoading={isLoading}
         isDisabled={disabled}

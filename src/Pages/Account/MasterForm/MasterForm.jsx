@@ -1,13 +1,13 @@
+import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 import { Notify } from "../../../utils/notify";
 import { addData, getDetailByID, updateData } from "../accountService";
-import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
-import * as Yup from "yup";
 
 export default function MasterForm() {
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ export default function MasterForm() {
         });
       }
       if (response.success) {
-        Notify.success("Master updated.");
+        Notify.success(editMode ? "Master updated successfully" : "Master added successfully");
         navigate("/account-list/");
       } else {
         throw new Error(response.message);
@@ -167,7 +167,7 @@ export default function MasterForm() {
             forcePasswordChange: result.forcePasswordChange || false,
           }));
         }
-        setLoginUserData(loginUserData)
+        setLoginUserData(loginUserData);
       })
       .catch((e) => {
         console.log(e);

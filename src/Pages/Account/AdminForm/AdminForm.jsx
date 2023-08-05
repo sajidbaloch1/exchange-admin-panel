@@ -133,7 +133,7 @@ export default function AdminForm() {
         });
       }
       if (response.success) {
-        Notify.success("Admin updated.");
+        Notify.success(editMode ? "Admin updated successfully" : "Admin added successfully");
         navigate("/account-list/");
       } else {
         throw new Error(response.message);

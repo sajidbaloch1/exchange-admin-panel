@@ -1,29 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Nav, TabContainer, Tabs, Tab, Breadcrumb, Row, Card, Col } from "react-bootstrap";
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { useFormik } from 'formik';
-import { getDetailByID, updateData } from "../accountService";
-import { Notify } from "../../../utils/notify";
+import { useFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Card, Col, Row, Tab, Tabs } from "react-bootstrap";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
+import { Notify } from "../../../utils/notify";
+import { getDetailByID, updateData } from "../accountService";
 
-import * as Yup from 'yup';
-import {
-  CForm,
-  CCol,
-  CButton,
-  CFormLabel,
-  CSpinner
-} from "@coreui/react";
+import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
+import * as Yup from "yup";
 
 export default function UserEditForm() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null); // State to hold the server error message
-  const [activeTab, setActiveTab] = useState('tab5');
+  const [activeTab, setActiveTab] = useState("tab5");
   const { id } = useParams();
-
 
   const profileValidationSchema = Yup.object({
     username: Yup.string()
@@ -34,17 +27,16 @@ export default function UserEditForm() {
         }
         return true;
       }),
-    fullName: Yup.string().required('Full name is required'),
-    mobileNumber: Yup.string()
-      .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
+    fullName: Yup.string().required("Full name is required"),
+    mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
     city: Yup.string(),
   });
 
   const passwordValidationSchema = Yup.object({
-    password: Yup.string().required("Password is required").min(6, 'Password must be at least 6 characters long'),
+    password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters long"),
     confirmPassword: Yup.string()
-      .required('Confirm Password is required')
-      .oneOf([Yup.ref('password'), null], 'Passwords must match'),
+      .required("Confirm Password is required")
+      .oneOf([Yup.ref("password"), null], "Passwords must match"),
   });
 
   const userLockValidationSchema = Yup.object({
@@ -54,66 +46,66 @@ export default function UserEditForm() {
   const userSettingValidationSchema = Yup.object({
     // Define validation schema for User Setting tab (if needed)
 
-    exposureLimit: Yup.number().when('role', (role, schema) => {
-      if (Array.isArray(role) && role.includes('user')) {
-        return schema.required('Exposure Limit is required');
+    exposureLimit: Yup.number().when("role", (role, schema) => {
+      if (Array.isArray(role) && role.includes("user")) {
+        return schema.required("Exposure Limit is required");
       }
       return schema;
     }),
     exposurePercentage: Yup.number()
-      .required('Exposure Percentage is required')
+      .required("Exposure Percentage is required")
       .max(100, "Exposure Percentage cannot exceed 100"),
-    stakeLimit: Yup.number().when('role', (role, schema) => {
-      if (Array.isArray(role) && role.includes('user')) {
-        return schema.required('Stake Limit is required');
+    stakeLimit: Yup.number().when("role", (role, schema) => {
+      if (Array.isArray(role) && role.includes("user")) {
+        return schema.required("Stake Limit is required");
       }
       return schema;
     }),
-    maxProfit: Yup.number().when('role', (role, schema) => {
-      if (Array.isArray(role) && role.includes('user')) {
-        return schema.required('Max Profit Limit is required');
+    maxProfit: Yup.number().when("role", (role, schema) => {
+      if (Array.isArray(role) && role.includes("user")) {
+        return schema.required("Max Profit Limit is required");
       }
       return schema;
     }),
-    maxLoss: Yup.number().when('role', (role, schema) => {
-      if (Array.isArray(role) && role.includes('user')) {
-        return schema.required('Max Loss Limit is required');
+    maxLoss: Yup.number().when("role", (role, schema) => {
+      if (Array.isArray(role) && role.includes("user")) {
+        return schema.required("Max Loss Limit is required");
       }
       return schema;
     }),
-    bonus: Yup.number().when('role', (role, schema) => {
-      if (Array.isArray(role) && role.includes('user')) {
-        return schema.required('Bonus Limit is required');
+    bonus: Yup.number().when("role", (role, schema) => {
+      if (Array.isArray(role) && role.includes("user")) {
+        return schema.required("Bonus Limit is required");
       }
       return schema;
     }),
-    maxStake: Yup.number().when('role', (role, schema) => {
-      if (Array.isArray(role) && role.includes('user')) {
-        return schema.required('Max Stake Limit is required');
+    maxStake: Yup.number().when("role", (role, schema) => {
+      if (Array.isArray(role) && role.includes("user")) {
+        return schema.required("Max Stake Limit is required");
       }
       return schema;
     }),
   });
 
   const initialUserValue = {
-    username: '',
-    fullName: '',
-    password: '',
-    confirmPassword: '',
-    city: '',
-    mobileNumber: '',
-    creditPoints: '',
-    role: 'user',
+    username: "",
+    fullName: "",
+    password: "",
+    confirmPassword: "",
+    city: "",
+    mobileNumber: "",
+    creditPoints: "",
+    role: "user",
     isBetLock: false,
     isActive: true,
     forcePasswordChange: true,
-    exposureLimit: '',
-    exposurePercentage: '',
-    stakeLimit: '',
-    maxProfit: '',
-    maxLoss: '',
-    bonus: '',
-    maxStake: ''
+    exposureLimit: "",
+    exposurePercentage: "",
+    stakeLimit: "",
+    maxProfit: "",
+    maxLoss: "",
+    bonus: "",
+    maxStake: "",
   };
 
   const submitForm = async (values) => {
@@ -122,14 +114,14 @@ export default function UserEditForm() {
     try {
       let response = null;
       if (!values.password) {
-        delete values.password
+        delete values.password;
       }
       response = await updateData({
         _id: id,
         ...values,
       });
       if (response.success) {
-        Notify.success("User updated.");
+        Notify.success("User updated successfully.");
         navigate("/user-list/");
       } else {
         throw new Error(response.message);
@@ -156,25 +148,24 @@ export default function UserEditForm() {
         const result = await getDetailByID(id);
 
         formik.setValues((prevValues) => ({
-
           ...prevValues,
-          username: result.username || '',
-          fullName: result.fullName || '',
+          username: result.username || "",
+          fullName: result.fullName || "",
           password: "",
-          city: result.city || '',
-          mobileNumber: result.mobileNumber || '',
-          creditPoints: result.creditPoints || '',
-          role: result.role || '',
+          city: result.city || "",
+          mobileNumber: result.mobileNumber || "",
+          creditPoints: result.creditPoints || "",
+          role: result.role || "",
           isBetLock: result.isBetLock || false,
           isActive: result.isActive || false,
           forcePasswordChange: result.forcePasswordChange || false,
-          exposureLimit: result.exposureLimit || '',
-          exposurePercentage: result.exposurePercentage || '',
-          stakeLimit: result.stakeLimit || '',
-          maxProfit: result.maxProfit || '',
-          maxLoss: result.maxLoss || '',
-          bonus: result.bonus || '',
-          maxStake: result.maxStake || '',
+          exposureLimit: result.exposureLimit || "",
+          exposurePercentage: result.exposurePercentage || "",
+          stakeLimit: result.stakeLimit || "",
+          maxProfit: result.maxProfit || "",
+          maxLoss: result.maxLoss || "",
+          bonus: result.bonus || "",
+          maxStake: result.maxStake || "",
         }));
       }
     };
@@ -186,13 +177,13 @@ export default function UserEditForm() {
   // Handle tab selection and set validation schema accordingly
   const handleTabSelect = (tabKey) => {
     setActiveTab(tabKey);
-    if (tabKey === 'tab5') {
+    if (tabKey === "tab5") {
       setValidationSchema(profileValidationSchema);
-    } else if (tabKey === 'tab6') {
+    } else if (tabKey === "tab6") {
       setValidationSchema(passwordValidationSchema);
-    } else if (tabKey === 'tab7') {
+    } else if (tabKey === "tab7") {
       setValidationSchema(userLockValidationSchema);
-    } else if (tabKey === 'tab8') {
+    } else if (tabKey === "tab8") {
       setValidationSchema(userSettingValidationSchema);
     }
   };
@@ -287,10 +278,18 @@ export default function UserEditForm() {
 
                               <CCol xs={12}>
                                 <div className="d-grid gap-2 d-md-block">
-                                  <CButton color="primary" type="submit" className="me-3" disabled={!formik.isValid || loading}>
+                                  <CButton
+                                    color="primary"
+                                    type="submit"
+                                    className="me-3"
+                                    disabled={!formik.isValid || loading}
+                                  >
                                     {loading ? <CSpinner size="sm" /> : "Save"}
                                   </CButton>
-                                  <Link to={`${process.env.PUBLIC_URL}/user-list`} className="btn btn-danger btn-icon text-white ">
+                                  <Link
+                                    to={`${process.env.PUBLIC_URL}/user-list`}
+                                    className="btn btn-danger btn-icon text-white "
+                                  >
                                     Cancel
                                   </Link>
                                 </div>
@@ -340,10 +339,18 @@ export default function UserEditForm() {
 
                               <CCol xs={12}>
                                 <div className="d-grid gap-2 d-md-block">
-                                  <CButton color="primary" type="submit" className="me-3" disabled={!formik.isValid || loading}>
+                                  <CButton
+                                    color="primary"
+                                    type="submit"
+                                    className="me-3"
+                                    disabled={!formik.isValid || loading}
+                                  >
                                     {loading ? <CSpinner size="sm" /> : "Save"}
                                   </CButton>
-                                  <Link to={`${process.env.PUBLIC_URL}/user-list`} className="btn btn-danger btn-icon text-white ">
+                                  <Link
+                                    to={`${process.env.PUBLIC_URL}/user-list`}
+                                    className="btn btn-danger btn-icon text-white "
+                                  >
                                     Cancel
                                   </Link>
                                 </div>
@@ -356,7 +363,6 @@ export default function UserEditForm() {
                       <Tab eventKey="tab7" className="me-1" title="User Lock">
                         <hr />
                         <Card>
-
                           <Card.Body>
                             <CForm
                               className="row g-3 needs-validation"
@@ -372,7 +378,7 @@ export default function UserEditForm() {
                                   name="isBetLock"
                                   checked={formik.values.isBetLock}
                                   onChange={() => {
-                                    formik.setFieldValue('isBetLock', !formik.values.isBetLock);
+                                    formik.setFieldValue("isBetLock", !formik.values.isBetLock);
                                   }}
                                 />
                               </CCol>
@@ -384,18 +390,25 @@ export default function UserEditForm() {
                                   name="isActive"
                                   checked={formik.values.isActive}
                                   onChange={() => {
-                                    formik.setFieldValue('isActive', !formik.values.isActive);
+                                    formik.setFieldValue("isActive", !formik.values.isActive);
                                   }}
                                 />
                               </CCol>
 
-
                               <CCol xs={12}>
                                 <div className="d-grid gap-2 d-md-block">
-                                  <CButton color="primary" type="submit" className="me-3" disabled={!formik.isValid || loading}>
+                                  <CButton
+                                    color="primary"
+                                    type="submit"
+                                    className="me-3"
+                                    disabled={!formik.isValid || loading}
+                                  >
                                     {loading ? <CSpinner size="sm" /> : "Save"}
                                   </CButton>
-                                  <Link to={`${process.env.PUBLIC_URL}/user-list`} className="btn btn-danger btn-icon text-white ">
+                                  <Link
+                                    to={`${process.env.PUBLIC_URL}/user-list`}
+                                    className="btn btn-danger btn-icon text-white "
+                                  >
                                     Cancel
                                   </Link>
                                 </div>
@@ -408,7 +421,6 @@ export default function UserEditForm() {
                       <Tab eventKey="tab8" title="User Setting">
                         <hr />
                         <Card>
-
                           <Card.Body>
                             <CForm
                               className="row g-3 needs-validation"
@@ -424,7 +436,7 @@ export default function UserEditForm() {
                                   name="forcePasswordChange"
                                   checked={formik.values.forcePasswordChange}
                                   onChange={() => {
-                                    formik.setFieldValue('forcePasswordChange', !formik.values.forcePasswordChange);
+                                    formik.setFieldValue("forcePasswordChange", !formik.values.forcePasswordChange);
                                   }}
                                 />
                               </CCol>
@@ -513,10 +525,18 @@ export default function UserEditForm() {
 
                               <CCol xs={12}>
                                 <div className="d-grid gap-2 d-md-block">
-                                  <CButton color="primary" type="submit" className="me-3" disabled={!formik.isValid || loading}>
+                                  <CButton
+                                    color="primary"
+                                    type="submit"
+                                    className="me-3"
+                                    disabled={!formik.isValid || loading}
+                                  >
                                     {loading ? <CSpinner size="sm" /> : "Save"}
                                   </CButton>
-                                  <Link to={`${process.env.PUBLIC_URL}/user-list`} className="btn btn-danger btn-icon text-white ">
+                                  <Link
+                                    to={`${process.env.PUBLIC_URL}/user-list`}
+                                    className="btn btn-danger btn-icon text-white "
+                                  >
                                     Cancel
                                   </Link>
                                 </div>
@@ -532,8 +552,7 @@ export default function UserEditForm() {
             </Card.Body>
           </Card>
         </Col>
-
       </Row>
-    </div >
+    </div>
   );
 }

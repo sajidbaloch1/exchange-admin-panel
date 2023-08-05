@@ -1,13 +1,13 @@
+import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, Col, Row } from "react-bootstrap";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
-import { addData } from "../accountService";
-import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
 import { Notify } from "../../../utils/notify";
-import * as Yup from "yup";
+import { addData } from "../accountService";
 
 const validationSchemaForCreate = Yup.object({
   username: Yup.string()
@@ -118,7 +118,7 @@ export default function UserForm() {
         ...values,
       });
       if (response.success) {
-        Notify.success("User updated.");
+        Notify.success("User added successfully.");
         navigate("/user-list/");
       } else {
         throw new Error(response.message);

@@ -15,7 +15,7 @@ export const deleteData = async (id) => {
   return result.success;
 };
 
-export const getDetailByID = async (id, fields = {}) => {
+export const getDetailByID = async (id, fields = null) => {
   if (!id) {
     return null;
   }
