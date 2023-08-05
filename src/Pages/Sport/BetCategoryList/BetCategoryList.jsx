@@ -100,7 +100,8 @@ export default function BetCategoryList(props) {
     setLoading(true);
     try {
       const requestParameter = {
-        sportId: sportId
+        sportId: sportId,
+        searchQuery: searchQuery
       }
 
       const result = await getBetCategoryListBySportID(requestParameter);

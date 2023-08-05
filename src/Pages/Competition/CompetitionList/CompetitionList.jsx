@@ -12,7 +12,7 @@ import FormSelectWithSearch from "../../../components/Common/FormComponents/Form
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
-
+import { Notify } from "../../../utils/notify";
 
 export default function CompetitionList() {
 
@@ -37,6 +37,9 @@ export default function CompetitionList() {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [formSelectKey, setFormSelectKey] = useState(0);
 
+  const [competitionStatus, setCompetitionStatus] = useState({}); // status and loading state of each competition
+  const [sportLoading, setSportLoading] = useState(false);
+
   const [filters, setFilters] = useState({
     sportId: "",
     starDate: "",
@@ -47,24 +50,45 @@ export default function CompetitionList() {
 
   const statusList = [{ id: '', lable: 'All' }, { id: true, lable: 'Active' }, { id: false, lable: 'Inactive' }]
 
+  const updateCompetitionStatus = (id, key, value) => {
+    setCompetitionStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
+  };
+
   const toggleHighlight = async (id, isActive) => {
-    setLoading(true);
+    updateCompetitionStatus(id, "loading", true);
     try {
-      const newStatus = !isActive; // Toggle the isActive status
+      const newStatus = !isActive;
       const request = { _id: id, fieldName: 'isActive', status: newStatus.toString() };
-      const success = await changeStatus(request);
-      if (success) {
-        fetchData(currentPage, sortBy, direction, searchQuery, filters);
-        setLoading(false);
+      const result = await changeStatus(request);
+      //const result = await changeStatus({ _id: id, status: newStatus.toString() });
+      if (result.success) {
+        Notify.success("Status updated successfully");
+        updateCompetitionStatus(id, "isActive", result.data.details.isActive);
       }
     } catch (error) {
-      // Handle error
       console.error("Error removing :", error);
-      // Display error message or show notification to the user
-      // Set the state to indicate the error condition
-      setLoading(false);
     }
+    updateCompetitionStatus(id, "loading", false);
   };
+
+  // const toggleHighlight = async (id, isActive) => {
+  //   setLoading(true);
+  //   try {
+  //     const newStatus = !isActive; // Toggle the isActive status
+  //     const request = { _id: id, fieldName: 'isActive', status: newStatus.toString() };
+  //     const success = await changeStatus(request);
+  //     if (success) {
+  //       fetchData(currentPage, sortBy, direction, searchQuery, filters);
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     // Handle error
+  //     console.error("Error removing :", error);
+  //     // Display error message or show notification to the user
+  //     // Set the state to indicate the error condition
+  //     setLoading(false);
+  //   }
+  // };
 
   const columns = [
     {
@@ -88,6 +112,12 @@ export default function CompetitionList() {
       name: "START DATE",
       selector: (row) => {
         const originalDate = new Date(row.startDate);
+        if (!row.endDate) {
+          return "-";
+        }
+        if (isNaN(originalDate)) {
+          return "-";
+        }
         const formattedDate = originalDate.toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
@@ -102,6 +132,12 @@ export default function CompetitionList() {
       name: "END DATE",
       selector: (row) => {
         const originalDate = new Date(row.endDate);
+        if (!row.endDate) {
+          return "-";
+        }
+        if (isNaN(originalDate)) {
+          return "-";
+        }
         const formattedDate = originalDate.toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
@@ -113,7 +149,7 @@ export default function CompetitionList() {
       sortField: 'startDate',
     },
     {
-      name: "COMPETITION STATUS",
+      name: "COMPETITION STAGE",
       selector: (row) => [row.competitionStatus],
       sortable: true,
       sortField: 'competitionStatus',
@@ -122,21 +158,22 @@ export default function CompetitionList() {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
-      cell: row => (
-        <div className="material-switch mt-4">
+      cell: (row) => (
+        <div className="material-switch mt-4 d-flex align-items-center" key={row._id}>
           <input
             id={`highlightSwitch_${row._id}`}
             name={`notes[${row._id}].highlight`}
-            onChange={() => toggleHighlight(row._id, row.isActive)}
-            checked={row.isActive}
+            onChange={() => toggleHighlight(row._id, competitionStatus[row._id]?.isActive)}
+            checked={competitionStatus[row._id]?.isActive || false}
             type="checkbox"
           />
-          <label
-            htmlFor={`highlightSwitch_${row._id}`}
-            className="label-primary"
-          ></label>
+          <label htmlFor={`highlightSwitch_${row._id}`} className="label-primary"></label>
+          {competitionStatus[row._id]?.loading ? (
+            <div className="pb-2 ps-4">
+              <CSpinner size="sm" />
+            </div>
+          ) : null}
         </div>
-
       ),
     },
     {
@@ -206,6 +243,11 @@ export default function CompetitionList() {
         toDate: toDate,
         status: status
       });
+      const initialCompetitionStatus = result.records.reduce((acc, competition) => {
+        acc[competition._id] = { isActive: competition.isActive, loading: false };
+        return acc;
+      }, {});
+      setCompetitionStatus(initialCompetitionStatus);
       setData(result.records);
       setTotalRows(result.totalRecords);
       setLoading(false);
@@ -264,12 +306,14 @@ export default function CompetitionList() {
   };
 
   const filterData = async () => {
+    setSportLoading(true);
     const sportData = await getAllSport();
     const dropdownOptions = sportData.records.map(option => ({
       value: option._id,
       label: option.name,
     }));
     setSportList(dropdownOptions);
+    setSportLoading(false);
   };
 
   const handleFilterClick = () => {
@@ -349,6 +393,8 @@ export default function CompetitionList() {
             <Card.Header>
               <FormSelectWithSearch
                 key={formSelectKey} // Add the key prop here
+                isLoading={sportLoading}
+                placeholder={sportLoading ? "Loading Competition..." : "Select Sport"}
                 label="Sport"
                 name="sportId"
                 value={selectedSport} // Set the selectedSport as the value

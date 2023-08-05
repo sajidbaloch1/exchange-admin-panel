@@ -10,6 +10,7 @@ import FormSelect from "../../../components/Common/FormComponents/FormSelect"; /
 import FormToggleSwitch from "../../../components/Common/FormComponents/FormToggleSwitch"; // Import the FormToggleSwitch component
 import { getAllCurrency } from "../../Currency/currencyService";
 import { getAllSport } from "../../Sport/sportService";
+import { Notify } from "../../../utils/notify";
 import { addData, getDetailByID, updateData } from "../accountService";
 
 const settlementDurationOptions = [
@@ -108,10 +109,10 @@ export default function SuperAdminForm() {
     isActive: true,
     forcePasswordChange: true,
     availableSports: [],
-    settlementDurationType: null,
-    settlementDate: null,
-    settlementDay: null,
-    settlementTime: null,
+    settlementDurationType: "",
+    settlementDate: "",
+    settlementDay: "",
+    settlementTime: "",
     isCasinoAvailable: false,
     isAutoSettlement: false,
   };
@@ -135,6 +136,8 @@ export default function SuperAdminForm() {
       }
 
       if (response.success) {
+        let msg = editMode ? "Super Admin Updated Successfully" : "Super Admin added Successfully";
+        Notify.success(msg);
         navigate("/account-list/");
       } else {
         throw new Error(response.message);
@@ -176,10 +179,12 @@ export default function SuperAdminForm() {
             isActive: result.isActive || false,
             forcePasswordChange: result.forcePasswordChange || false,
             availableSports: result.availableSports || [],
-            settlementDurationType: result.settlementDurationType || null,
-            settlementDate: result.settlementDate || null,
-            settlementDay: result.settlementDay || null,
-            settlementTime: result.settlementTime || null,
+            settlementDurationType: result.settlementDurationType || '',
+            settlementDate: result.settlementDate || "",
+            settlementDay: result.settlementDay || "",
+            settlementTime: result.settlementTime || "",
+            isAutoSettlement: result.isAutoSettlement || "",
+            isCasinoAvailable: result.isCasinoAvailable || "",
           }));
         }
 

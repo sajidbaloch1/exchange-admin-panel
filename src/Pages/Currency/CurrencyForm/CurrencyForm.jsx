@@ -12,7 +12,8 @@ export default function CurrencyForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : "";
+  const id = location.state ? location.state.id : null;
+  const editMode = !!id;
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
@@ -26,7 +27,7 @@ export default function CurrencyForm() {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
-      multiplier: Yup.number().min(0).required("Multiplier must be a number"),
+      multiplier: Yup.number().min(0).required("Conversion Rate must be a number"),
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
@@ -34,7 +35,7 @@ export default function CurrencyForm() {
       setLoading(true); // Set loading state to true
       try {
         let response = null;
-        if (id !== "" && id !== undefined) {
+        if (editMode) {
           response = await updateCurrency({
             _id: id,
             name: values.name,
@@ -47,7 +48,8 @@ export default function CurrencyForm() {
           });
         }
         if (response.success) {
-          Notify.success("Currency updated.");
+          let msg = editMode ? "Currency Updated Successfully" : "Currency added Successfully";
+          Notify.success(msg);
           navigate("/currency-list/");
         } else {
           throw new Error(response.message);

@@ -15,13 +15,15 @@ export default function CompetitionForm() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : '';
+  const id = location.state ? location.state.id : null;
+  const editMode = !!id;
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null); // State to hold the server error message
   const [sportList, setSportList] = useState([]);
+  const [sportLoading, setSportLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -42,7 +44,7 @@ export default function CompetitionForm() {
         let response = null;
 
         const { name, sportId } = values;
-        if (id !== "" && id !== undefined) {
+        if (editMode) {
           response = await updateCompetition({
             _id: id,
             ...values,
@@ -53,7 +55,8 @@ export default function CompetitionForm() {
           });
         }
         if (response.success) {
-          Notify.success("Competition updated.");
+          let msg = editMode ? "Competition Updated Successfully" : "Competition added Successfully";
+          Notify.success(msg);
           navigate("/competition-list/");
         } else {
           throw new Error(response.message);
@@ -87,13 +90,14 @@ export default function CompetitionForm() {
           endDate: endDateFormatted || "",
         }));
       }
-
+      setSportLoading(true);
       const sportData = await getAllSport();
       const dropdownOptions = sportData.records.map(option => ({
         value: option._id,
         label: option.name,
       }));
       setSportList(dropdownOptions);
+      setSportLoading(false);
     };
     fetchData();
   }, [id]);
@@ -136,6 +140,8 @@ export default function CompetitionForm() {
                 />
 
                 <FormSelectWithSearch
+                  isLoading={sportLoading}
+                  placeholder={sportLoading ? "Loading Competition..." : "Select Sport"}
                   label="Sport"
                   name="sportId"
                   value={formik.values.sportId}
