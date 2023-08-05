@@ -71,7 +71,7 @@ export default function SuperAdminForm() {
       }
 
       if (response.success) {
-        Notify.success("Theme user updated.");
+        Notify.success(editMode ? "Theme user updated successfully." : "Theme user added successfully");
         navigate("/theme-user-list/");
       } else {
         throw new Error(response.message);
