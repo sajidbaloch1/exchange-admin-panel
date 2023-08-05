@@ -15,7 +15,7 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
   const [clickedUserProfit, setClickedUserProfit] = useState(0);
   const [clickedUserNewProfit, setClickedUserNewProfit] = useState(0);
   const [transactionCode, setTransactionCode] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
@@ -46,7 +46,7 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
         .then(([parent, user]) => {
           setParentBalance(parent.balance);
           setClickedUserBalance(user.balance);
-          setClickedUserProfit(user.profit);
+          setClickedUserProfit(user.profit ?? 0);
         })
         .finally(() => setLoading(false));
     }
@@ -65,15 +65,16 @@ const TransactionModal = ({ show, onHide, handleTransactionSubmit, rowData, tran
     let newParentBalance = 0;
     let clickedUserNewBalance = 0;
     let clickedUserNewProfit = 0;
+
     // Calculate the new parent balance and profit
     if (transactionType === "credit") {
-      newParentBalance = parentBalance - Amount;
-      clickedUserNewBalance = clickedUserBalance + Amount;
-      clickedUserNewProfit = clickedUserProfit + Amount;
+      newParentBalance = Number(parentBalance) - Amount;
+      clickedUserNewBalance = Number(clickedUserBalance) + Amount;
+      clickedUserNewProfit = Number(clickedUserProfit) + Amount;
     } else {
-      newParentBalance = parentBalance + Amount;
-      clickedUserNewBalance = clickedUserBalance - Amount;
-      clickedUserNewProfit = clickedUserProfit - Amount;
+      newParentBalance = Number(parentBalance) + Amount;
+      clickedUserNewBalance = Number(clickedUserBalance) - Amount;
+      clickedUserNewProfit = clickedUserProfit ? Number(clickedUserProfit) - Amount : 0;
     }
 
     setAmount(Amount);
