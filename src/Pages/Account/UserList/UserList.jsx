@@ -30,9 +30,12 @@ export default function UserList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
-
+  const [eventStatus, setEventStatus] = useState({});
   const allowedRoles = ['user'];
 
+  const updateEventStatus = (id, key, value) => {
+    setEventStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
+  };
   const toggleHighlight = async (id, type, toggleValue) => {
     setLoading(true);
     setLoading(true);

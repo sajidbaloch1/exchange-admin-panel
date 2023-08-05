@@ -33,7 +33,8 @@ export default function BetCategorySettingForm(props) {
       notes: [{ description: "", highlight: false }],
     },
     validationSchema: Yup.object({
-      minBet: Yup.number().required("Min Bet is required"),
+      minBet: Yup.number().required("Min Bet is required")
+        .min(1, "Min Bet cannot be lower than 1"),
       maxBet: Yup.number()
         .required("Max Bet is required")
         .test("minBetLessThanMaxBet", "Max Bet must be greater than Min Bet", function (value) {
@@ -48,7 +49,8 @@ export default function BetCategorySettingForm(props) {
 
           return true;
         }),
-      betDelay: Yup.number().required("Min Bet is required"),
+      betDelay: Yup.number().required("Min Bet is required")
+        .min(1, "Bet delay cannot be lower than 1"),
       notes: Yup.array().of(
         Yup.object().shape({
           description: Yup.string().required("Description is required"),
@@ -141,7 +143,7 @@ export default function BetCategorySettingForm(props) {
                 <FormInput
                   label="Min Bet"
                   name="minBet"
-                  type="text"
+                  type="number"
                   value={formik.values.minBet}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -153,7 +155,7 @@ export default function BetCategorySettingForm(props) {
                 <FormInput
                   label="Max Bet"
                   name="maxBet"
-                  type="text"
+                  type="number"
                   value={formik.values.maxBet}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -165,7 +167,7 @@ export default function BetCategorySettingForm(props) {
                 <FormInput
                   label="Bet Delay"
                   name="betDelay"
-                  type="text"
+                  type="number"
                   value={formik.values.betDelay}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
