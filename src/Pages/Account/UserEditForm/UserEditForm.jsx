@@ -429,7 +429,7 @@ export default function UserEditForm() {
                               onSubmit={formik.handleSubmit}
                             >
                               {serverError && <p className="text-danger">{serverError}</p>}
-                              <CCol md="2">
+                              <CCol md="12">
                                 <CFormLabel htmlFor="forcePasswordChange">Force Password change</CFormLabel>
                                 <FormToggleSwitch
                                   id="forcePasswordChange"
@@ -440,6 +440,7 @@ export default function UserEditForm() {
                                   }}
                                 />
                               </CCol>
+
                               <FormInput
                                 label="Exposure Limit"
                                 name="exposureLimit"
@@ -477,41 +478,6 @@ export default function UserEditForm() {
                               />
 
                               <FormInput
-                                label="Max Profit"
-                                name="maxProfit"
-                                type="text"
-                                value={formik.values.maxProfit}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.maxProfit && formik.errors.maxProfit}
-                                isRequired="true"
-                                width={2}
-                              />
-
-                              <FormInput
-                                label="Max Loss"
-                                name="maxLoss"
-                                type="text"
-                                value={formik.values.maxLoss}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.maxLoss && formik.errors.maxLoss}
-                                isRequired="true"
-                                width={2}
-                              />
-
-                              <FormInput
-                                label="Bonus"
-                                name="bonus"
-                                type="text"
-                                value={formik.values.bonus}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.bonus && formik.errors.bonus}
-                                isRequired="true"
-                                width={2}
-                              />
-                              <FormInput
                                 label="Max Stake"
                                 name="maxStake"
                                 type="text"
@@ -522,6 +488,44 @@ export default function UserEditForm() {
                                 isRequired="true"
                                 width={2}
                               />
+
+                              <Row className="mt-3">
+                                <FormInput
+                                  label="Max Profit"
+                                  name="maxProfit"
+                                  type="text"
+                                  value={formik.values.maxProfit}
+                                  onChange={formik.handleChange}
+                                  onBlur={formik.handleBlur}
+                                  error={formik.touched.maxProfit && formik.errors.maxProfit}
+                                  isRequired="true"
+                                  width={2}
+                                />
+
+                                <FormInput
+                                  label="Max Loss"
+                                  name="maxLoss"
+                                  type="text"
+                                  value={formik.values.maxLoss}
+                                  onChange={formik.handleChange}
+                                  onBlur={formik.handleBlur}
+                                  error={formik.touched.maxLoss && formik.errors.maxLoss}
+                                  isRequired="true"
+                                  width={2}
+                                />
+
+                                <FormInput
+                                  label="Bonus"
+                                  name="bonus"
+                                  type="text"
+                                  value={formik.values.bonus}
+                                  onChange={formik.handleChange}
+                                  onBlur={formik.handleBlur}
+                                  error={formik.touched.bonus && formik.errors.bonus}
+                                  isRequired="true"
+                                  width={2}
+                                />
+                              </Row>
 
                               <CCol xs={12}>
                                 <div className="d-grid gap-2 d-md-block">

@@ -23,7 +23,9 @@ const validationSchemaForCreate = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
-  mobileNumber: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
+  mobileNumber: Yup.string()
+    .matches(/^\d{10}$/, "Mobile number must be 10 digits")
+    .required("Mobile number is required"),
   creditPoints: Yup.number()
     .required("Credit amount is required")
     .test("creditPoints", "Credit amount exceeds available balance", function (value) {
@@ -37,49 +39,13 @@ const validationSchemaForCreate = Yup.object({
       }
       return true; // Validation passed
     }),
-
-  exposureLimit: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("Exposure Limit is required");
-    }
-    return schema;
-  }),
-  exposurePercentage: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("Exposure Percentage Limit is required");
-    }
-    return schema;
-  }),
-  stakeLimit: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("Stake Limit is required");
-    }
-    return schema;
-  }),
-  maxProfit: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("Max Profit Limit is required");
-    }
-    return schema;
-  }),
-  maxLoss: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("Max Loss Limit is required");
-    }
-    return schema;
-  }),
-  bonus: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("Bonus Limit is required");
-    }
-    return schema;
-  }),
-  maxStake: Yup.number().when("role", (role, schema) => {
-    if (Array.isArray(role) && role.includes("user")) {
-      return schema.required("max Stake Limit is required");
-    }
-    return schema;
-  }),
+  exposureLimit: Yup.number(),
+  exposurePercentage: Yup.number(),
+  stakeLimit: Yup.number(),
+  maxProfit: Yup.number(),
+  maxLoss: Yup.number(),
+  bonus: Yup.number(),
+  maxStake: Yup.number(),
 });
 
 export default function UserForm() {
@@ -100,13 +66,13 @@ export default function UserForm() {
     isBetLock: false,
     isActive: true,
     forcePasswordChange: true,
-    exposureLimit: "",
-    exposurePercentage: "",
-    stakeLimit: "",
-    maxProfit: "",
-    maxLoss: "",
-    bonus: "",
-    maxStake: "",
+    exposureLimit: 0,
+    exposurePercentage: 0,
+    stakeLimit: 0,
+    maxProfit: 0,
+    maxLoss: 0,
+    bonus: 0,
+    maxStake: 0,
   };
 
   const submitForm = async (values) => {
@@ -116,6 +82,13 @@ export default function UserForm() {
       let response = null;
       response = await addData({
         ...values,
+        exposureLimit: values.exposureLimit || 0,
+        exposurePercentage: values.exposurePercentage || 0,
+        stakeLimit: values.stakeLimit || 0,
+        maxProfit: values.maxProfit || 0,
+        maxLoss: values.maxLoss || 0,
+        bonus: values.bonus || 0,
+        maxStake: values.maxStake || 0,
       });
       if (response.success) {
         Notify.success("User added successfully.");
@@ -206,7 +179,7 @@ export default function UserForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.mobileNumber && formik.errors.mobileNumber}
-                  isRequired="false"
+                  isRequired="true"
                   width={3}
                 />
 
@@ -248,11 +221,11 @@ export default function UserForm() {
 
                 <input type="hidden" name="role" value={formik.values.role} />
 
-                <Row>
-                  <hr className="my-5" />
+                <hr className="my-5" />
 
-                  <h4 className="mb-4">User Setting </h4>
+                <h4 className="mb-4">User Setting </h4>
 
+                <Row className="mt-2">
                   <CCol md="1">
                     <CFormLabel htmlFor="isBetLock">Bet Lock</CFormLabel>
                     <FormToggleSwitch
@@ -288,95 +261,102 @@ export default function UserForm() {
                       }}
                     />
                   </CCol>
+                </Row>
+
+                <Row className="mt-3">
                   <FormInput
                     label="Exposure Limit"
                     name="exposureLimit"
-                    type="text"
+                    type="number"
                     value={formik.values.exposureLimit}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.exposureLimit && formik.errors.exposureLimit}
-                    isRequired="true"
+                    isRequired="false"
                     width={2}
                   />
 
                   <FormInput
                     label="Exposure Percentage"
                     name="exposurePercentage"
-                    type="text"
+                    type="number"
                     value={formik.values.exposurePercentage}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.exposurePercentage && formik.errors.exposurePercentage}
-                    isRequired="true"
+                    isRequired="false"
                     width={2}
                   />
 
                   <FormInput
                     label="Stake Limit"
                     name="stakeLimit"
-                    type="text"
+                    type="number"
                     value={formik.values.stakeLimit}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.stakeLimit && formik.errors.stakeLimit}
-                    isRequired="true"
+                    isRequired="false"
                     width={2}
                   />
 
                   <FormInput
+                    label="Max Stake"
+                    name="maxStake"
+                    type="number"
+                    value={formik.values.maxStake}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.maxStake && formik.errors.maxStake}
+                    isRequired="false"
+                    width={2}
+                  />
+                </Row>
+
+                <Row className="mt-3">
+                  <FormInput
                     label="Max Profit"
                     name="maxProfit"
-                    type="text"
+                    type="number"
                     value={formik.values.maxProfit}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.maxProfit && formik.errors.maxProfit}
-                    isRequired="true"
+                    isRequired="false"
                     width={2}
                   />
 
                   <FormInput
                     label="Max Loss"
                     name="maxLoss"
-                    type="text"
+                    type="number"
                     value={formik.values.maxLoss}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.maxLoss && formik.errors.maxLoss}
-                    isRequired="true"
+                    isRequired="false"
                     width={2}
                   />
 
                   <FormInput
                     label="Bonus"
                     name="bonus"
-                    type="text"
+                    type="number"
                     value={formik.values.bonus}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.bonus && formik.errors.bonus}
-                    isRequired="true"
-                    width={2}
-                  />
-                  <FormInput
-                    label="Max Stake"
-                    name="maxStake"
-                    type="text"
-                    value={formik.values.maxStake}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.maxStake && formik.errors.maxStake}
-                    isRequired="true"
+                    isRequired="false"
                     width={2}
                   />
                 </Row>
 
-                <CCol xs={12}>
+                <CCol className="mt-5">
                   <div className="d-grid gap-2 d-md-block">
                     <CButton color="primary" type="submit" className="me-3">
                       {loading ? <CSpinner size="sm" /> : "Save"}
                     </CButton>
+
                     <Link to={`${process.env.PUBLIC_URL}/user-list`} className="btn btn-danger btn-icon text-white ">
                       Cancel
                     </Link>

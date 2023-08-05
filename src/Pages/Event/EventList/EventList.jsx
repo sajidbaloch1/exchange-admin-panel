@@ -67,6 +67,7 @@ export default function EventList() {
   const competitionName = location.state ? location.state.competitionName : "";
   const [filters, setFilters] = useState({
     competitionId: location.state ? location.state.competitionId : "",
+    sportId: location.state ? location.state.sportId : "",
     starDate: "",
     endDate: "",
     status: "",
@@ -185,7 +186,7 @@ export default function EventList() {
   const fetchData = async (page, sortBy, direction, searchQuery, filters) => {
     setLoading(true);
     try {
-      const { competitionId, fromDate, toDate, status } = filters;
+      const { competitionId, fromDate, toDate, status, sportId } = filters;
       const result = await getAllEvent({
         page: page,
         perPage: perPage,
@@ -193,7 +194,7 @@ export default function EventList() {
         direction: direction,
         searchQuery: searchQuery,
         competitionId: competitionId,
-        sportId: selectedSport,
+        sportId,
         fromDate: fromDate,
         toDate: toDate,
         status: status,
@@ -264,6 +265,7 @@ export default function EventList() {
   const handleFilterClick = () => {
     const newFilters = {
       competitionId: selectedCompetition,
+      sportId: selectedSport,
       fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
       toDate: endDateValue, // Replace endDateValue with the actual state value for end date
       status: selectedStatus,
@@ -280,10 +282,12 @@ export default function EventList() {
     setEndDateValue("");
     setSelectedStatus("");
     setFormSelectKey(formSelectKey + 1);
+    setSelectedSport("");
     // Add more filter states if needed
     // Fetch data with the updated filters object
     fetchData(currentPage, sortBy, direction, searchQuery, {
       sportId: "",
+      competitionId: "",
       startDate: "",
       endDate: "",
       // Add more filters here if needed

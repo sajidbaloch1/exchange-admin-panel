@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { Breadcrumb, Card, Row, Col, Form } from "react-bootstrap";
+import { CButton, CCol, CForm, CSpinner } from "@coreui/react";
 import { useFormik } from "formik";
-import { getCompetitionDetailByID, addCompetition, updateCompetition } from "../competitionService";
-import { getAllSport } from '../../Sport/sportService'
-import FormInput from "../../../components/Common/FormComponents/FormInput";
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import React, { useEffect, useState } from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
-import { Notify } from "../../../utils/notify";
+import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
+import { Notify } from "../../../utils/notify";
+import { getAllSport } from "../../Sport/sportService";
+import { addCompetition, getCompetitionDetailByID, updateCompetition } from "../competitionService";
 
 export default function CompetitionForm() {
   const navigate = useNavigate();
@@ -30,11 +29,11 @@ export default function CompetitionForm() {
       name: "",
       sportId: "",
       startDate: "",
-      endDate: ""
+      endDate: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
-      sportId: Yup.string().required('Sport is required'),
+      sportId: Yup.string().required("Sport is required"),
     }),
     onSubmit: async (values) => {
       // Perform form submission logic
@@ -77,10 +76,10 @@ export default function CompetitionForm() {
         const result = await getCompetitionDetailByID(id);
 
         const startDateObj = new Date(result.startDate);
-        const startDateFormatted = startDateObj.toISOString().split('T')[0];
+        const startDateFormatted = startDateObj.toISOString().split("T")[0];
 
         const endDateObj = new Date(result.endDate);
-        const endDateFormatted = endDateObj.toISOString().split('T')[0];
+        const endDateFormatted = endDateObj.toISOString().split("T")[0];
 
         formik.setValues((prevValues) => ({
           ...prevValues,
@@ -92,7 +91,7 @@ export default function CompetitionForm() {
       }
       setSportLoading(true);
       const sportData = await getAllSport();
-      const dropdownOptions = sportData.records.map(option => ({
+      const dropdownOptions = sportData.records.map((option) => ({
         value: option._id,
         label: option.name,
       }));
@@ -141,13 +140,12 @@ export default function CompetitionForm() {
 
                 <FormSelectWithSearch
                   isLoading={sportLoading}
-                  placeholder={sportLoading ? "Loading Competition..." : "Select Sport"}
+                  placeholder={sportLoading ? "Loading Sports..." : "Select Sport"}
                   label="Sport"
                   name="sportId"
                   value={formik.values.sportId}
                   onChange={(name, selectedValue) => {
-                    formik.setFieldValue('sportId', selectedValue); // Use the 'name' argument here
-
+                    formik.setFieldValue("sportId", selectedValue); // Use the 'name' argument here
                   }}
                   onBlur={formik.handleBlur}
                   error={formik.touched.sportId && formik.errors.sportId}
