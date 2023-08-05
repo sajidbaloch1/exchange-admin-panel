@@ -1,40 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { CButton, CCol, CSpinner } from "@coreui/react";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllCompetition, deleteCompetition, changeStatus } from "../competitionService";
-import { getAllSport } from '../../Sport/sportService'
-import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils/alertUtils';
-import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
-import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
-import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
-import { CForm, CCol, CFormLabel, CButton, CSpinner } from "@coreui/react";
+import { Link } from "react-router-dom";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
+import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
+import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
+import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { showAlert } from "../../../utils/alertUtils";
+import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
+import { getAllSport } from "../../Sport/sportService";
+import { changeStatus, deleteCompetition, getAllCompetition } from "../competitionService";
 
 export default function CompetitionList() {
-
   const Export = ({ onExport }) => (
-    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
+    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
+      Export
+    </Button>
   );
 
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [direction, setDirection] = useState('desc');
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [direction, setDirection] = useState("desc");
   const [sportList, setSportList] = useState([]);
   // Filter param
-  const [startDateValue, setStartDateValue] = useState('');
-  const [endDateValue, setEndDateValue] = useState('');
-  const [selectedSport, setSelectedSport] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [startDateValue, setStartDateValue] = useState("");
+  const [endDateValue, setEndDateValue] = useState("");
+  const [selectedSport, setSelectedSport] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [formSelectKey, setFormSelectKey] = useState(0);
 
   const [competitionStatus, setCompetitionStatus] = useState({}); // status and loading state of each competition
@@ -44,11 +45,15 @@ export default function CompetitionList() {
     sportId: "",
     starDate: "",
     endDate: "",
-    status: ""
+    status: "",
     // Add more filters here if needed
   });
 
-  const statusList = [{ id: '', lable: 'All' }, { id: true, lable: 'Active' }, { id: false, lable: 'Inactive' }]
+  const statusList = [
+    { id: "", lable: "All" },
+    { id: true, lable: "Active" },
+    { id: false, lable: "Inactive" },
+  ];
 
   const updateCompetitionStatus = (id, key, value) => {
     setCompetitionStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
@@ -58,7 +63,7 @@ export default function CompetitionList() {
     updateCompetitionStatus(id, "loading", true);
     try {
       const newStatus = !isActive;
-      const request = { _id: id, fieldName: 'isActive', status: newStatus.toString() };
+      const request = { _id: id, fieldName: "isActive", status: newStatus.toString() };
       const result = await changeStatus(request);
       //const result = await changeStatus({ _id: id, status: newStatus.toString() });
       if (result.success) {
@@ -93,20 +98,20 @@ export default function CompetitionList() {
   const columns = [
     {
       name: "SR.NO",
-      selector: (row, index) => ((currentPage - 1) * perPage) + (index + 1),
+      selector: (row, index) => (currentPage - 1) * perPage + (index + 1),
       sortable: false,
     },
     {
       name: "NAME",
       selector: (row) => [row.name],
       sortable: true,
-      sortField: 'name'
+      sortField: "name",
     },
     {
       name: "SPORT",
       selector: (row) => [row.sportsName],
       sortable: true,
-      sortField: 'sportsName'
+      sortField: "sportsName",
     },
     {
       name: "START DATE",
@@ -118,15 +123,15 @@ export default function CompetitionList() {
         if (isNaN(originalDate)) {
           return "-";
         }
-        const formattedDate = originalDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+        const formattedDate = originalDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
         return formattedDate;
       },
       sortable: true,
-      sortField: 'startDate',
+      sortField: "startDate",
     },
     {
       name: "END DATE",
@@ -138,21 +143,21 @@ export default function CompetitionList() {
         if (isNaN(originalDate)) {
           return "-";
         }
-        const formattedDate = originalDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+        const formattedDate = originalDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
         return formattedDate;
       },
       sortable: true,
-      sortField: 'startDate',
+      sortField: "startDate",
     },
     {
       name: "COMPETITION STAGE",
       selector: (row) => [row.competitionStatus],
       sortable: true,
-      sortField: 'competitionStatus',
+      sortField: "competitionStatus",
     },
     {
       name: "STATUS",
@@ -177,22 +182,34 @@ export default function CompetitionList() {
       ),
     },
     {
-      name: 'TOTAL EVENTS',
-      cell: row => (
+      name: "TOTAL EVENTS",
+      cell: (row) => (
         <div>
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to see events</Tooltip>}>
-            <Link to={`${process.env.PUBLIC_URL}/competition-event-list`} state={{ competitionId: row._id, competitionName: row.name }} className="btn btn-info btn-lg ms-2">{row.totalEvent}</Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to see events</Tooltip>}>
+            <Link
+              to={`${process.env.PUBLIC_URL}/competition-event-list`}
+              state={{ competitionId: row._id, competitionName: row.name }}
+              className="btn btn-info btn-lg ms-2"
+            >
+              {row.totalEvent}
+            </Link>
           </OverlayTrigger>
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
     },
     {
-      name: 'ACTION',
-      cell: row => (
+      name: "ACTION",
+      cell: (row) => (
         <div>
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
-            <Link to={`${process.env.PUBLIC_URL}/competition-form`} state={{ id: row._id }} className="btn btn-primary btn-lg"><i className="fa fa-edit"></i></Link>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
+            <Link
+              to={`${process.env.PUBLIC_URL}/competition-form`}
+              state={{ id: row._id }}
+              className="btn btn-primary btn-lg"
+            >
+              <i className="fa fa-edit"></i>
+            </Link>
           </OverlayTrigger>
 
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
@@ -241,7 +258,7 @@ export default function CompetitionList() {
         sportId: sportId,
         fromDate: fromDate,
         toDate: toDate,
-        status: status
+        status: status,
       });
       const initialCompetitionStatus = result.records.reduce((acc, competition) => {
         acc[competition._id] = { isActive: competition.isActive, loading: false };
@@ -286,7 +303,7 @@ export default function CompetitionList() {
     setLoading(false);
   };
 
-  const handlePageChange = page => {
+  const handlePageChange = (page) => {
     setCurrentPage(page);
     fetchData(page, sortBy, direction, searchQuery, filters);
   };
@@ -298,7 +315,7 @@ export default function CompetitionList() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('competition/getAllCompetition', searchQuery, 'competition.csv');
+    await downloadCSV("competition/getAllCompetition", searchQuery, "competition.csv");
   };
 
   const handleDelete = (id) => {
@@ -308,7 +325,7 @@ export default function CompetitionList() {
   const filterData = async () => {
     setSportLoading(true);
     const sportData = await getAllSport();
-    const dropdownOptions = sportData.records.map(option => ({
+    const dropdownOptions = sportData.records.map((option) => ({
       value: option._id,
       label: option.name,
     }));
@@ -321,7 +338,7 @@ export default function CompetitionList() {
       sportId: selectedSport,
       fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
       toDate: endDateValue, // Replace endDateValue with the actual state value for end date
-      status: selectedStatus
+      status: selectedStatus,
     };
     setFilters(newFilters);
     // Fetch data with the updated filters object
@@ -342,17 +359,16 @@ export default function CompetitionList() {
       sportId: "",
       startDate: "",
       endDate: "",
-      status: ""
+      status: "",
       // Add more filters here if needed
     });
   };
 
   useEffect(() => {
-
-    if (searchQuery !== '') {
+    if (searchQuery !== "") {
       fetchData(currentPage, sortBy, direction, searchQuery, filters); // fetch page 1 of users
     } else {
-      fetchData(currentPage, sortBy, direction, '', filters); // fetch page 1 of users
+      fetchData(currentPage, sortBy, direction, "", filters); // fetch page 1 of users
     }
     filterData();
   }, [perPage, searchQuery]);
@@ -394,12 +410,12 @@ export default function CompetitionList() {
               <FormSelectWithSearch
                 key={formSelectKey} // Add the key prop here
                 isLoading={sportLoading}
-                placeholder={sportLoading ? "Loading Competition..." : "Select Sport"}
+                placeholder={sportLoading ? "Loading Sports..." : "Select Sport"}
                 label="Sport"
                 name="sportId"
                 value={selectedSport} // Set the selectedSport as the value
                 onChange={(name, selectedValue) => setSelectedSport(selectedValue)} // Update the selectedSport
-                onBlur={() => { }} // Add an empty function as onBlur prop
+                onBlur={() => {}} // Add an empty function as onBlur prop
                 error=""
                 width={2}
                 options={sportList}
@@ -411,7 +427,7 @@ export default function CompetitionList() {
                 type="date"
                 value={startDateValue}
                 onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={2}
               />
 
@@ -421,7 +437,7 @@ export default function CompetitionList() {
                 type="date"
                 value={endDateValue}
                 onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={2}
               />
 
@@ -430,7 +446,7 @@ export default function CompetitionList() {
                 name="status"
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={2}
               >
                 {statusList.map((status, index) => (
@@ -455,11 +471,7 @@ export default function CompetitionList() {
               </CCol>
             </Card.Header>
             <Card.Body>
-              <SearchInput
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                loading={loading}
-              />
+              <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}
