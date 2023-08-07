@@ -148,6 +148,18 @@ const Sidebar = () => {
           ],
         },
         {
+          menutitle: "BANK",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/bank`,
+              icon: "briefcase",
+              type: "link",
+              active: false,
+              title: "Bank",
+            },
+          ],
+        },
+        {
           menutitle: "REPORTS",
           Items: [
             {
