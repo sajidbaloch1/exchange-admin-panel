@@ -49,8 +49,13 @@ const UserList = React.lazy(() => import("./Pages/Account/UserList/UserList"));
 const UserEditForm = React.lazy(() => import("./Pages/Account/UserEditForm/UserEditForm"));
 const MultiLogin = React.lazy(() => import("./Pages/Account/MultiLogin/"));
 
+// Bank
+const Bank = React.lazy(() => import("./Pages/Bank/Bank/Bank"));
+
 // Report
 const AccountStatement = React.lazy(() => import("./Pages/Report/AccountStatement/AccountStatement"));
+
+
 
 //custom Pages
 const Login = React.lazy(() => import("./Pages/Login/Login"));
@@ -256,6 +261,10 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/bank`} element={<Bank />} />
                   </Route>
                 </Route>
               </Route>
