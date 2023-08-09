@@ -1,10 +1,18 @@
 import CryptoJS from "crypto-js";
 
+/**
+ * Logs out the user by clearing the localStorage and reloading the page.
+ */
 export const logoutUser = () => {
   localStorage.clear();
   window.location.reload();
 };
 
+/**
+ * Decrypts an AES encrypted string using the permissions AES secret.
+ * @param {string} encryptedString - The string to decrypt.
+ * @returns {object} - The decrypted object.
+ */
 const decryptAESEncryption = (encryptedString) => {
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedString, process.env.REACT_APP_PERMISSIONS_AES_SECRET);
@@ -15,6 +23,10 @@ const decryptAESEncryption = (encryptedString) => {
   }
 };
 
+/**
+ * Gets the active app modules from the localStorage and decrypts them.
+ * @returns {object} - The decrypted active app modules.
+ */
 const appModules = () => {
   const modules = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_AMLS_KEY));
   if (!modules) {
@@ -23,6 +35,10 @@ const appModules = () => {
   return decryptAESEncryption(modules);
 };
 
+/**
+ * Gets the active session keys from the localStorage and decrypts them.
+ * @returns {object} - The decrypted active session keys.
+ */
 const activeSessionKeys = () => {
   const activeKeys = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY));
   console.log(activeKeys);
@@ -32,9 +48,23 @@ const activeSessionKeys = () => {
   return decryptAESEncryption(activeKeys);
 };
 
+/**
+ * The decrypted active app modules.
+ * @type {object}
+ */
 export const activeModules = appModules();
+
+/**
+ * The decrypted active session keys.
+ * @type {object}
+ */
 export const permissionKeys = activeSessionKeys();
 
+/**
+ * Checks if a given permission key is included in the active session keys.
+ * @param {string} key - The permission key to check.
+ * @returns {boolean} - Whether the permission key is included in the active session keys.
+ */
 const hasPermission = (key = null) => {
   if (!key) {
     return false;
@@ -42,6 +72,10 @@ const hasPermission = (key = null) => {
   return permissionKeys.includes(key);
 };
 
+/**
+ * The permission object containing all the permissions for the app.
+ * @type {object}
+ */
 export const permission = {
   // Account Module
   ACCOUNT_MODULE: {
