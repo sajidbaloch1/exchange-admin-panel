@@ -1,6 +1,7 @@
 // AuthContext.js
 import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { postData as postDataWithAuth } from "../utils/fetch-services";
 import { postData } from "../utils/fetch-services-without-token";
 
 export const AuthContext = createContext();
@@ -24,6 +25,22 @@ export const AuthProvider = ({ children }) => {
 
   // console.log(ipAddressDetail);
 
+  const fetchAppModules = async (token = null) => {
+    if (!token) logout();
+    const result = await postDataWithAuth("permission/getAppModulesList", {}, token);
+    if (result.success) {
+      localStorage.setItem(process.env.REACT_APP_PERMISSIONS_AMLS_KEY, JSON.stringify(result.data));
+    }
+  };
+
+  const fetchUserPermissions = async (userId, token = null) => {
+    if (!token) logout();
+    const result = await postDataWithAuth("permission/getUserActivePermissions", { userId }, token);
+    if (result.success) {
+      localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, JSON.stringify(result.data));
+    }
+  };
+
   const login = async (username, password) => {
     setLoading(true);
     const result = await postData("auth/login", {
@@ -31,17 +48,21 @@ export const AuthProvider = ({ children }) => {
       password: password,
     });
     if (result.success) {
+      const jwtToken = result.data.token;
+
+      await Promise.all([fetchAppModules(jwtToken), fetchUserPermissions(result.data.user._id, jwtToken)]);
+
       if (result.data.user.forcePasswordChange) {
         navigate("/reset-password", {
           state: {
             id: result.data.user._id,
-            token: result.data.token,
+            token: jwtToken,
             isForceChangePassword: true,
           },
         });
       } else {
         localStorage.setItem("user_info", JSON.stringify(result.data.user));
-        localStorage.setItem("jws_token", result.data.token);
+        localStorage.setItem("jws_token", jwtToken);
         setIsAuthenticated(true);
         setLoginError("");
         navigate("/dashboard");
@@ -81,8 +102,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem("user_info");
     localStorage.clear();
+    window.location.reload();
   };
 
   return (

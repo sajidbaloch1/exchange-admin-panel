@@ -61,6 +61,11 @@ export function Header() {
       const result = await postData("users/rehydrateUser", { _id: user._id });
       if (result.success) {
         localStorage.setItem("user_info", JSON.stringify(result.data.details));
+        if (result.data.details.scKey) {
+          localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, JSON.stringify(result.data.details.scKey));
+        } else {
+          signout();
+        }
       }
     };
 
@@ -68,6 +73,7 @@ export function Header() {
       rehydrateUser();
     }, 60 * 1000 * 1); // 1 minute
 
+    rehydrateUser();
     return () => clearInterval(interval);
   });
 

@@ -81,8 +81,8 @@ export default function Dashboard() {
           setCreditPts(response.result[0].creditPoints);
           setAllPts(response.result[0].AllPts);
           setSettlementPts(response.result[0].settlementPoint);
-          setUpPts(response.result[0].upperPoint)
-          setDownPts(response.result[0].downPoint)
+          setUpPts(response.result[0].upperPoint);
+          setDownPts(response.result[0].downPoint);
         }
       }
     };

@@ -46,11 +46,6 @@ export const updateUserStatus = async (request) => {
   return result;
 };
 
-export const getAppModuleListing = async (request) => {
-  const result = await postData("users/getAppModulesList", request);
-  return result.success ? result.data.details : [];
-};
-
 // Decrypt with CryptoJS AES
 export const decryptUserPermissions = (encryptedPermissions) => {
   try {
@@ -66,11 +61,36 @@ export const decryptUserPermissions = (encryptedPermissions) => {
   }
 };
 
+export const getUserDefaultPermissions = async () => {
+  const result = await postData("permission/getDefaultUserPermissions");
+  if (result.success) {
+    const permissions = decryptUserPermissions(result.data);
+    return permissions;
+  }
+  return [];
+};
+
+export const getUserPermissionModules = async (id) => {
+  const result = await postData("permission/getUserPermissionModules", { userId: id });
+  if (result.success) {
+    const permissions = decryptUserPermissions(result.data);
+    return permissions;
+  }
+  return [];
+};
+
+export const getUserPermissions = async (id) => {
+  if (id) {
+    return await getUserPermissionModules(id);
+  }
+  return await getUserDefaultPermissions();
+};
+
 export const getPermissionsById = async (id) => {
   if (id) {
-    const result = await postData("users/getUserPermissions", { _id: id });
+    const result = await postData("permission/getUserActivePermissions", { userId: id });
     if (result.success) {
-      return decryptUserPermissions(result.data.details);
+      return decryptUserPermissions(result.data);
     }
   }
   return [];

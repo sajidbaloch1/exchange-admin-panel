@@ -7,7 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import { Notify } from "../../../utils/notify";
-import { createCloneUser, getAppModuleListing, getDetailByID, getPermissionsById, updateData } from "../accountService";
+import { createCloneUser, getDetailByID, getPermissionsById, getUserPermissions, updateData } from "../accountService";
 import MultiLoginListing from "./MultiLoginListing";
 
 const multiLoginCreateSchema = Yup.object({
@@ -55,6 +55,7 @@ export default function MultiLogin() {
   const id = location.state ? location.state.id : "";
 
   const [loading, setLoading] = useState(false);
+  const [defaultPermissionLoading, setDefaultPermissionLoading] = useState(false);
 
   const [moduleList, setModuleList] = useState([]);
   const [serverError, setServerError] = useState(null);
@@ -100,8 +101,11 @@ export default function MultiLogin() {
   });
 
   useEffect(() => {
-    Promise.all([getDetailByID(id), getAppModuleListing(), getPermissionsById(id)])
-      .then(([user, modules, permissions]) => {
+    setDefaultPermissionLoading(true);
+    Promise.all([getDetailByID(id), getUserPermissions(id), getPermissionsById(id)])
+      .then(([user, defaultPermissions, permissions]) => {
+        setDefaultPermissionLoading(false);
+
         if (user) {
           formik.setValues((prev) => ({
             ...user,
@@ -112,14 +116,20 @@ export default function MultiLogin() {
           }));
         }
 
-        setModuleList(modules);
+        setModuleList(defaultPermissions);
 
         if (permissions.length) {
           const moduleIds = [];
-          permissions.forEach((permission) => {
-            const module = modules.find((m) => m.key === permission);
-            if (module) {
-              moduleIds.push(module._id);
+          defaultPermissions.forEach((defPermission) => {
+            if (permissions.includes(defPermission.key)) {
+              moduleIds.push(defPermission._id);
+            }
+            if (defPermission.subModules?.length) {
+              defPermission.subModules.forEach((subModule) => {
+                if (permissions.includes(subModule.key)) {
+                  moduleIds.push(subModule.moduleId);
+                }
+              });
             }
           });
           formik.setFieldValue("moduleIds", moduleIds);
@@ -216,31 +226,55 @@ export default function MultiLogin() {
                   width={3}
                 />
 
-                <Row>
-                  <CCol xs={12} className="mt-3">
-                    <CFormLabel>Privileges</CFormLabel>
-                  </CCol>
-
-                  {moduleList.map((detail, key) => (
-                    <CCol xs={12} md={6} lg={3} key={key}>
-                      <div className="form-check">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id={detail._id}
-                          name="moduleIds"
-                          checked={formik.values.moduleIds.includes(detail._id)}
-                          onChange={(e) => handleModuleChange(detail._id, e.target.checked)}
-                        />
-                        <CFormLabel className="form-check-label" htmlFor={detail._id}>
-                          {detail.name}
-                        </CFormLabel>
-                      </div>
+                {defaultPermissionLoading ? (
+                  <div className="d-flex justify-content-center align-items-center" style={{ height: "150px" }}>
+                    <CSpinner />
+                  </div>
+                ) : (
+                  <Row className="mt-5">
+                    <CCol xs={12}>
+                      <CFormLabel>Privileges</CFormLabel>
                     </CCol>
-                  ))}
-                </Row>
+
+                    {moduleList.map((module) => (
+                      <CCol xs={12} sm={6} md={4} lg={2} key={module.key} className="pb-3">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id={module.key}
+                            name="moduleIds"
+                            checked={formik.values.moduleIds.includes(module._id)}
+                            onChange={(e) => handleModuleChange(module._id, e.target.checked)}
+                          />
+                          <CFormLabel className="form-check-label fw-bold">{module.name}</CFormLabel>
+
+                          {module.subModules?.length ? (
+                            <div className="ms-2">
+                              {module.subModules.map((subModule) => (
+                                <div className="form-check" key={subModule.moduleId}>
+                                  <input
+                                    disabled={!formik.values.moduleIds.includes(module._id)}
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    id={subModule.moduleId}
+                                    name="moduleIds"
+                                    checked={formik.values.moduleIds.includes(subModule.moduleId)}
+                                    onChange={(e) => handleModuleChange(subModule.moduleId, e.target.checked)}
+                                  />
+                                  <CFormLabel className="form-check-label fw-normal">{subModule.name}</CFormLabel>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </CCol>
+                    ))}
+                  </Row>
+                )}
 
                 <FormInput
+                  className="mt-5"
                   label="Transaction Code"
                   name="transactionCode"
                   type="password"
@@ -252,7 +286,7 @@ export default function MultiLogin() {
                   width={3}
                 />
 
-                <CCol xs={12} className="mt-4">
+                <CCol xs={12} className="mt-5">
                   <div className="d-grid gap-2 d-md-block">
                     <CButton color="primary" type="submit" className="me-3">
                       {loading ? <CSpinner size="sm" /> : "Save"}
@@ -272,7 +306,7 @@ export default function MultiLogin() {
         </Col>
       </Row>
 
-      <MultiLoginListing id={id} moduleList={moduleList} />
+      <MultiLoginListing parentLoading={defaultPermissionLoading} id={id} moduleList={moduleList} />
     </div>
   );
 }
