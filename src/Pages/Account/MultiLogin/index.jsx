@@ -7,13 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 import { Notify } from "../../../utils/notify";
-import {
-  createCloneUser,
-  getDefaultUserPermissions,
-  getDetailByID,
-  getPermissionsById,
-  updateData,
-} from "../accountService";
+import { createCloneUser, getDetailByID, getPermissionsById, getUserPermissions, updateData } from "../accountService";
 import MultiLoginListing from "./MultiLoginListing";
 
 const multiLoginCreateSchema = Yup.object({
@@ -108,7 +102,7 @@ export default function MultiLogin() {
 
   useEffect(() => {
     setDefaultPermissionLoading(true);
-    Promise.all([getDetailByID(id), getDefaultUserPermissions(), getPermissionsById(id)])
+    Promise.all([getDetailByID(id), getUserPermissions(id), getPermissionsById(id)])
       .then(([user, defaultPermissions, permissions]) => {
         setDefaultPermissionLoading(false);
 
@@ -126,10 +120,16 @@ export default function MultiLogin() {
 
         if (permissions.length) {
           const moduleIds = [];
-          permissions.forEach((permission) => {
-            const module = defaultPermissions.find((m) => m.key === permission);
-            if (module) {
-              moduleIds.push(module._id);
+          defaultPermissions.forEach((defPermission) => {
+            if (permissions.includes(defPermission.key)) {
+              moduleIds.push(defPermission._id);
+            }
+            if (defPermission.subModules?.length) {
+              defPermission.subModules.forEach((subModule) => {
+                if (permissions.includes(subModule.key)) {
+                  moduleIds.push(subModule.moduleId);
+                }
+              });
             }
           });
           formik.setFieldValue("moduleIds", moduleIds);
@@ -252,15 +252,15 @@ export default function MultiLogin() {
                           {module.subModules?.length ? (
                             <div className="ms-2">
                               {module.subModules.map((subModule) => (
-                                <div className="form-check" key={subModule.key}>
+                                <div className="form-check" key={subModule.moduleId}>
                                   <input
                                     disabled={!formik.values.moduleIds.includes(module._id)}
                                     type="checkbox"
                                     className="form-check-input"
-                                    id={subModule.key}
+                                    id={subModule.moduleId}
                                     name="moduleIds"
-                                    checked={formik.values.moduleIds.includes(subModule._id)}
-                                    onChange={(e) => handleModuleChange(subModule._id, e.target.checked)}
+                                    checked={formik.values.moduleIds.includes(subModule.moduleId)}
+                                    onChange={(e) => handleModuleChange(subModule.moduleId, e.target.checked)}
                                   />
                                   <CFormLabel className="form-check-label fw-normal">{subModule.name}</CFormLabel>
                                 </div>

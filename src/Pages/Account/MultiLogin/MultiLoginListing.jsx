@@ -122,10 +122,19 @@ function MultiLoginListing({ parentLoading = false, id, moduleList = [] }) {
         const users = result.records.map((user) => {
           const clonedUser = { ...user };
           const decryptedModules = decryptUserPermissions(user.permissions);
+
           moduleList.forEach((module) => {
             const modulePermission = decryptedModules.find((permission) => permission === module.key);
             clonedUser[module.key] = modulePermission;
+
+            if (module.subModules?.length) {
+              module.subModules.forEach((subModule) => {
+                const subModulePermission = decryptedModules.find((permission) => permission === subModule.key);
+                clonedUser[subModule.key] = subModulePermission;
+              });
+            }
           });
+
           return clonedUser;
         });
         setClonedUsers(users);
