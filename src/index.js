@@ -37,6 +37,10 @@ const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSett
 const ThemeUserList = React.lazy(() => import("./Pages/ThemeUser/ThemeUserList/ThemeUserList"));
 const ThemeUserForm = React.lazy(() => import("./Pages/ThemeUser/ThemeUserForm/ThemeUserForm"));
 
+// Transaction Panel User
+const TransactionPanelUserList = React.lazy(() => import("./Pages/TransactionPanelUser/TransactionPanelUserList/TransactionPanelUserList"));
+const TransactionPanelUserForm = React.lazy(() => import("./Pages/TransactionPanelUser/TransactionPanelUserForm/TransactionPanelUserForm"));
+
 // All User Accounts
 const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
 const SuperAdminForm = React.lazy(() => import("./Pages/Account/SuperAdminForm/SuperAdminForm"));
@@ -181,6 +185,15 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-list`} element={<ThemeUserList />} />
+                  </Route>
+
+                  {/* Theme User route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_master"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/transaction-panel-user-form`} element={<TransactionPanelUserForm />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_master"]} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/transaction-panel-user-list`} element={<TransactionPanelUserList />} />
                   </Route>
 
                   {/* Accounts route  */}
