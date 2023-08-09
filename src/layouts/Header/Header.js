@@ -61,6 +61,7 @@ export function Header() {
       const result = await postData("users/rehydrateUser", { _id: user._id });
       if (result.success) {
         localStorage.setItem("user_info", JSON.stringify(result.data.details));
+        localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, result.data.scKey);
       }
     };
 
@@ -68,6 +69,7 @@ export function Header() {
       rehydrateUser();
     }, 60 * 1000 * 1); // 1 minute
 
+    rehydrateUser();
     return () => clearInterval(interval);
   });
 
