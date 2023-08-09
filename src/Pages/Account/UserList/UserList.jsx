@@ -9,6 +9,7 @@ import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { deleteData, getAllData, updateUserStatus } from "../accountService";
+import { permission } from "../../../lib/user-permissions";
 
 export default function UserList() {
   const location = useLocation();
@@ -17,8 +18,10 @@ export default function UserList() {
   if (user.role !== "system_owner") {
     login_user_id = user._id;
   }
+
+  //console.log(permission);
   const { id } = useParams();
-  const initialParentId = id ? id : login_user_id;
+  const initialParentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;
   const [parentId, setParentId] = useState(initialParentId);
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
@@ -101,7 +104,7 @@ export default function UserList() {
       sortable: true,
       sortField: "city",
     },
-    {
+    permission.USER_MODULE.USER_BET_UPDATE && {
       name: "B STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
@@ -113,6 +116,7 @@ export default function UserList() {
             onChange={() => toggleStatus("bet", row._id, row.isBetLock)}
             checked={userBetStatus[row._id]?.isBetLock || false}
             type="checkbox"
+            disabled={!permission.USER_MODULE.USER_BET_UPDATE}
           />
           <label htmlFor={`betSwitch_${row._id}`} className="label-primary"></label>
           {userBetStatus[row._id]?.loading ? (
@@ -123,7 +127,7 @@ export default function UserList() {
         </div>
       ),
     },
-    {
+    permission.USER_MODULE.USER_STATUS_UPDATE && {
       name: "U STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
@@ -135,6 +139,7 @@ export default function UserList() {
             onChange={() => toggleStatus("user", row._id, row.isActive)}
             checked={userStatus[row._id]?.isActive || false}
             type="checkbox"
+            disabled={!permission.USER_MODULE.USER_STATUS_UPDATE}
           />
           <label htmlFor={`userSwitch_${row._id}`} className="label-primary"></label>
           {userStatus[row._id]?.loading ? (
@@ -145,20 +150,22 @@ export default function UserList() {
         </div>
       ),
     },
-    {
+    permission.USER_MODULE.UPDATE && {
       name: "ACTION",
       cell: (row) => (
         <div>
+
           <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
             <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id} className="btn btn-primary btn-lg">
               <i className="fa fa-edit"></i>
             </Link>
           </OverlayTrigger>
+
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
         </div>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
@@ -283,13 +290,14 @@ export default function UserList() {
           <h1 className="page-title">ALL USERS</h1>
         </div>
         <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/user-form`} className="btn btn-primary btn-icon text-white me-3">
-            <span>
-              <i className="fe fe-plus"></i>&nbsp;
-            </span>
-            CREATE USER
-          </Link>
-
+          {(permission.USER_MODULE.CREATE) && (
+            <Link to={`${process.env.PUBLIC_URL}/user-form`} className="btn btn-primary btn-icon text-white me-3">
+              <span>
+                <i className="fe fe-plus"></i>&nbsp;
+              </span>
+              CREATE USER
+            </Link>
+          )}
           {/* <Link to="#" className="btn btn-success btn-icon text-white">
             <span>
               <i className="fe fe-log-in"></i>&nbsp;

@@ -1,11 +1,14 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Scrollbars from "react-custom-scrollbars";
+import { permission } from "../../lib/user-permissions";
 
 const Sidebar = () => {
   const location = useLocation(); // Get the current location
   const [mainmenu, setMainMenu] = useState([]);
   const userRole = JSON.parse(localStorage.getItem("user_info")).role;
+  const isClone = JSON.parse(localStorage.getItem("user_info")).isClone;
+  //console.log(isClone)
 
   useEffect(() => {
     setMainMenu(getMenuItems(userRole));
@@ -110,19 +113,23 @@ const Sidebar = () => {
       },
       );
     } else if (userRole === "super_admin") {
+      if (!isClone) {
+        menuItems.push(
+          {
+            menutitle: "MULTILOGIN",
+            Items: [
+              {
+                path: `${process.env.PUBLIC_URL}/multi-login`,
+                icon: "copy",
+                type: "link",
+                active: false,
+                title: "Multi login",
+              },
+            ],
+          },
+        );
+      }
       menuItems.push(
-        {
-          menutitle: "MULTILOGIN",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/multi-login`,
-              icon: "copy",
-              type: "link",
-              active: false,
-              title: "Multi login",
-            },
-          ],
-        },
         {
           menutitle: "USER",
           Items: [

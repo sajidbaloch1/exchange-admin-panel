@@ -10,15 +10,17 @@ import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
+import { permission } from "../../../lib/user-permissions";
 
 export default function AccountList() {
   let login_user_id = "";
   const user = JSON.parse(localStorage.getItem("user_info"));
   login_user_id = user._id;
 
+  console.log(permission.ACCOUNT_MODULE.UPDATE);
+
   const { id } = useParams();
-  const initialParentId = id ? id : login_user_id;
-  const parentId = initialParentId;
+  const parentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;
   const { role } = JSON.parse(localStorage.getItem("user_info")) || {};
 
   const roleHierarchy = {
@@ -121,24 +123,29 @@ export default function AccountList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to deposit</Tooltip>}>
-            <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
-              D
-            </Button>
-          </OverlayTrigger>
+          {(permission.ACCOUNT_MODULE.DEPOSIT &&
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to deposit</Tooltip>}>
+              <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
+                D
+              </Button>
+            </OverlayTrigger>
+          )}
 
-          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to withdrw</Tooltip>}>
-            <Button
-              variant="danger"
-              onClick={() => handleWithdrawClick(row)}
-              className="btn btn-lg ms-2 me-2"
-              title="Withdraw"
-            >
-              W
-            </Button>
-          </OverlayTrigger>
+          {(permission.ACCOUNT_MODULE.WITHDRAW &&
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to withdrw</Tooltip>}>
+              <Button
+                variant="danger"
+                onClick={() => handleWithdrawClick(row)}
+                className="btn btn-lg ms-2 me-2"
+                title="Withdraw"
+              >
+                W
+              </Button>
+            </OverlayTrigger>
+          )}
 
-          {row.role === "super_admin" && (
+
+          {row.role === "super_admin" && permission.ACCOUNT_MODULE.UPDATE && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/super-admin-form`}
@@ -149,7 +156,7 @@ export default function AccountList() {
               </Link>
             </OverlayTrigger>
           )}
-          {row.role === "admin" && (
+          {row.role === "admin" && permission.ACCOUNT_MODULE.UPDATE && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/admin-form`}
@@ -160,7 +167,7 @@ export default function AccountList() {
               </Link>
             </OverlayTrigger>
           )}
-          {row.role === "super_master" && (
+          {row.role === "super_master" && permission.ACCOUNT_MODULE.UPDATE && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/super-master-form`}
@@ -171,7 +178,7 @@ export default function AccountList() {
               </Link>
             </OverlayTrigger>
           )}
-          {row.role === "master" && (
+          {row.role === "master" && permission.ACCOUNT_MODULE.UPDATE && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/master-form`}
@@ -182,7 +189,7 @@ export default function AccountList() {
               </Link>
             </OverlayTrigger>
           )}
-          {row.role === "agent" && (
+          {row.role === "agent" && permission.ACCOUNT_MODULE.UPDATE && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
               <Link
                 to={`${process.env.PUBLIC_URL}/agent-form`}
@@ -377,7 +384,7 @@ export default function AccountList() {
           <h1 className="page-title">ALL ACCOUNTS</h1>
         </div>
         <div className="ms-auto pageheader-btn">
-          {role === "system_owner" && (
+          {role === "system_owner" && permission.ACCOUNT_MODULE.CREATE && (
             <Link
               to={`${process.env.PUBLIC_URL}/super-admin-form`}
               className="btn btn-primary btn-icon text-white me-3"
@@ -388,7 +395,7 @@ export default function AccountList() {
               CREATE ACCOUNT
             </Link>
           )}
-          {role !== "system_owner" && (
+          {role !== "system_owner" && permission.ACCOUNT_MODULE.CREATE && (
             <Dropdown className="dropdown btn-group">
               <Dropdown.Toggle variant="" type="button" className="btn btn-primary dropdown-toggle">
                 <i className="fe fe-plus"></i>&nbsp;CREATE ACCOUNT
