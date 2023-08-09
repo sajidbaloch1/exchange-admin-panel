@@ -228,6 +228,18 @@ const Sidebar = () => {
           ],
         },
         {
+          menutitle: "USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/transaction-panel-user-list`,
+              icon: "users",
+              type: "link",
+              active: false,
+              title: "Transaction panel users",
+            },
+          ],
+        },
+        {
           menutitle: "REPORTS",
           Items: [
             {
