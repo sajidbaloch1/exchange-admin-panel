@@ -46,9 +46,9 @@ export const updateUserStatus = async (request) => {
   return result;
 };
 
-export const getAppModuleListing = async (request) => {
-  const result = await postData("users/getAppModulesList", request);
-  return result.success ? result.data.details : [];
+export const getDefaultUserPermissions = async () => {
+  const result = await postData("permission/getDefaultUserPermissions");
+  return result.success ? result.data : [];
 };
 
 // Decrypt with CryptoJS AES
@@ -68,9 +68,10 @@ export const decryptUserPermissions = (encryptedPermissions) => {
 
 export const getPermissionsById = async (id) => {
   if (id) {
-    const result = await postData("users/getUserPermissions", { _id: id });
+    const result = await postData("permission/getUserActivePermissions", { userId: id });
     if (result.success) {
-      return decryptUserPermissions(result.data.details);
+      console.log(decryptUserPermissions(result.data));
+      return decryptUserPermissions(result.data);
     }
   }
   return [];

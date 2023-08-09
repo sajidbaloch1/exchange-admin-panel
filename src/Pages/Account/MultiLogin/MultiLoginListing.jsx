@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput";
 import { decryptUserPermissions, getAllData, user } from "../accountService";
 
-
 const generateTableColumns = (moduleList) => {
   const columns = [
     {
@@ -34,16 +33,31 @@ const generateTableColumns = (moduleList) => {
     },
   ];
 
-  moduleList.forEach((detail) => {
+  moduleList.forEach((module) => {
     columns.push({
-      name: detail.name.toUpperCase(),
-      selector: (row) => [row[detail.key]],
+      name: module.name.toUpperCase(),
+      selector: (row) => [row[module.key]],
       sortable: true,
-      sortField: detail.key,
+      sortField: module.key,
       cell: (row) => (
-        <div className="h4 mb-0">{row[detail.key] ? <i className="fa fa-check-circle text-success" /> : null}</div>
+        <div className="h4 mb-0">{row[module.key] ? <i className="fa fa-check-circle text-success" /> : null}</div>
       ),
     });
+    if (module.subModules.length) {
+      module.subModules.forEach((subModule) => {
+        columns.push({
+          name: `${subModule.name.toUpperCase()} (${module.name.toUpperCase()})`,
+          selector: (row) => [row[subModule.key]],
+          sortable: true,
+          sortField: subModule.key,
+          cell: (row) => (
+            <div className="h4 mb-0">
+              {row[subModule.key] ? <i className="fa fa-check-circle text-success" /> : null}
+            </div>
+          ),
+        });
+      });
+    }
   });
 
   columns.push({
@@ -62,7 +76,7 @@ const generateTableColumns = (moduleList) => {
   return columns;
 };
 
-function MultiLoginListing({ id, moduleList = [] }) {
+function MultiLoginListing({ parentLoading = false, id, moduleList = [] }) {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [clonedUsers, setClonedUsers] = useState([]);
@@ -131,7 +145,9 @@ function MultiLoginListing({ id, moduleList = [] }) {
 
       <Card.Body>
         {loading ? (
-          <CSpinner size="sm" />
+          <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+            <CSpinner />
+          </div>
         ) : (
           <>
             <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} loading={loading} />
@@ -141,10 +157,10 @@ function MultiLoginListing({ id, moduleList = [] }) {
                 data={clonedUsers}
                 // onSelectedRowsChange={handleRowSelected}
                 // clearSelectedRows={toggleCleared}
-                //selectableRows
+                // selectableRows
                 pagination
                 highlightOnHover
-                progressPending={loading}
+                progressPending={loading || parentLoading}
                 paginationServer
                 paginationTotalRows={totalRows}
                 onChangeRowsPerPage={handlePerRowsChange}
