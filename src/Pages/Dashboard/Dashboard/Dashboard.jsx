@@ -5,6 +5,7 @@ import CountUp from "react-countup";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as dashboard from "../../../data/dashboard/dashboard";
 import { getTransactionCode } from "../../../lib/transaction-code";
+import { permission } from "../../../lib/user-permissions";
 import { getDashboardById } from "../dashboardService";
 
 export default function Dashboard() {
@@ -13,6 +14,8 @@ export default function Dashboard() {
 
   const newUser = location?.state?.newUser ?? false;
   const authUser = location?.state?.user ?? null;
+
+  console.log(permission);
 
   const { _id } = JSON.parse(localStorage.getItem("user_info")) || {};
 

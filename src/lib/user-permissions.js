@@ -25,6 +25,7 @@ const appModules = () => {
 
 const activeSessionKeys = () => {
   const activeKeys = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY));
+  console.log(activeKeys);
   if (!activeKeys) {
     logoutUser();
   }
