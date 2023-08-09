@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
 import { Notify } from "../../../utils/notify";
-import { createThemeUser, getThemeUserById, updateThemeUser } from "../themeUserService";
+import { createTransactionUser, getTransactionUserById, updateTransactionUser } from "../transactionPanelUserService";
 
 
 const validationSchemaForCreate = Yup.object({
@@ -35,7 +35,7 @@ const validationSchemaForUpdate = Yup.object({
     }),
 });
 
-export default function ThemeUserForm() {
+export default function TransactionPanelUserForm() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -60,19 +60,19 @@ export default function ThemeUserForm() {
       let response = null;
 
       if (editMode) {
-        response = await updateThemeUser({
+        response = await updateTransactionUser({
           _id: id,
           ...values,
         });
       } else {
-        response = await createThemeUser({
+        response = await createTransactionUser({
           ...values,
         });
       }
 
       if (response.success) {
-        Notify.success(editMode ? "Transaction panel updated successfully." : "Transaction panel added successfully");
-        navigate("/theme-user-list/");
+        Notify.success(editMode ? "Transaction panel user updated successfully." : "Transaction user added successfully");
+        navigate("/transaction-panel-user-list/");
       } else {
         throw new Error(response.message);
       }
@@ -92,7 +92,7 @@ export default function ThemeUserForm() {
   useEffect(() => {
     const fetchData = async () => {
       // !!! IMPORTANT NOTE: The order of the promises in the array must match the order of the results in the results array
-      Promise.all([getThemeUserById(id)]).then((results) => {
+      Promise.all([getTransactionUserById(id)]).then((results) => {
         const [fetchtedUser] = results;
 
         if (fetchtedUser !== null) {
@@ -183,7 +183,7 @@ export default function ThemeUserForm() {
                   {loading ? <CSpinner size="sm" /> : editMode ? "Update" : "Create"}
                 </CButton>
 
-                <Link to={`${process.env.PUBLIC_URL}/theme-user-list`} className="btn btn-danger btn-icon text-white ">
+                <Link to={`${process.env.PUBLIC_URL}/transaction-panel-user-list`} className="btn btn-danger btn-icon text-white ">
                   Cancel
                 </Link>
               </div>
