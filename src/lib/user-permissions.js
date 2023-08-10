@@ -117,3 +117,469 @@ export const permission = {
     ACCOUNT_STATEMENT: hasPermission(activeModules?.REPORT_ACCOUNT_STATEMENT),
   },
 };
+
+const appStaticModules = () => {
+  const user = JSON.parse(localStorage.getItem("user_info"));
+  const staticModules = {};
+  if (user && user.role === 'system_owner') {
+
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: true,
+      CREATE: false,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+  } else if (user && user.role === 'super_admin') {
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+  } else if (user && user.role === 'admin') {
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+
+    staticModules.THEME_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+  } else if (user && user.role === 'super_master') {
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+
+    staticModules.THEME_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+  } else if (user && user.role === 'master') {
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+
+    staticModules.THEME_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+  } else if (user && user.role === 'agent') {
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+      STATUS: true,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: true,
+      CREATE: true,
+      UPDATE: true,
+      DELETE: true,
+    };
+
+
+    staticModules.THEME_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+  } else {
+    staticModules.MULTI_LOGIN_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.CURRENCIES_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.SPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.COMPETITION_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+      STATUS: false,
+    };
+
+    staticModules.ADD_EVENT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+
+
+    staticModules.THEME_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+    staticModules.TRANSCATION_PANEL_USER_MODULE = {
+      ACTIVE: false,
+      CREATE: false,
+      UPDATE: false,
+      DELETE: false,
+    };
+  }
+
+  return staticModules;
+};
+
+export const appStaticModulesByUser = appStaticModules();

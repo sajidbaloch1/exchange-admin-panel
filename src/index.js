@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
 import "./index.scss";
 
+
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
 const App = React.lazy(() => import("./components/app"));
@@ -58,8 +59,6 @@ const Bank = React.lazy(() => import("./Pages/Bank/Bank/Bank"));
 
 // Report
 const AccountStatement = React.lazy(() => import("./Pages/Report/AccountStatement/AccountStatement"));
-
-
 
 //custom Pages
 const Login = React.lazy(() => import("./Pages/Login/Login"));
@@ -188,11 +187,11 @@ const Root = () => {
                   </Route>
 
                   {/* Theme User route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_master"]} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["master"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/transaction-panel-user-form`} element={<TransactionPanelUserForm />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_master"]} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["master"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/transaction-panel-user-list`} element={<TransactionPanelUserList />} />
                   </Route>
 
@@ -272,11 +271,11 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/multi-login`} element={<MultiLogin />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner", "super_admin", "admin", "super_master", "master", "agent"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={["super_admin", "admin", "super_master", "master", "agent"]} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={["system_owner", "super_admin", "admin", "super_master", "master", "agent"]} />}>
                     <Route path={`${process.env.PUBLIC_URL}/bank`} element={<Bank />} />
                   </Route>
                 </Route>

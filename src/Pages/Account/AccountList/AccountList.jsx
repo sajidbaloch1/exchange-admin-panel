@@ -10,14 +10,15 @@ import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
-import { permission } from "../../../lib/user-permissions";
+import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function AccountList() {
   let login_user_id = "";
   const user = JSON.parse(localStorage.getItem("user_info"));
   login_user_id = user._id;
 
-  console.log(permission.ACCOUNT_MODULE.UPDATE);
+  console.log(permission);
+  console.log(appStaticModulesByUser);
 
   const { id } = useParams();
   const parentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;

@@ -13,6 +13,7 @@ import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { getAllSport } from "../../Sport/sportService";
 import { changeStatus, deleteCompetition, getAllCompetition } from "../competitionService";
+import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function CompetitionList() {
   const Export = ({ onExport }) => (
@@ -159,7 +160,7 @@ export default function CompetitionList() {
       sortable: true,
       sortField: "competitionStatus",
     },
-    {
+    appStaticModulesByUser.COMPETITION_MODULE.STATUS && {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
@@ -198,7 +199,7 @@ export default function CompetitionList() {
         </div>
       ),
     },
-    {
+    appStaticModulesByUser.COMPETITION_MODULE.UPDATE && {
       name: "ACTION",
       cell: (row) => (
         <div>
@@ -216,7 +217,7 @@ export default function CompetitionList() {
         </div>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
@@ -387,20 +388,16 @@ export default function CompetitionList() {
             </Breadcrumb.Item>
           </Breadcrumb> */}
         </div>
-        <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/competition-form`} className="btn btn-primary btn-icon text-white me-3">
-            <span>
-              <i className="fe fe-plus"></i>&nbsp;
-            </span>
-            CREATE COMPETITION
-          </Link>
-          {/* <Link to="#" className="btn btn-success btn-icon text-white">
-            <span>
-              <i className="fe fe-log-in"></i>&nbsp;
-            </span>
-            Export
-          </Link> */}
-        </div>
+        {appStaticModulesByUser.COMPETITION_MODULE.CREATE &&
+          <div className="ms-auto pageheader-btn">
+            <Link to={`${process.env.PUBLIC_URL}/competition-form`} className="btn btn-primary btn-icon text-white me-3">
+              <span>
+                <i className="fe fe-plus"></i>&nbsp;
+              </span>
+              CREATE COMPETITION
+            </Link>
+          </div>
+        }
       </div>
 
       <Row className=" row-sm">
@@ -415,7 +412,7 @@ export default function CompetitionList() {
                 name="sportId"
                 value={selectedSport} // Set the selectedSport as the value
                 onChange={(name, selectedValue) => setSelectedSport(selectedValue)} // Update the selectedSport
-                onBlur={() => {}} // Add an empty function as onBlur prop
+                onBlur={() => { }} // Add an empty function as onBlur prop
                 error=""
                 width={2}
                 options={sportList}
@@ -427,7 +424,7 @@ export default function CompetitionList() {
                 type="date"
                 value={startDateValue}
                 onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => {}}
+                onBlur={() => { }}
                 width={2}
               />
 
@@ -437,7 +434,7 @@ export default function CompetitionList() {
                 type="date"
                 value={endDateValue}
                 onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => {}}
+                onBlur={() => { }}
                 width={2}
               />
 
@@ -446,7 +443,7 @@ export default function CompetitionList() {
                 name="status"
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => {}}
+                onBlur={() => { }}
                 width={2}
               >
                 {statusList.map((status, index) => (

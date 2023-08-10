@@ -1,18 +1,23 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Scrollbars from "react-custom-scrollbars";
-import { permission } from "../../lib/user-permissions";
+import { permission, appStaticModulesByUser } from "../../lib/user-permissions";
 
 const Sidebar = () => {
   const location = useLocation(); // Get the current location
   const [mainmenu, setMainMenu] = useState([]);
   const userRole = JSON.parse(localStorage.getItem("user_info")).role;
   const isClone = JSON.parse(localStorage.getItem("user_info")).isClone;
-  //console.log(isClone)
+
+  const mergedPermissions = {
+    ...permission,
+    ...appStaticModulesByUser
+  };
+
+  console.log(mergedPermissions);
 
   useEffect(() => {
     setMainMenu(getMenuItems(userRole));
-
   }, []);
 
   const getMenuItems = (userRole) => {
@@ -42,93 +47,9 @@ const Sidebar = () => {
           },
         ],
       },
-
     ];
 
-    if (userRole === "system_owner") {
-      menuItems.push(
-
-        {
-          menutitle: "CURRENCY",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/currency-list`,
-              icon: "dollar-sign",
-              type: "link",
-              active: false,
-              title: "Currencies",
-            },
-          ],
-        },
-        {
-          menutitle: "SPORTS",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/sport-list`,
-              icon: "grid",
-              type: "link",
-              active: false,
-              title: "Sports",
-              allRouet: ['sport-form', 'sport-list']
-            },
-          ],
-        },
-        {
-          menutitle: "COMPETITION",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/competition-list`,
-              icon: "globe",
-              type: "link",
-              active: false,
-              title: "Competitions",
-              allRouet: ['competition-form', 'competition-list']
-            },
-          ],
-        },
-        {
-          menutitle: "EVENT",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/event-list`,
-              icon: "layers",
-              type: "link",
-              active: false,
-              title: "Events",
-              allRouet: ['event-form', 'event-list']
-            },
-          ],
-        }, {
-        menutitle: "ADD EVENT",
-        Items: [
-          {
-            path: `${process.env.PUBLIC_URL}/api-event-list`,
-            icon: "layers",
-            type: "link",
-            active: false,
-            title: "Add Event",
-            allRouet: ['api-event-list']
-          },
-        ],
-      },
-      );
-    } else if (userRole === "super_admin") {
-      if (!isClone) {
-        menuItems.push(
-          {
-            menutitle: "MULTILOGIN",
-            Items: [
-              {
-                path: `${process.env.PUBLIC_URL}/multi-login`,
-                icon: "copy",
-                type: "link",
-                active: false,
-                title: "Multi login",
-              },
-            ],
-          },
-        );
-      }
+    if (mergedPermissions.USER_MODULE.ACTIVE) {
       menuItems.push(
         {
           menutitle: "USER",
@@ -142,6 +63,100 @@ const Sidebar = () => {
             },
           ],
         },
+      );
+    }
+
+    if (mergedPermissions.CURRENCIES_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "CURRENCY",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/currency-list`,
+              icon: "dollar-sign",
+              type: "link",
+              active: false,
+              title: "Currencies",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.SPORT_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "SPORTS",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/sport-list`,
+              icon: "grid",
+              type: "link",
+              active: false,
+              title: "Sports",
+              allRouet: ['sport-form', 'sport-list']
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.COMPETITION_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "COMPETITION",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/competition-list`,
+              icon: "globe",
+              type: "link",
+              active: false,
+              title: "Competitions",
+              allRouet: ['competition-form', 'competition-list']
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.EVENT_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "EVENT",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/event-list`,
+              icon: "layers",
+              type: "link",
+              active: false,
+              title: "Events",
+              allRouet: ['event-form', 'event-list']
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.ADD_EVENT_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "ADD EVENT",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/api-event-list`,
+              icon: "layers",
+              type: "link",
+              active: false,
+              title: "Add Event",
+              allRouet: ['api-event-list']
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.THEME_USER_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "THEME USER",
           Items: [
@@ -154,6 +169,28 @@ const Sidebar = () => {
             },
           ],
         },
+      );
+    }
+
+    if (mergedPermissions.TRANSCATION_PANEL_USER_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "TRANSACTION PANEL USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/transaction-panel-user-list`,
+              icon: "users",
+              type: "link",
+              active: false,
+              title: "Transaction panel users",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.BANK_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "BANK",
           Items: [
@@ -166,153 +203,11 @@ const Sidebar = () => {
             },
           ],
         },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
+      );
+    }
 
-      );
-    } else if (userRole === "admin") {
+    if (mergedPermissions.ACCOUNT_STATEMENT_REPORT_MODULE.ACTIVE) {
       menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
-      );
-    }
-    else if (userRole === "super_master") {
-      menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/transaction-panel-user-list`,
-              icon: "users",
-              type: "link",
-              active: false,
-              title: "Transaction panel users",
-            },
-          ],
-        },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
-      );
-    }
-    else if (userRole === "master") {
-      menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
-      );
-    } else if (userRole === "agent") {
-      menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
         {
           menutitle: "REPORTS",
           Items: [
