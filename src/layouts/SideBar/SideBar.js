@@ -14,11 +14,17 @@ const Sidebar = () => {
     ...appStaticModulesByUser
   };
 
-  console.log(mergedPermissions);
+  //console.log(permission)
+  //console.log(appStaticModulesByUser)
+  //console.log(mergedPermissions)
+  //console.log(userRole)
 
   useEffect(() => {
     setMainMenu(getMenuItems(userRole));
-  }, []);
+    return () => {
+
+    };
+  }, [appStaticModulesByUser]);
 
   const getMenuItems = (userRole) => {
 
@@ -35,19 +41,25 @@ const Sidebar = () => {
           },
         ],
       },
-      {
-        menutitle: "ACCOUNT",
-        Items: [
-          {
-            path: `${process.env.PUBLIC_URL}/account-list`,
-            icon: "users",
-            type: "link",
-            active: false,
-            title: "Accounts",
-          },
-        ],
-      },
+
     ];
+
+    if (mergedPermissions.ACCOUNT_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "ACCOUNT",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/account-list`,
+              icon: "users",
+              type: "link",
+              active: false,
+              title: "Accounts",
+            },
+          ],
+        },
+      );
+    }
 
     if (mergedPermissions.USER_MODULE.ACTIVE) {
       menuItems.push(

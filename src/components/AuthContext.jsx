@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
     if (!token) logout();
     const result = await postDataWithAuth("permission/getUserActivePermissions", { userId }, token);
     if (result.success) {
+      console.log(result.data);
       localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, JSON.stringify(result.data));
     }
   };

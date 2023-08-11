@@ -19,7 +19,7 @@ const decryptAESEncryption = (encryptedString) => {
     const string = bytes.toString(CryptoJS.enc.Utf8);
     return JSON.parse(string);
   } catch (e) {
-    logoutUser();
+    //logoutUser();
   }
 };
 
@@ -30,7 +30,7 @@ const decryptAESEncryption = (encryptedString) => {
 const appModules = () => {
   const modules = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_AMLS_KEY));
   if (!modules) {
-    logoutUser();
+    //logoutUser();
   }
   return decryptAESEncryption(modules);
 };
@@ -42,7 +42,7 @@ const appModules = () => {
 const activeSessionKeys = () => {
   const activeKeys = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY));
   if (!activeKeys) {
-    logoutUser();
+    //logoutUser();
   }
   return decryptAESEncryption(activeKeys);
 };
@@ -121,6 +121,8 @@ export const permission = {
 const appStaticModules = () => {
   const user = JSON.parse(localStorage.getItem("user_info"));
   const staticModules = {};
+  //console.log(user)
+
   if (user && user.role === 'system_owner') {
 
     staticModules.MULTI_LOGIN_MODULE = {
@@ -563,7 +565,6 @@ const appStaticModules = () => {
       UPDATE: false,
       DELETE: false,
     };
-
 
     staticModules.THEME_USER_MODULE = {
       ACTIVE: false,
