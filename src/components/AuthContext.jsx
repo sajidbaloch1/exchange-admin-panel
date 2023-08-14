@@ -37,16 +37,26 @@ export const AuthProvider = ({ children }) => {
     if (!token) logout();
     const result = await postDataWithAuth("permission/getUserActivePermissions", { userId }, token);
     if (result.success) {
-      console.log(result.data);
       localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, JSON.stringify(result.data));
     }
   };
 
   const login = async (username, password) => {
     setLoading(true);
+
+    const response = await fetch(`https://ipinfo.io/?token=48be71f88148b3`, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+    });
+    const ipData = await response.json();
+
     const result = await postData("auth/login", {
       username: username,
       password: password,
+      ipAddress: ipData.ip
     });
     if (result.success) {
       const jwtToken = result.data.token;
