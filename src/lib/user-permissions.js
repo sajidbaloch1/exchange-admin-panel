@@ -173,9 +173,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
     staticModules.TRANSCATION_PANEL_USER_MODULE = {
@@ -233,9 +234,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
     staticModules.TRANSCATION_PANEL_USER_MODULE = {
@@ -293,9 +295,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
 
@@ -360,9 +363,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
 
@@ -427,9 +431,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
 
@@ -494,9 +499,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
 
@@ -561,9 +567,10 @@ const appStaticModules = () => {
 
     staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
       ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
+    };
+
+    staticModules.USER_HISTORY_REPORT_MODULE = {
+      ACTIVE: true,
     };
 
     staticModules.THEME_USER_MODULE = {

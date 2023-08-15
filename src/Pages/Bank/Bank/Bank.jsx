@@ -135,6 +135,7 @@ export default function Bank() {
       selector: (row) => [row.fromtoName],
       sortable: true,
       sortField: 'fromtoName',
+      width: '200px',
       cell: (row) => (
         <Row className=" row-sm">
 

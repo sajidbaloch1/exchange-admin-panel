@@ -59,6 +59,7 @@ const Bank = React.lazy(() => import("./Pages/Bank/Bank/Bank"));
 
 // Report
 const AccountStatement = React.lazy(() => import("./Pages/Report/AccountStatement/AccountStatement"));
+const UserHistory = React.lazy(() => import("./Pages/Report/UserHistory/UserHistory"));
 
 //custom Pages
 const Login = React.lazy(() => import("./Pages/Login/Login"));
@@ -218,6 +219,10 @@ const Root = () => {
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.REPORT_MODULE.ACCOUNT_STATEMENT} />}>
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
+                  </Route>
+
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_HISTORY_REPORT_MODULE} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/user-history`} element={<UserHistory />} />
                   </Route>
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.BANK_MODULE.ACTIVE} />}>

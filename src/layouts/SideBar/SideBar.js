@@ -234,6 +234,11 @@ const Sidebar = () => {
                   title: "Account statement",
                   type: "link",
                 },
+                {
+                  path: `${process.env.PUBLIC_URL}/user-history`,
+                  title: "User history",
+                  type: "link",
+                },
               ],
             },
           ],

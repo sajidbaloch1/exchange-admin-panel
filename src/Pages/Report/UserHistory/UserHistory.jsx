@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllTransactionActivity } from "../reportService";
+import { getUserActivity, getUserActivityTypes } from "../reportService";
 import { downloadCSV } from '../../../utils/csvUtils';
 import { showAlert } from '../../../utils/alertUtils';
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
@@ -16,7 +16,7 @@ import FormSelectWithSearch from "../../../components/Common/FormComponents/Form
 import FormInput from "../../../components/Common/FormComponents/FormInput";
 
 
-export default function AccountStatement() {
+export default function UserHistory() {
 
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
@@ -31,23 +31,33 @@ export default function AccountStatement() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [direction, setDirection] = useState('desc');
 
-  const [userList, setuserList] = useState([]);
+  const [userList, setUserList] = useState([]);
   const [startDateValue, setStartDateValue] = useState('');
   const [endDateValue, setEndDateValue] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
+  const [typeList, setTypeList] = useState([]);
+  const [selectedType, setSelectedType] = useState('');
   const [filters, setFilters] = useState({
     userId: "",
     starDate: "",
     endDate: "",
+    type: ""
     // Add more filters here if needed
   });
   const [formSelectKey, setFormSelectKey] = useState(0);
+  const [formSelectTypeKey, setFormSelectTypeKey] = useState(Math.random());
 
   const columns = [
     {
       name: "SR.NO",
       selector: (row, index) => ((currentPage - 1) * perPage) + (index + 1),
       sortable: false,
+    },
+    {
+      name: "USERNAME",
+      selector: (row) => [row.username],
+      sortable: true,
+      sortField: 'points',
     },
     {
       name: "DATE",
@@ -67,46 +77,23 @@ export default function AccountStatement() {
       sortField: 'date'
     },
     {
-      name: "CREDIT",
-      selector: (row) => [row.points],
+      name: "IP ADDRESS",
+      selector: (row) => [row.ipAddress],
       sortable: true,
-      sortField: 'points',
-      cell: (row) => (
-        <div style={{ color: "green" }}>
-          {row.type === "credit" ? row.points : ""}
-        </div>
-      ),
+      sortField: 'ipAddress',
     },
     {
-      name: "DEBIT",
-      selector: (row) => [row.points],
+      name: "CITY",
+      selector: (row) => [row.city],
       sortable: true,
-      sortField: 'points',
-      cell: (row) => (
-        <div style={{ color: "red" }}>
-          {row.type === "debit" ? "-" + row.points : ""}
-        </div>
-      ),
+      sortField: 'city',
     },
     {
-      name: "PTS",
-      selector: (row) => [row.balancePoints],
+      name: "COUNTRY",
+      selector: (row) => [row.country],
       sortable: true,
-      sortField: 'balancePoints',
-
-    },
-    {
-      name: "REMARKS",
-      selector: (row) => [row.remark],
-      sortable: true,
-      sortField: 'remark'
-    },
-    {
-      name: "FROMTO",
-      selector: (row) => [row.fromtoName],
-      sortable: true,
-      sortField: 'fromtoName'
-    },
+      sortField: 'country',
+    }
   ];
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
@@ -114,14 +101,15 @@ export default function AccountStatement() {
   const fetchData = async (page, sortBy, direction, searchQuery, filters) => {
     setLoading(true);
     try {
-      const { userId, fromDate, toDate } = filters;
-      const result = await getAllTransactionActivity({
+      const { userId, fromDate, toDate, type } = filters;
+      const result = await getUserActivity({
         page: page,
         perPage: perPage,
         sortBy: sortBy,
         direction: direction,
         searchQuery: searchQuery,
         userId: userId,
+        type: type,
         fromDate: fromDate,
         toDate: toDate
       });
@@ -159,7 +147,7 @@ export default function AccountStatement() {
   };
 
   const handleDownload = async () => {
-    await downloadCSV('currencies/getAllTransactionActivity', searchQuery, 'currency.csv');
+    await downloadCSV('currencies/getUserActivity', searchQuery, 'currency.csv');
   };
 
   const selectionRange = {
@@ -181,6 +169,7 @@ export default function AccountStatement() {
   const handleFilterClick = () => {
     const newFilters = {
       userId: selectedUser,
+      type: selectedType,
       fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
       toDate: endDateValue, // Replace endDateValue with the actual state value for end date
     };
@@ -192,27 +181,33 @@ export default function AccountStatement() {
   const resetFilters = () => {
     // Clear the filter values
     setSelectedUser("");
+    setSelectedType("");
     setStartDateValue("");
     setEndDateValue("");
     // Add more filter states if needed
     setFormSelectKey(formSelectKey + 1);
+    setFormSelectTypeKey(formSelectTypeKey + 1);
 
     // Fetch data with the updated filters object
     fetchData(currentPage, sortBy, direction, searchQuery, {
-      sportId: "",
+      userId: "",
       startDate: "",
       endDate: "",
+      type: ""
       // Add more filters here if needed
     });
   };
 
   const filterData = async () => {
-    const userData = await getAllData();
-    const dropdownOptions = userData.records.map(option => ({
-      value: option._id,
-      label: option.username,
-    }));
-    setuserList(dropdownOptions);
+    Promise.all([getAllData(), getUserActivityTypes()]).then((results) => {
+      const [userData, userActivityTypes] = results;
+      const dropdownOptions = userData.records.map(option => ({
+        value: option._id,
+        label: option.username,
+      }));
+      setUserList(dropdownOptions);
+      setTypeList(userActivityTypes);
+    });
   };
 
   useEffect(() => {
@@ -228,7 +223,7 @@ export default function AccountStatement() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">ACCOUNT STATEMENT</h1>
+          <h1 className="page-title">USER HISTORY</h1>
         </div>
       </div>
 
@@ -239,13 +234,25 @@ export default function AccountStatement() {
               <FormSelectWithSearch
                 key={formSelectKey} // Add the key prop here
                 label="Client name"
-                name="sportId"
+                name="userId"
                 value={selectedUser} // Set the selectedUser as the value
                 onChange={(name, selectedValue) => setSelectedUser(selectedValue)} // Update the selectedUser
                 onBlur={() => { }} // Add an empty function as onBlur prop
                 error=""
                 width={2}
                 options={userList}
+              />
+
+              <FormSelectWithSearch
+                key={formSelectTypeKey} // Add the key prop here
+                label="Type"
+                name="type"
+                value={selectedType} // Set the selectedType as the value
+                onChange={(name, selectedValue) => setSelectedType(selectedValue)} // Update the selectedType
+                onBlur={() => { }} // Add an empty function as onBlur prop
+                error=""
+                width={2}
+                options={typeList}
               />
 
               <FormInput

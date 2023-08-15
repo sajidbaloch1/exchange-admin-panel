@@ -3,6 +3,7 @@ import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postData as postDataWithAuth } from "../utils/fetch-services";
 import { postData } from "../utils/fetch-services-without-token";
+import { ipDetails } from "../utils/ip-details";
 
 export const AuthContext = createContext();
 
@@ -43,20 +44,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     setLoading(true);
-
-    const response = await fetch(`https://ipinfo.io/?token=48be71f88148b3`, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-    });
-    const ipData = await response.json();
-
+    const ipData = await ipDetails();
     const result = await postData("auth/login", {
       username: username,
       password: password,
-      ipAddress: ipData.ip
+      ipAddress: ipData.ip,
+      city: ipData.city,
+      country: ipData.country
     });
     if (result.success) {
       const jwtToken = result.data.token;
