@@ -1,0 +1,95 @@
+.main-title-row .center-content .yes-nno-tab {
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.yes-nno-tab div {
+  border-radius: 8px;
+  width: auto;
+  min-width: 60px;
+  padding: 5px;
+  text-align: center;
+  margin-left: 5px;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.yes-nno-tab {
+  display: flex;
+  align-items: revert;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.griad-6-boxes {
+  display: grid;
+  grid-column-gap: 7px;
+  grid-row-gap: 7px;
+  grid-template-columns: repeat(6, minmax(auto, 1fr));
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.grey-box {
+  border-radius: 10px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  flex-flow: wrap;
+  justify-content: center;
+}
+
+.grey-box span {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+.back0 {
+  background-color: #72BBEFA3;
+}
+
+.back1 {
+  background-color: #72BBEFCC;
+}
+
+.back2 {
+  background-color: #72BBEF;
+}
+
+.lay0 {
+  background-color: #F994BA;
+}
+
+.lay1 {
+  background-color: #F994BACC;
+}
+
+.lay2 {
+  background-color: #F994BAA3;
+}
+
+.bg-green {
+  background-color: rgba(0, 255, 0, 0.3);
+  /* Green with 30% opacity */
+  transition: background-color 0.5s ease-in-out;
+  /* Smooth transition over 0.5 seconds */
+}
+
+.bg-red {
+  background-color: rgba(255, 0, 0, 0.3);
+  /* Red with 30% opacity */
+  transition: background-color 0.5s ease-in-out;
+  /* Smooth transition over 0.5 seconds */
+}

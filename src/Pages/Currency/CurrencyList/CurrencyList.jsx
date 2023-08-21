@@ -7,6 +7,7 @@ import SearchInput from "../../../components/Common/FormComponents/SearchInput";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { deleteCurrency, getAllCurrency } from "../currencyService";
+import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function CurrencyList() {
   const Export = ({ onExport }) => (
@@ -42,7 +43,7 @@ export default function CurrencyList() {
       sortable: true,
       sortField: "multiplier",
     },
-    {
+    appStaticModulesByUser.CURRENCIES_MODULE.UPDATE && {
       name: "ACTION",
       cell: (row) => (
         <div>
@@ -59,7 +60,7 @@ export default function CurrencyList() {
         </div>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
@@ -163,20 +164,17 @@ export default function CurrencyList() {
         <div>
           <h1 className="page-title">ALL CURRENCIES</h1>
         </div>
-        <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/currency-form`} className="btn btn-primary btn-icon text-white me-3">
-            <span>
-              <i className="fe fe-plus"></i>&nbsp;
-            </span>
-            CREATE CURRENCY
-          </Link>
-          {/* <Link to="#" className="btn btn-success btn-icon text-white">
-            <span>
-              <i className="fe fe-log-in"></i>&nbsp;
-            </span>
-            Export
-          </Link> */}
-        </div>
+        {appStaticModulesByUser.CURRENCIES_MODULE.CREATE &&
+          <div className="ms-auto pageheader-btn">
+
+            <Link to={`${process.env.PUBLIC_URL}/currency-form`} className="btn btn-primary btn-icon text-white me-3">
+              <span>
+                <i className="fe fe-plus"></i>&nbsp;
+              </span>
+              CREATE CURRENCY
+            </Link>
+          </div>
+        }
       </div>
 
       <Row className=" row-sm">

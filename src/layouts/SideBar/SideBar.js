@@ -1,16 +1,36 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState, useEffect, useContext } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Scrollbars from "react-custom-scrollbars";
+import { permission, appStaticModulesByUser } from "../../lib/user-permissions";
+import { SocketContext } from "../../components/SocketContext";
 
 const Sidebar = () => {
   const location = useLocation(); // Get the current location
   const [mainmenu, setMainMenu] = useState([]);
   const userRole = JSON.parse(localStorage.getItem("user_info")).role;
+  const isClone = JSON.parse(localStorage.getItem("user_info")).isClone;
+
+  const { testSocket, socket } = useContext(SocketContext);
+
+
+
+
+  const mergedPermissions = {
+    ...permission,
+    ...appStaticModulesByUser
+  };
+
+  //console.log(permission)
+  //console.log(appStaticModulesByUser)
+  //console.log(mergedPermissions)
+  //console.log(userRole)
 
   useEffect(() => {
     setMainMenu(getMenuItems(userRole));
+    return () => {
 
-  }, []);
+    };
+  }, [appStaticModulesByUser]);
 
   const getMenuItems = (userRole) => {
 
@@ -27,24 +47,79 @@ const Sidebar = () => {
           },
         ],
       },
-      {
-        menutitle: "ACCOUNT",
-        Items: [
-          {
-            path: `${process.env.PUBLIC_URL}/account-list`,
-            icon: "users",
-            type: "link",
-            active: false,
-            title: "Accounts",
-          },
-        ],
-      },
 
     ];
 
-    if (userRole === "system_owner") {
+    if (mergedPermissions.ACCOUNT_MODULE.ACTIVE) {
       menuItems.push(
+        {
+          menutitle: "ACCOUNT",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/account-list`,
+              icon: "users",
+              type: "link",
+              active: false,
+              title: "Accounts",
+            },
+          ],
+        },
+      );
+    }
 
+    if (mergedPermissions.MULTI_LOGIN_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "MULTI LOGIN",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/multi-login`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "Multi Login",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.EVENT_BET.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "EVENT BET DETAIL LOGIN",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/event-bet-detail`,
+              icon: "layers",
+              type: "link",
+              active: false,
+              title: "Event Bet",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.USER_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/user-list`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "Users",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.CURRENCIES_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "CURRENCY",
           Items: [
@@ -57,6 +132,11 @@ const Sidebar = () => {
             },
           ],
         },
+      );
+    }
+
+    if (mergedPermissions.SPORT_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "SPORTS",
           Items: [
@@ -70,6 +150,11 @@ const Sidebar = () => {
             },
           ],
         },
+      );
+    }
+
+    if (mergedPermissions.COMPETITION_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "COMPETITION",
           Items: [
@@ -83,6 +168,11 @@ const Sidebar = () => {
             },
           ],
         },
+      );
+    }
+
+    if (mergedPermissions.EVENT_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "EVENT",
           Items: [
@@ -95,46 +185,30 @@ const Sidebar = () => {
               allRouet: ['event-form', 'event-list']
             },
           ],
-        }, {
-        menutitle: "ADD EVENT",
-        Items: [
-          {
-            path: `${process.env.PUBLIC_URL}/api-event-list`,
-            icon: "layers",
-            type: "link",
-            active: false,
-            title: "Add Event",
-            allRouet: ['api-event-list']
-          },
-        ],
-      },
+        },
       );
-    } else if (userRole === "super_admin") {
+    }
+
+    if (mergedPermissions.ADD_EVENT_MODULE.ACTIVE) {
       menuItems.push(
         {
-          menutitle: "MULTILOGIN",
+          menutitle: "ADD EVENT",
           Items: [
             {
-              path: `${process.env.PUBLIC_URL}/multi-login`,
-              icon: "copy",
+              path: `${process.env.PUBLIC_URL}/api-event-list`,
+              icon: "layers",
               type: "link",
               active: false,
-              title: "Multi login",
+              title: "Add Event",
+              allRouet: ['api-event-list']
             },
           ],
         },
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "Users",
-            },
-          ],
-        },
+      );
+    }
+
+    if (mergedPermissions.THEME_USER_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "THEME USER",
           Items: [
@@ -147,6 +221,28 @@ const Sidebar = () => {
             },
           ],
         },
+      );
+    }
+
+    if (mergedPermissions.TRANSCATION_PANEL_USER_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "TRANSACTION PANEL USER",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/transaction-panel-user-list`,
+              icon: "users",
+              type: "link",
+              active: false,
+              title: "Transaction panel users",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.BANK_MODULE.ACTIVE) {
+      menuItems.push(
         {
           menutitle: "BANK",
           Items: [
@@ -159,40 +255,11 @@ const Sidebar = () => {
             },
           ],
         },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
+      );
+    }
 
-      );
-    } else if (userRole === "admin") {
+    if (mergedPermissions.ACCOUNT_STATEMENT_REPORT_MODULE.ACTIVE) {
       menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
         {
           menutitle: "REPORTS",
           Items: [
@@ -207,117 +274,9 @@ const Sidebar = () => {
                   title: "Account statement",
                   type: "link",
                 },
-              ],
-            },
-          ],
-        },
-      );
-    }
-    else if (userRole === "super_master") {
-      menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/transaction-panel-user-list`,
-              icon: "users",
-              type: "link",
-              active: false,
-              title: "Transaction panel users",
-            },
-          ],
-        },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
                 {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
-      );
-    }
-    else if (userRole === "master") {
-      menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
-                  type: "link",
-                },
-              ],
-            },
-          ],
-        },
-      );
-    } else if (userRole === "agent") {
-      menuItems.push(
-        {
-          menutitle: "USER",
-          Items: [
-            {
-              path: `${process.env.PUBLIC_URL}/user-list`,
-              icon: "user",
-              type: "link",
-              active: false,
-              title: "User",
-            },
-          ],
-        },
-        {
-          menutitle: "REPORTS",
-          Items: [
-            {
-              title: "Reports",
-              icon: "file-text",
-              type: "sub",
-              active: false,
-              children: [
-                {
-                  path: `${process.env.PUBLIC_URL}/account-statement`,
-                  title: "Account statement",
+                  path: `${process.env.PUBLIC_URL}/user-history`,
+                  title: "User history",
                   type: "link",
                 },
               ],

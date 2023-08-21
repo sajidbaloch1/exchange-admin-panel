@@ -9,6 +9,7 @@ import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { changeStatus, deleteSport, getAllSport } from "../sportService";
+import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function SportList() {
   const Export = ({ onExport }) => (
@@ -65,7 +66,7 @@ export default function SportList() {
       sortable: false,
       cell: (row) => <span className="ms-2"> {row.betCategoryCount}</span>,
     },
-    {
+    appStaticModulesByUser.SPORT_MODULE.STATUS && {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
@@ -91,12 +92,13 @@ export default function SportList() {
       name: "ACTION",
       cell: (row) => (
         <div>
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
-            <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
-              <i className="fa fa-edit"></i>
-            </Link>
-          </OverlayTrigger>
-
+          {appStaticModulesByUser.SPORT_MODULE.UPDATE &&
+            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+              <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+                <i className="fa fa-edit"></i>
+              </Link>
+            </OverlayTrigger>
+          }
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
           <OverlayTrigger placement="top" overlay={<Tooltip > Bet Categories and Rules</Tooltip>}>
             <Link
@@ -113,7 +115,7 @@ export default function SportList() {
         </div>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   const actionsMemo = React.useMemo(() => <Export onExport={() => handleDownload()} />, []);
   const [selectedRows, setSelectedRows] = React.useState([]);
@@ -232,20 +234,16 @@ export default function SportList() {
             </Breadcrumb.Item>
           </Breadcrumb> */}
         </div>
-        <div className="ms-auto pageheader-btn">
-          <Link to={`${process.env.PUBLIC_URL}/sport-form`} className="btn btn-primary btn-icon text-white me-3">
-            <span>
-              <i className="fe fe-plus"></i>&nbsp;
-            </span>
-            CREATE SPORT
-          </Link>
-          {/* <Link to="#" className="btn btn-success btn-icon text-white">
-            <span>
-              <i className="fe fe-log-in"></i>&nbsp;
-            </span>
-            Export
-          </Link> */}
-        </div>
+        {(appStaticModulesByUser.SPORT_MODULE.CREATE) && (
+          <div className="ms-auto pageheader-btn">
+            <Link to={`${process.env.PUBLIC_URL}/sport-form`} className="btn btn-primary btn-icon text-white me-3">
+              <span>
+                <i className="fe fe-plus"></i>&nbsp;
+              </span>
+              CREATE SPORT
+            </Link>
+          </div>
+        )}
       </div>
 
       <Row className=" row-sm">

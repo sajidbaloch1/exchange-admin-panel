@@ -3,6 +3,7 @@ import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postData as postDataWithAuth } from "../utils/fetch-services";
 import { postData } from "../utils/fetch-services-without-token";
+import { ipDetails } from "../utils/ip-details";
 
 export const AuthContext = createContext();
 
@@ -43,9 +44,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     setLoading(true);
+    const ipData = await ipDetails();
     const result = await postData("auth/login", {
       username: username,
       password: password,
+      ipAddress: ipData.ip,
+      city: ipData.city,
+      country: ipData.country
     });
     if (result.success) {
       const jwtToken = result.data.token;

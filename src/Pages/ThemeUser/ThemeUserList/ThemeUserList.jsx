@@ -7,6 +7,7 @@ import SearchInput from "../../../components/Common/FormComponents/SearchInput";
 import { showAlert } from "../../../utils/alertUtils";
 import { deleteThemeUser, getAllThemeUsers } from "../themeUserService";
 import { Notify } from "../../../utils/notify";
+import { permissionKeys, activeModules, permission } from "../../../lib/user-permissions";
 
 export default function ThemeUserList() {
   const location = useLocation();
@@ -16,8 +17,10 @@ export default function ThemeUserList() {
     login_user_id = user._id;
   }
 
+  console.log(permission.THEME_USER_MODULE);
+
   const { id } = useParams();
-  const initialParentId = id ? id : login_user_id;
+  const initialParentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;
   const [parentId, setParentId] = useState(initialParentId);
 
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -76,6 +79,7 @@ export default function ThemeUserList() {
         sortBy: sortBy,
         direction: direction,
         searchQuery: searchQuery,
+        parentId: parentId,
       });
 
       setData(result.records);

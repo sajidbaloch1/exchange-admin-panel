@@ -17,7 +17,7 @@ export default function TransactionPanelUserList() {
   }
 
   const { id } = useParams();
-  const initialParentId = id ? id : login_user_id;
+  const initialParentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;
   const [parentId, setParentId] = useState(initialParentId);
 
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -76,6 +76,7 @@ export default function TransactionPanelUserList() {
         sortBy: sortBy,
         direction: direction,
         searchQuery: searchQuery,
+        parentId: parentId,
       });
 
       setData(result.records);
