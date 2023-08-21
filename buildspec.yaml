@@ -17,6 +17,3 @@ phases:
     commands:
       # Push the Docker image to Amazon ECR
       - docker push public.ecr.aws/t5i4j4g5/admin:latest
-  artifacts:
-  files:
-    - appspec.yaml
