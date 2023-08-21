@@ -13,14 +13,14 @@ import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
 import Collapse from "@mui/material/Collapse";
 import BetLockModal from "../BetLockModal";
-import { SocketContext } from "../../../components/SocketContext";
 import BetBox from "../../../components/Common/BetComponents/BetBox";
+import { marketSocket } from "../../../lib/socket";
 
 export default function EventBetDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   //id get from state
-  const id = location.state ? location.state.id : '';
+  const id = location.state ? location.state.id : "";
   //id get from url
   //const { id } = useParams();
   const [validated, setValidated] = useState(false);
@@ -31,7 +31,6 @@ export default function EventBetDetail() {
 
   const [marketId, setMarketId] = useState(0);
   const [showBetLockModal, setShowBetLockModal] = useState(false);
-  const [rowData, setRowData] = useState("");
 
   const [betList, setBetList] = useState([]);
 
@@ -44,8 +43,6 @@ export default function EventBetDetail() {
 
   const [teamTwoLayData, setTeamTwoLayData] = useState([]);
   const [teamTwoBackData, setTeamTwoBackData] = useState([]);
-
-  const { matchOddDetails, socket } = useContext(SocketContext);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -74,24 +71,61 @@ export default function EventBetDetail() {
 
   const [show, setShow] = useState(true);
 
+  // useEffect(() => {
+  //   socket.on("getMatchOdds", (data) => {
+  //     if (data.length > 0) {
+  //       setTeamOneLayData(data[0].matchOdds[0]?.lay);
+  //       setTeamOneBackData(data[0].matchOdds[0]?.back);
+
+  //       setTeamTwoLayData(data[0].matchOdds[1]?.lay);
+  //       setTeamTwoBackData(data[0].matchOdds[1]?.back);
+  //     }
+  //     //setTeamOneData(data[0].matchOdds)
+  //   });
+
+  //   return () => {
+  //     socket.off("getMatchOdds");
+  //   };
+  // }, []);
+
   useEffect(() => {
-    socket.on('getMatchOdds', data => {
+    marketSocket.on("disconnect", (data) => {
+      console.log("disconnected");
+    });
 
-      if (data.length > 0) {
-        setTeamOneLayData(data[0].matchOdds[0]?.lay)
-        setTeamOneBackData(data[0].matchOdds[0]?.back)
+    marketSocket.on("connect_error", (err) => {
+      console.log(err.message);
+    });
 
-        setTeamTwoLayData(data[0].matchOdds[1]?.lay)
-        setTeamTwoBackData(data[0].matchOdds[1]?.back)
-      }
-      //setTeamOneData(data[0].matchOdds)
-    })
+    marketSocket.on("server_error", (message) => {
+      console.log(message);
+    });
 
+    marketSocket.on(`market:match_odds:${marketId}`, (data) => {
+      console.log(data);
+    });
+
+    marketSocket.on("connect", () => {
+      marketSocket.emit("join", {
+        id: marketId,
+        type: "match_odds",
+      });
+    });
 
     return () => {
-      socket.off('getMatchOdds')
-    }
-  }, [])
+      marketSocket.off("disconnect");
+      marketSocket.off("connect_error");
+      marketSocket.off("server_error");
+      marketSocket.off(`market:match_odds:${marketId}`);
+    };
+  }, [marketId]);
+
+  useEffect(() => {
+    marketSocket.connect();
+    return () => {
+      marketSocket.disconnect();
+    };
+  }, [marketId]);
 
   useEffect(() => {
     // When teamOneBackData updates, set the current data as previous
@@ -103,11 +137,9 @@ export default function EventBetDetail() {
       const eventData = await getEventMatchData(eventId);
 
       setSelectedEvent(eventData); // Set the selected event data in state
-      setTeamOne(eventData.marketRunners[0].selectionId)
-      setTeamTwo(eventData.marketRunners[1].selectionId)
+      setTeamOne(eventData.marketRunners[0].selectionId);
+      setTeamTwo(eventData.marketRunners[1].selectionId);
       setMarketId(eventData.marketId); // Update the marketId here
-      betDetail();
-      matchOddDetails(marketId)
     } catch (error) {
       console.error("Error fetching event data:", error);
       // Handle the error here, e.g., show a notification or error message
@@ -123,7 +155,7 @@ export default function EventBetDetail() {
   const betDetail = async () => {
     try {
       const betData = await getAllBet(marketId);
-      setBetList(betData)
+      setBetList(betData);
     } catch (error) {
       console.error("Error fetching event data:", error);
       // Handle the error here, e.g., show a notification or error message
@@ -137,6 +169,7 @@ export default function EventBetDetail() {
     };
     fetchData();
     betDetail();
+    console.log(marketId);
   }, [id, marketId]);
 
   return (
@@ -148,47 +181,46 @@ export default function EventBetDetail() {
               <h3 className="card-title">Match</h3>
             </Card.Header>
             <Card.Body>
-
               <Row>
                 <CCol lg={3}>
                   <Accordion defaultActiveKey="0">
                     {sportList.map((sport, index) => (
                       <Accordion.Item key={sport._id} eventKey={sport._id} className="mb-1">
-                        <Accordion.Header className="panel-heading1 style3" >
-                          {sport.name}
-                        </Accordion.Header>
+                        <Accordion.Header className="panel-heading1 style3">{sport.name}</Accordion.Header>
                         <Accordion.Body className="border">
                           <Accordion defaultActiveKey="0">
-                            {sport.competitions.map((competition, competition_index) => (
-
-                              competition.isActive === true && (
-                                < Accordion.Item key={competition._id} eventKey={competition._id} className="mb-1" >
-                                  <Accordion.Header className="panel-heading1 style3">
-                                    {competition.name}
-                                  </Accordion.Header>
-                                  <Accordion.Body className="border">
-                                    <div className="">
-                                      <ul className="list-group">
-                                        {competition.events.map((event, event_index) => (
-                                          event.isActive == true &&
-                                          <li
-                                            onClick={() => {
-                                              eventMatchData(event._id); // Call the function on event click
-                                            }}
-                                            className="listunorder" key={event._id + '_list'}
-                                            style={{ cursor: "pointer" }}>
-                                            {event.name}
-                                          </li>
-
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  </Accordion.Body>
-                                </Accordion.Item>
-                              )
-                            ))}
+                            {sport.competitions.map(
+                              (competition, competition_index) =>
+                                competition.isActive === true && (
+                                  <Accordion.Item key={competition._id} eventKey={competition._id} className="mb-1">
+                                    <Accordion.Header className="panel-heading1 style3">
+                                      {competition.name}
+                                    </Accordion.Header>
+                                    <Accordion.Body className="border">
+                                      <div className="">
+                                        <ul className="list-group">
+                                          {competition.events.map(
+                                            (event, event_index) =>
+                                              event.isActive == true && (
+                                                <li
+                                                  onClick={() => {
+                                                    eventMatchData(event._id); // Call the function on event click
+                                                  }}
+                                                  className="listunorder"
+                                                  key={event._id + "_list"}
+                                                  style={{ cursor: "pointer" }}
+                                                >
+                                                  {event.name}
+                                                </li>
+                                              )
+                                          )}
+                                        </ul>
+                                      </div>
+                                    </Accordion.Body>
+                                  </Accordion.Item>
+                                )
+                            )}
                           </Accordion>
-
                         </Accordion.Body>
                       </Accordion.Item>
                     ))}
@@ -199,7 +231,9 @@ export default function EventBetDetail() {
                   {selectedEvent && (
                     <Row>
                       <div>
-                        <h4>{selectedEvent.competitionName} {' > '} {selectedEvent.eventName} </h4>
+                        <h4>
+                          {selectedEvent.competitionName} {" > "} {selectedEvent.eventName}{" "}
+                        </h4>
                         {/* Display other competition data here */}
                       </div>
                       <hr className="mt-5"></hr>
@@ -221,14 +255,12 @@ export default function EventBetDetail() {
                               color="inherit"
                               onClick={() => setShow(false)}
                               aria-label="close"
-                            >
-                            </IconButton>
+                            ></IconButton>
                           </div>
                         </CardActions>
 
                         <Collapse in={expanded} timeout="auto">
                           <div className="card-body">
-
                             <div className="row main-title-row">
                               <div className="col-md-4 col-sm-12 col-12"></div>
                               <div className="col-md-8 col-sm-12 col-12 center-content">
@@ -241,7 +273,9 @@ export default function EventBetDetail() {
                             </div>
                             <div className="row pb-2">
                               <div className="col-md-4 col-sm-12 col-12">
-                                <div className="title-area"><span>{selectedEvent.marketRunners[0]?.runnerName}</span></div>
+                                <div className="title-area">
+                                  <span>{selectedEvent.marketRunners[0]?.runnerName}</span>
+                                </div>
                               </div>
                               <div className="col-md-8 col-sm-12 col-12">
                                 <div className="blocks griad-6-boxes">
@@ -259,15 +293,15 @@ export default function EventBetDetail() {
                                     //console.log(previousPrice);
                                     //console.log(back_one.price)
                                     if (previousPrice !== back_one.price) {
-                                      console.log('inn');
+                                      console.log("inn");
                                     }
 
                                     const backgroundColor = previousPrice
                                       ? back_one.price > previousPrice
                                         ? "bg-green" // Set your CSS class for price increase (green background)
                                         : back_one.price < previousPrice
-                                          ? "bg-red" // Set your CSS class for price decrease (red background)
-                                          : "back" + back_one_index
+                                        ? "bg-red" // Set your CSS class for price decrease (red background)
+                                        : "back" + back_one_index
                                       : "";
                                     //console.log(backgroundColor);
                                     return (
@@ -288,14 +322,15 @@ export default function EventBetDetail() {
                                       colorClass={`lay${lay_one_index}`}
                                     />
                                   ))}
-
                                 </div>
                               </div>
                             </div>
 
                             <div className="row pb-2">
                               <div className="col-md-4 col-sm-12 col-12">
-                                <div className="title-area"><span>{selectedEvent.marketRunners[1]?.runnerName}</span></div>
+                                <div className="title-area">
+                                  <span>{selectedEvent.marketRunners[1]?.runnerName}</span>
+                                </div>
                               </div>
                               <div className="col-md-8 col-sm-12 col-12">
                                 <div className="blocks griad-6-boxes">
@@ -320,7 +355,6 @@ export default function EventBetDetail() {
                               </div>
                             </div>
                           </div>
-
                         </Collapse>
                       </Card>
                     </Row>
@@ -335,7 +369,12 @@ export default function EventBetDetail() {
                           <h3 className="card-title text-white">MY BETS</h3>
 
                           <div className="rtlcards ">
-                            <Button variant="success" onClick={() => handleDepositClick()} className="btn" title="Deposit">
+                            <Button
+                              variant="success"
+                              onClick={() => handleDepositClick()}
+                              className="btn"
+                              title="Deposit"
+                            >
                               View More
                             </Button>
                             <ExpandMore
@@ -352,8 +391,7 @@ export default function EventBetDetail() {
                               color="inherit"
                               onClick={() => setShow(false)}
                               aria-label="close"
-                            >
-                            </IconButton>
+                            ></IconButton>
                           </div>
                         </CardActions>
 
@@ -363,8 +401,8 @@ export default function EventBetDetail() {
                               <table className="table coupon-table mb-0">
                                 <thead>
                                   <tr>
-                                    <th >UserName</th>
-                                    <th >Nation</th>
+                                    <th>UserName</th>
+                                    <th>Nation</th>
                                     <th className="text-right">Rate</th>
                                     <th className="text-right">Amount</th>
                                   </tr>
@@ -382,23 +420,17 @@ export default function EventBetDetail() {
                               </table>
                             </div>
                           </div>
-
                         </Collapse>
                       </Card>
                     </Row>
                   )}
                 </CCol>
               </Row>
-
             </Card.Body>
           </Card>
         </Col>
       </Row>
-      <BetLockModal
-        show={showBetLockModal}
-        onHide={() => setShowBetLockModal(false)}
-        betList={betList}
-      />
-    </div >
+      <BetLockModal show={showBetLockModal} onHide={() => setShowBetLockModal(false)} betList={betList} />
+    </div>
   );
 }

@@ -110,6 +110,9 @@ export default function EventList() {
           year: "numeric",
           month: "long",
           day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
         });
         return formattedDate;
       },
@@ -354,7 +357,7 @@ export default function EventList() {
             </Breadcrumb.Item>
           </Breadcrumb> */}
         </div>
-        {(appStaticModulesByUser.EVENT_MODULE.CREATE && competitionName === "") && (
+        {appStaticModulesByUser.EVENT_MODULE.CREATE && competitionName === "" && (
           <div className="ms-auto pageheader-btn">
             <Link to={`${process.env.PUBLIC_URL}/event-form`} className="btn btn-primary btn-icon text-white me-3">
               <span>
@@ -377,7 +380,7 @@ export default function EventList() {
                 name="sportId"
                 value={selectedCompetition} // Set the selectedCompetition as the value
                 onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
-                onBlur={() => { }} // Add an empty function as onBlur prop
+                onBlur={() => {}} // Add an empty function as onBlur prop
                 error=""
                 width={3}
                 options={competitionList}
@@ -391,7 +394,7 @@ export default function EventList() {
                 name="sportId"
                 value={selectedSport} // Set the selectedSport as the value
                 onChange={(name, selectedValue) => setSelectedSport(selectedValue)} // Update the selectedSport
-                onBlur={() => { }} // Add an empty function as onBlur prop
+                onBlur={() => {}} // Add an empty function as onBlur prop
                 error=""
                 width={3}
                 options={sportList}
@@ -405,7 +408,7 @@ export default function EventList() {
                 type="date"
                 value={startDateValue}
                 onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={3}
               />
 
@@ -415,7 +418,7 @@ export default function EventList() {
                 type="date"
                 value={endDateValue}
                 onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={3}
               />
 
@@ -424,7 +427,7 @@ export default function EventList() {
                 name="status"
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={3}
               >
                 {statusList.map((status, index) => (
