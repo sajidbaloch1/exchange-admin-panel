@@ -5,23 +5,20 @@ import "react-data-table-component-extensions/dist/index.css";
 import { Link, useParams } from "react-router-dom";
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the FormInput component
+import { permission } from "../../../lib/user-permissions";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import TransactionModal from "../TransactionModal";
 import { createTransaction, deleteData, getAllData } from "../accountService";
-import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function AccountList() {
   let login_user_id = "";
   const user = JSON.parse(localStorage.getItem("user_info"));
   login_user_id = user._id;
 
-  console.log(permission);
-  console.log(appStaticModulesByUser);
-
   const { id } = useParams();
-  const parentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;
+  const parentId = id ? id : user.isClone ? user.cloneParentId : login_user_id;
   const { role } = JSON.parse(localStorage.getItem("user_info")) || {};
 
   const roleHierarchy = {
@@ -124,7 +121,7 @@ export default function AccountList() {
       width: "200px",
       cell: (row) => (
         <div className="d-flex justify-content-end align-items-center">
-          {(permission.ACCOUNT_MODULE.DEPOSIT &&
+          {permission.ACCOUNT_MODULE.DEPOSIT && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to deposit</Tooltip>}>
               <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
                 D
@@ -132,7 +129,7 @@ export default function AccountList() {
             </OverlayTrigger>
           )}
 
-          {(permission.ACCOUNT_MODULE.WITHDRAW &&
+          {permission.ACCOUNT_MODULE.WITHDRAW && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to withdrw</Tooltip>}>
               <Button
                 variant="danger"
@@ -144,7 +141,6 @@ export default function AccountList() {
               </Button>
             </OverlayTrigger>
           )}
-
 
           {row.role === "super_admin" && permission.ACCOUNT_MODULE.UPDATE && (
             <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>

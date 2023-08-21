@@ -8,13 +8,13 @@ import FormInput from "../../../components/Common/FormComponents/FormInput";
 import FormSelect from "../../../components/Common/FormComponents/FormSelect"; // Import the FormSelect component
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { permission } from "../../../lib/user-permissions";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { getAllCompetitionOptions } from "../../Competition/competitionService";
 import { getAllSport } from "../../Sport/sportService";
 import { changeStatus, deleteEvent, getAllEvent } from "../eventService";
-import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function EventList() {
   const Export = ({ onExport }) => (
@@ -116,7 +116,7 @@ export default function EventList() {
       sortable: true,
       sortField: "matchDate",
     },
-    appStaticModulesByUser.EVENT_MODULE.STATUS && {
+    permission.EVENTS.ACTIVE && {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
@@ -138,7 +138,7 @@ export default function EventList() {
         </div>
       ),
     },
-    appStaticModulesByUser.EVENT_MODULE.UPDATE && {
+    permission.EVENTS.ACTIVE && {
       name: "ACTION",
       cell: (row) => (
         <div>
@@ -354,7 +354,7 @@ export default function EventList() {
             </Breadcrumb.Item>
           </Breadcrumb> */}
         </div>
-        {(appStaticModulesByUser.EVENT_MODULE.CREATE && competitionName === "") && (
+        {permission.EVENTS.ACTIVE && competitionName === "" && (
           <div className="ms-auto pageheader-btn">
             <Link to={`${process.env.PUBLIC_URL}/event-form`} className="btn btn-primary btn-icon text-white me-3">
               <span>
@@ -377,7 +377,7 @@ export default function EventList() {
                 name="sportId"
                 value={selectedCompetition} // Set the selectedCompetition as the value
                 onChange={(name, selectedValue) => setSelectedCompetition(selectedValue)} // Update the selectedCompetition
-                onBlur={() => { }} // Add an empty function as onBlur prop
+                onBlur={() => {}} // Add an empty function as onBlur prop
                 error=""
                 width={3}
                 options={competitionList}
@@ -391,7 +391,7 @@ export default function EventList() {
                 name="sportId"
                 value={selectedSport} // Set the selectedSport as the value
                 onChange={(name, selectedValue) => setSelectedSport(selectedValue)} // Update the selectedSport
-                onBlur={() => { }} // Add an empty function as onBlur prop
+                onBlur={() => {}} // Add an empty function as onBlur prop
                 error=""
                 width={3}
                 options={sportList}
@@ -405,7 +405,7 @@ export default function EventList() {
                 type="date"
                 value={startDateValue}
                 onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={3}
               />
 
@@ -415,7 +415,7 @@ export default function EventList() {
                 type="date"
                 value={endDateValue}
                 onChange={(event) => setEndDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={3}
               />
 
@@ -424,7 +424,7 @@ export default function EventList() {
                 name="status"
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                onBlur={() => {}}
                 width={3}
               >
                 {statusList.map((status, index) => (

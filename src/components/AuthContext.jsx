@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       password: password,
       ipAddress: ipData.ip,
       city: ipData.city,
-      country: ipData.country
+      country: ipData.country,
     });
     if (result.success) {
       const jwtToken = result.data.token;

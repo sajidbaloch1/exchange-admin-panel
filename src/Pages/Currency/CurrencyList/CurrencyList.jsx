@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Button, Card, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { permission } from "../../../lib/user-permissions";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { deleteCurrency, getAllCurrency } from "../currencyService";
-import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function CurrencyList() {
   const Export = ({ onExport }) => (
@@ -43,11 +43,11 @@ export default function CurrencyList() {
       sortable: true,
       sortField: "multiplier",
     },
-    appStaticModulesByUser.CURRENCIES_MODULE.UPDATE && {
+    permission.CURRENCIES.ACTIVE && {
       name: "ACTION",
       cell: (row) => (
         <div>
-          <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
             <Link
               to={`${process.env.PUBLIC_URL}/currency-form`}
               state={{ id: row._id }}
@@ -164,9 +164,8 @@ export default function CurrencyList() {
         <div>
           <h1 className="page-title">ALL CURRENCIES</h1>
         </div>
-        {appStaticModulesByUser.CURRENCIES_MODULE.CREATE &&
+        {permission.CURRENCIES.ACTIVE && (
           <div className="ms-auto pageheader-btn">
-
             <Link to={`${process.env.PUBLIC_URL}/currency-form`} className="btn btn-primary btn-icon text-white me-3">
               <span>
                 <i className="fe fe-plus"></i>&nbsp;
@@ -174,7 +173,7 @@ export default function CurrencyList() {
               CREATE CURRENCY
             </Link>
           </div>
-        }
+        )}
       </div>
 
       <Row className=" row-sm">
