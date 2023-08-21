@@ -2,6 +2,7 @@ import React, { Fragment, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
+import { SocketProvider } from "./components/SocketContext";
 import "./index.scss";
 import { permission, appStaticModulesByUser } from "./lib/user-permissions";
 
@@ -30,6 +31,9 @@ const CompetitionForm = React.lazy(() => import("./Pages/Competition/Competition
 const EventList = React.lazy(() => import("./Pages/Event/EventList/EventList"));
 const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
 const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
+
+// Event Bet
+const EventBetDetail = React.lazy(() => import("./Pages/EventBet/EventBetDetail/EventBetDetail"));
 
 // Theme Setting
 const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
@@ -155,6 +159,11 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/api-event-list`} element={<ApiEventForm />} />
                   </Route>
 
+                  {/* Event Bet  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.EVENT_BET.ACTIVE} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/event-bet-detail`} element={<EventBetDetail />} />
+                  </Route>
+
                   {/* Theme User route  */}
                   <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-form`} element={<ThemeUserForm />} />
@@ -248,4 +257,6 @@ const Root = () => {
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<Root />);
+root.render(<SocketProvider>
+  <Root />
+</SocketProvider>);

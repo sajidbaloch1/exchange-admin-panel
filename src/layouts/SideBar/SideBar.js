@@ -1,13 +1,19 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState, useEffect, useContext } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Scrollbars from "react-custom-scrollbars";
 import { permission, appStaticModulesByUser } from "../../lib/user-permissions";
+import { SocketContext } from "../../components/SocketContext";
 
 const Sidebar = () => {
   const location = useLocation(); // Get the current location
   const [mainmenu, setMainMenu] = useState([]);
   const userRole = JSON.parse(localStorage.getItem("user_info")).role;
   const isClone = JSON.parse(localStorage.getItem("user_info")).isClone;
+
+  const { testSocket, socket } = useContext(SocketContext);
+
+
+
 
   const mergedPermissions = {
     ...permission,
@@ -55,6 +61,40 @@ const Sidebar = () => {
               type: "link",
               active: false,
               title: "Accounts",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.MULTI_LOGIN_MODULE.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "MULTI LOGIN",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/multi-login`,
+              icon: "user",
+              type: "link",
+              active: false,
+              title: "Multi Login",
+            },
+          ],
+        },
+      );
+    }
+
+    if (mergedPermissions.EVENT_BET.ACTIVE) {
+      menuItems.push(
+        {
+          menutitle: "EVENT BET DETAIL LOGIN",
+          Items: [
+            {
+              path: `${process.env.PUBLIC_URL}/event-bet-detail`,
+              icon: "layers",
+              type: "link",
+              active: false,
+              title: "Event Bet",
             },
           ],
         },

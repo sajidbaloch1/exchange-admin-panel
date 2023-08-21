@@ -14,6 +14,7 @@ import { getAllData } from "../../Account/accountService";
 import { CCol, CButton, CSpinner } from "@coreui/react";
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
+import { exportToExcel, exportToPDF } from '../../../utils/exportUtils'; // Import utility functions for exporting
 
 
 export default function UserHistory() {
@@ -166,6 +167,58 @@ export default function UserHistory() {
     // }
   }
 
+  const handleExcelExport = async () => {
+    try {
+      const response = await getUserActivity(); // Replace with your actual API call
+      // Generate and download Excel file
+
+      const formattedData = response.records.map(item => ({
+        "USERNAME": item.username,
+        "DATE": new Date(item.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+        }),
+        "IP ADDRESS": item.ipAddress,
+        "CITY": item.city,
+        "COUNTRY": item.country,
+      }));
+      exportToExcel(formattedData, 'userHistory.xlsx'); // Utilize exportToExcel utility function
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+    }
+  };
+
+  const handlePDFExport = async () => {
+    try {
+      const response = await getUserActivity(); // Replace with your actual API call
+      // Generate and download PDF file
+
+      const columns = ['USERNAME', 'DATE', 'IP ADDRESS', 'CITY', 'COUNTRY'];
+
+      const formattedData = response.records.map(item => ({
+        "USERNAME": item.username,
+        "DATE": new Date(item.createdAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+        }),
+        "IP ADDRESS": item.ipAddress,
+        "CITY": item.city,
+        "COUNTRY": item.country,
+      }));
+      exportToPDF(columns, formattedData, 'userHistory.pdf');
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+    }
+  };
+
   const handleFilterClick = () => {
     const newFilters = {
       userId: selectedUser,
@@ -286,6 +339,9 @@ export default function UserHistory() {
                   >
                     Reset
                   </button>
+
+                  <Button variant="success" className="ms-3 me-3 mt-6" onClick={handleExcelExport}><i className="fa fa-file-excel-o"></i></Button>
+                  <Button variant="info" className=" mt-6" onClick={handlePDFExport}><i className="fa fa-file-pdf-o"></i></Button>
                 </div>
               </CCol>
             </Card.Header>

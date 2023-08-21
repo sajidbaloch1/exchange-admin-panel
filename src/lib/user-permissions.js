@@ -133,6 +133,10 @@ const appStaticModules = () => {
       STATUS: false,
     };
 
+    staticModules.EVENT_BET = {
+      ACTIVE: true,
+    };
+
     staticModules.CURRENCIES_MODULE = {
       ACTIVE: true,
       CREATE: false,
@@ -194,6 +198,10 @@ const appStaticModules = () => {
       STATUS: true,
     };
 
+    staticModules.EVENT_BET = {
+      ACTIVE: true,
+    };
+
     staticModules.CURRENCIES_MODULE = {
       ACTIVE: false,
       CREATE: false,
@@ -253,6 +261,10 @@ const appStaticModules = () => {
       UPDATE: true,
       DELETE: true,
       STATUS: true,
+    };
+
+    staticModules.EVENT_BET = {
+      ACTIVE: false,
     };
 
     staticModules.CURRENCIES_MODULE = {
@@ -323,6 +335,10 @@ const appStaticModules = () => {
       STATUS: true,
     };
 
+    staticModules.EVENT_BET = {
+      ACTIVE: false,
+    };
+
     staticModules.CURRENCIES_MODULE = {
       ACTIVE: false,
       CREATE: false,
@@ -389,6 +405,10 @@ const appStaticModules = () => {
       UPDATE: true,
       DELETE: true,
       STATUS: true,
+    };
+
+    staticModules.EVENT_BET = {
+      ACTIVE: false,
     };
 
     staticModules.CURRENCIES_MODULE = {
@@ -459,6 +479,10 @@ const appStaticModules = () => {
       STATUS: true,
     };
 
+    staticModules.EVENT_BET = {
+      ACTIVE: false,
+    };
+
     staticModules.CURRENCIES_MODULE = {
       ACTIVE: false,
       CREATE: false,
@@ -525,6 +549,10 @@ const appStaticModules = () => {
       UPDATE: false,
       DELETE: false,
       STATUS: false,
+    };
+
+    staticModules.EVENT_BET = {
+      ACTIVE: false,
     };
 
     staticModules.CURRENCIES_MODULE = {
