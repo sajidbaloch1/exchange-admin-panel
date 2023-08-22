@@ -48,8 +48,6 @@ function MatchOdds({ marketId, selectedEvent }) {
         const teamOneData = { back: [], lay: [] };
         const teamTwoData = { back: [], lay: [] };
 
-        console.log(data);
-
         for (let i = 0; i < 3; i++) {
           teamOneData.back.push(teamOne.back[i] || {});
           teamOneData.lay.push(teamOne.lay[i] || {});
