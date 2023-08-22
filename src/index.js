@@ -2,7 +2,6 @@ import React, { Fragment, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
-import { SocketProvider } from "./components/SocketContext";
 import "./index.scss";
 import { permission } from "./lib/user-permissions";
 
@@ -33,7 +32,7 @@ const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
 const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
 
 // Event Bet
-const EventBetDetail = React.lazy(() => import("./Pages/EventBet/EventBetDetail/EventBetDetail"));
+const EventBetDetail = React.lazy(() => import("./Pages/EventBet/EventBetDetail"));
 
 // Theme Setting
 const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
@@ -248,8 +247,4 @@ const Root = () => {
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <SocketProvider>
-    <Root />
-  </SocketProvider>
-);
+root.render(<Root />);
