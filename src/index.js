@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
 import "./index.scss";
-import { appStaticModulesByUser, permission } from "./lib/user-permissions";
+import { permission } from "./lib/user-permissions";
 
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
@@ -90,16 +90,12 @@ const Loaderimg = () => {
   );
 };
 
-const mergedPermissions = {
-  ...permission,
-  ...appStaticModulesByUser,
-};
-
 const Root = () => {
   useEffect(() => {
     //Switcherdata.localStorageBackUp();
     //Switcherdata.HorizontalHoverMenu();
   }, []);
+
   return (
     <Fragment>
       <BrowserRouter>
@@ -111,172 +107,124 @@ const Root = () => {
                   <Route path="/" element={<ProtectedRoutes allowedRoles={true} />}>
                     <Route path={`${process.env.PUBLIC_URL}/dashboard`} element={<Dashboard />} />
                   </Route>
-
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.CURRENCIES_MODULE.CREATE} />}
-                  >
-                    <Route path={`${process.env.PUBLIC_URL}/currency-form`} element={<CurrencyForm />} />
-                  </Route>
-
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.CURRENCIES_MODULE.ACTIVE} />}
-                  >
+                  {/* Currency */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.CURRENCIES.ACTIVE} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/currency-form`} element={<CurrencyForm />} />{" "}
+                  </Route>{" "}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.CURRENCIES.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/currency-list`} element={<CurrencyList />} />
                   </Route>
-
                   {/* Sports route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.SPORTS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/sport-form`} element={<SportForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.SPORTS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/sport-list`} element={<SportList />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.SPORTS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/bet-category-list`} element={<BetCategoryListBySport />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.SPORTS.ACTIVE} />}>
                     <Route
                       path={`${process.env.PUBLIC_URL}/bet-category-setting`}
                       element={<BetCategorySettingForm />}
                     />
                   </Route>
-
                   {/* Competition route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.CREATE} />}>
-                    <Route path={`${process.env.PUBLIC_URL}/competition-form`} element={<CompetitionForm />} />
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                    {" "}
+                    <Route path={`${process.env.PUBLIC_URL}/competition-form`} element={<CompetitionForm />} />{" "}
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/competition-list`} element={<CompetitionList />} />
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/competition-event-list`} element={<EventList />} />
                   </Route>
-
                   {/* Event route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.EVENT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/event-form`} element={<EventForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.EVENT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/event-list`} element={<EventList />} />
                   </Route>
-
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.ADD_EVENT_MODULE.ACTIVE} />}
-                  >
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/api-event-list`} element={<ApiEventForm />} />
                   </Route>
-
                   {/* Event Bet  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.EVENT_BET.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENT_BET.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/event-bet-detail`} element={<EventBetDetail />} />
                   </Route>
-
                   {/* Theme User route  */}
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.CREATE} />}
-                  >
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.THEME_USER_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-form`} element={<ThemeUserForm />} />
                   </Route>
-
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.ACTIVE} />}
-                  >
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.THEME_USER_MODULE.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-list`} element={<ThemeUserList />} />
                   </Route>
-
-                  {/* Theme User route  */}
+                  {/* Transaction Panel User route  */}
                   <Route
                     path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.TRANSCATION_PANEL_USER_MODULE.CREATE} />}
+                    element={<ProtectedRoutes allowedRoles={permission.TRANSACTION_PANEL_USER_MODULE.CREATE} />}
                   >
                     <Route
                       path={`${process.env.PUBLIC_URL}/transaction-panel-user-form`}
                       element={<TransactionPanelUserForm />}
                     />
                   </Route>
-
                   <Route
                     path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.TRANSCATION_PANEL_USER_MODULE.ACTIVE} />}
+                    element={<ProtectedRoutes allowedRoles={permission.TRANSACTION_PANEL_USER_MODULE.ACTIVE} />}
                   >
                     <Route
                       path={`${process.env.PUBLIC_URL}/transaction-panel-user-list`}
                       element={<TransactionPanelUserList />}
                     />
                   </Route>
-
                   {/* Accounts route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/account-list`} element={<AccountList />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/account-list/:id`} element={<AccountList />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/super-admin-form`} element={<SuperAdminForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/admin-form`} element={<AdminForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/super-master-form`} element={<SuperMasterForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/master-form`} element={<MasterForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ACCOUNT_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.ACCOUNT_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/agent-form`} element={<AgentForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_MODULE.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.USER_MODULE.CREATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/user-form`} element={<UserForm />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.USER_MODULE.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/user-list`} element={<UserList />} />
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_MODULE.UPDATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.USER_MODULE.UPDATE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/user-edit/:id`} element={<UserEditForm />} />
                   </Route>
-
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.MULTI_LOGIN_MODULE.ACTIVE} />}
-                  >
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.MULTI_LOGIN.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/multi-login`} element={<MultiLogin />} />
                   </Route>
-
                   <Route
                     path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.REPORT_MODULE.ACCOUNT_STATEMENT} />}
+                    element={<ProtectedRoutes allowedRoles={permission.REPORT_MODULE.ACCOUNT_STATEMENT} />}
                   >
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
                   </Route>
-
-                  <Route
-                    path="/"
-                    element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_HISTORY_REPORT_MODULE} />}
-                  >
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.USER_HISTORY_REPORT_MODULE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/user-history`} element={<UserHistory />} />
                   </Route>
-
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.BANK_MODULE.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.BANK_MODULE.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/bank`} element={<Bank />} />
                   </Route>
                 </Route>

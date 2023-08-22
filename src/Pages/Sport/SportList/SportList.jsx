@@ -1,15 +1,15 @@
 import { CSpinner } from "@coreui/react";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Dropdown, Row, Tooltip, OverlayTrigger } from "react-bootstrap";
+import { Button, Card, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
 import { Link } from "react-router-dom";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
+import { permission } from "../../../lib/user-permissions";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { changeStatus, deleteSport, getAllSport } from "../sportService";
-import { permission, appStaticModulesByUser } from "../../../lib/user-permissions";
 
 export default function SportList() {
   const Export = ({ onExport }) => (
@@ -66,7 +66,7 @@ export default function SportList() {
       sortable: false,
       cell: (row) => <span className="ms-2"> {row.betCategoryCount}</span>,
     },
-    appStaticModulesByUser.SPORT_MODULE.STATUS && {
+    permission.SPORTS.ACTIVE && {
       name: "STATUS",
       selector: (row) => [row.betCategory],
       sortable: false,
@@ -92,15 +92,19 @@ export default function SportList() {
       name: "ACTION",
       cell: (row) => (
         <div>
-          {appStaticModulesByUser.SPORT_MODULE.UPDATE &&
-            <OverlayTrigger placement="top" overlay={<Tooltip > Click here to edit</Tooltip>}>
-              <Link to={`${process.env.PUBLIC_URL}/sport-form`} state={{ id: row._id }} className="btn btn-primary btn-lg">
+          {permission.SPORTS.ACTIVE && (
+            <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
+              <Link
+                to={`${process.env.PUBLIC_URL}/sport-form`}
+                state={{ id: row._id }}
+                className="btn btn-primary btn-lg"
+              >
                 <i className="fa fa-edit"></i>
               </Link>
             </OverlayTrigger>
-          }
+          )}
           {/* <button onClick={(e) => handleDelete(row._id)} className="btn btn-danger btn-lg ms-2"><i className="fa fa-trash"></i></button> */}
-          <OverlayTrigger placement="top" overlay={<Tooltip > Bet Categories and Rules</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Bet Categories and Rules</Tooltip>}>
             <Link
               to={{
                 pathname: `${process.env.PUBLIC_URL}/bet-category-list`,
@@ -111,7 +115,6 @@ export default function SportList() {
               <i className="fa fa-file"></i>
             </Link>
           </OverlayTrigger>
-
         </div>
       ),
     },
@@ -147,7 +150,6 @@ export default function SportList() {
     setLoading(true);
     try {
       const result = await getAllSport(page, perPage, sortBy, direction, searchQuery);
-
 
       const initialSportStatus = result.records.reduce((acc, sport) => {
         acc[sport._id] = { isActive: sport.isActive, loading: false };
@@ -234,7 +236,7 @@ export default function SportList() {
             </Breadcrumb.Item>
           </Breadcrumb> */}
         </div>
-        {(appStaticModulesByUser.SPORT_MODULE.CREATE) && (
+        {permission.SPORTS.ACTIVE && (
           <div className="ms-auto pageheader-btn">
             <Link to={`${process.env.PUBLIC_URL}/sport-form`} className="btn btn-primary btn-icon text-white me-3">
               <span>

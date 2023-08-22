@@ -27,10 +27,11 @@ const decryptAESEncryption = (encryptedString) => {
  * Gets the active app modules from the localStorage and decrypts them.
  * @returns {object} - The decrypted active app modules.
  */
-const appModules = () => {
+export const appModules = () => {
   const modules = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_AMLS_KEY));
-  if (!modules) {
-    //logoutUser();
+  const token = localStorage.getItem("jwt_token");
+  if (token && !modules) {
+    logoutUser();
   }
   return decryptAESEncryption(modules);
 };
@@ -39,10 +40,11 @@ const appModules = () => {
  * Gets the active session keys from the localStorage and decrypts them.
  * @returns {object} - The decrypted active session keys.
  */
-const activeSessionKeys = () => {
+export const activeSessionKeys = () => {
   const activeKeys = JSON.parse(localStorage.getItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY));
-  if (!activeKeys) {
-    //logoutUser();
+  const token = localStorage.getItem("jwt_token");
+  if (token && !activeKeys) {
+    logoutUser();
   }
   return decryptAESEncryption(activeKeys);
 };
@@ -104,6 +106,14 @@ export const permission = {
     DELETE: hasPermission(activeModules?.THEME_USER_DELETE),
   },
 
+  // Transaction Panel User Module
+  TRANSACTION_PANEL_USER_MODULE: {
+    ACTIVE: hasPermission(activeModules?.TRANSACTION_PANEL_USER_MODULE),
+    CREATE: hasPermission(activeModules?.TRANSACTION_PANEL_USER_CREATE),
+    UPDATE: hasPermission(activeModules?.TRANSACTION_PANEL_USER_UPDATE),
+    DELETE: hasPermission(activeModules?.TRANSACTION_PANEL_USER_DELETE),
+  },
+
   // Bank Permission
   BANK_MODULE: {
     ACTIVE: hasPermission(activeModules?.BANK_MODULE),
@@ -115,507 +125,34 @@ export const permission = {
   REPORT_MODULE: {
     ACTIVE: hasPermission(activeModules?.REPORT_MODULE),
     ACCOUNT_STATEMENT: hasPermission(activeModules?.REPORT_ACCOUNT_STATEMENT),
+    USER_HISTORY: hasPermission(activeModules?.REPORT_USER_HISTORY),
+  },
+
+  // Event Bet Permissions
+  EVENT_BET: {
+    ACTIVE: hasPermission(activeModules?.EVENT_BET_MODULE),
+  },
+
+  // Static Modules
+  DASHBOARD: {
+    ACTIVE: hasPermission(activeModules?.DASHBOARD),
+  },
+  MULTI_LOGIN: {
+    ACTIVE: hasPermission(activeModules?.MULTI_LOGIN),
+  },
+  CURRENCIES: {
+    ACTIVE: hasPermission(activeModules?.CURRENCIES),
+  },
+  SPORTS: {
+    ACTIVE: hasPermission(activeModules?.SPORTS),
+  },
+  COMPETITIONS: {
+    ACTIVE: hasPermission(activeModules?.COMPETITIONS),
+  },
+  EVENTS: {
+    ACTIVE: hasPermission(activeModules?.EVENTS),
+  },
+  ADD_EVENT: {
+    ACTIVE: hasPermission(activeModules?.ADD_EVENT),
   },
 };
-
-const appStaticModules = () => {
-  const user = JSON.parse(localStorage.getItem("user_info"));
-  const staticModules = {};
-  //console.log(user)
-
-  if (user && user.role === 'system_owner') {
-
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: true,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: true,
-      CREATE: false,
-      UPDATE: true,
-      DELETE: true,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-  } else if (user && user.role === 'super_admin') {
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: true,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-  } else if (user && user.role === 'admin') {
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: false,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-
-    staticModules.THEME_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-  } else if (user && user.role === 'super_master') {
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: false,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-
-    staticModules.THEME_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-  } else if (user && user.role === 'master') {
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: false,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-
-    staticModules.THEME_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-    };
-  } else if (user && user.role === 'agent') {
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: true,
-      CREATE: true,
-      UPDATE: true,
-      DELETE: true,
-      STATUS: true,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: false,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-
-    staticModules.THEME_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-  } else {
-    staticModules.MULTI_LOGIN_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_BET = {
-      ACTIVE: false,
-    };
-
-    staticModules.CURRENCIES_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.SPORT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.COMPETITION_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-      STATUS: false,
-    };
-
-    staticModules.ADD_EVENT_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-
-    staticModules.ACCOUNT_STATEMENT_REPORT_MODULE = {
-      ACTIVE: false,
-    };
-
-    staticModules.USER_HISTORY_REPORT_MODULE = {
-      ACTIVE: true,
-    };
-
-    staticModules.THEME_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-    staticModules.TRANSCATION_PANEL_USER_MODULE = {
-      ACTIVE: false,
-      CREATE: false,
-      UPDATE: false,
-      DELETE: false,
-    };
-  }
-
-  return staticModules;
-};
-
-export const appStaticModulesByUser = appStaticModules();

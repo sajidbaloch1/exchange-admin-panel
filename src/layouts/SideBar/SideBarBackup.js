@@ -1,6 +1,7 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import Scrollbars from "react-custom-scrollbars";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { SocketContext } from "../../components/SocketContext";
 import { appStaticModulesByUser, permission } from "../../lib/user-permissions";
 
 const Sidebar = () => {
@@ -8,6 +9,8 @@ const Sidebar = () => {
   const [mainmenu, setMainMenu] = useState([]);
   const userRole = JSON.parse(localStorage.getItem("user_info")).role;
   const isClone = JSON.parse(localStorage.getItem("user_info")).isClone;
+
+  const { testSocket, socket } = useContext(SocketContext);
 
   const mergedPermissions = {
     ...permission,
