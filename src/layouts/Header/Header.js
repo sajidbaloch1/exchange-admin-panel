@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { Container, Dropdown, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../components/AuthContext";
-import { postData } from "../../utils/fetch-services";
 import { userSocket } from "../../lib/socket";
 
 export function Header() {

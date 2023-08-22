@@ -2,9 +2,8 @@ import React, { Fragment, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
-import { SocketProvider } from "./components/SocketContext";
 import "./index.scss";
-import { permission, appStaticModulesByUser } from "./lib/user-permissions";
+import { appStaticModulesByUser, permission } from "./lib/user-permissions";
 
 //const Switcherlayout = React.lazy(() => import("./components/switcherlayout"));
 //App
@@ -33,7 +32,7 @@ const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
 const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEventForm"));
 
 // Event Bet
-const EventBetDetail = React.lazy(() => import("./Pages/EventBet/EventBetDetail/EventBetDetail"));
+const EventBetDetail = React.lazy(() => import("./Pages/EventBet/EventBetDetail"));
 
 // Theme Setting
 const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
@@ -43,8 +42,12 @@ const ThemeUserList = React.lazy(() => import("./Pages/ThemeUser/ThemeUserList/T
 const ThemeUserForm = React.lazy(() => import("./Pages/ThemeUser/ThemeUserForm/ThemeUserForm"));
 
 // Transaction Panel User
-const TransactionPanelUserList = React.lazy(() => import("./Pages/TransactionPanelUser/TransactionPanelUserList/TransactionPanelUserList"));
-const TransactionPanelUserForm = React.lazy(() => import("./Pages/TransactionPanelUser/TransactionPanelUserForm/TransactionPanelUserForm"));
+const TransactionPanelUserList = React.lazy(() =>
+  import("./Pages/TransactionPanelUser/TransactionPanelUserList/TransactionPanelUserList")
+);
+const TransactionPanelUserForm = React.lazy(() =>
+  import("./Pages/TransactionPanelUser/TransactionPanelUserForm/TransactionPanelUserForm")
+);
 
 // All User Accounts
 const AccountList = React.lazy(() => import("./Pages/Account/AccountList/AccountList"));
@@ -89,7 +92,7 @@ const Loaderimg = () => {
 
 const mergedPermissions = {
   ...permission,
-  ...appStaticModulesByUser
+  ...appStaticModulesByUser,
 };
 
 const Root = () => {
@@ -109,11 +112,17 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/dashboard`} element={<Dashboard />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.CURRENCIES_MODULE.CREATE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.CURRENCIES_MODULE.CREATE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/currency-form`} element={<CurrencyForm />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.CURRENCIES_MODULE.ACTIVE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.CURRENCIES_MODULE.ACTIVE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/currency-list`} element={<CurrencyList />} />
                   </Route>
 
@@ -131,7 +140,10 @@ const Root = () => {
                   </Route>
 
                   <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.SPORT_MODULE.ACTIVE} />}>
-                    <Route path={`${process.env.PUBLIC_URL}/bet-category-setting`} element={<BetCategorySettingForm />} />
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/bet-category-setting`}
+                      element={<BetCategorySettingForm />}
+                    />
                   </Route>
 
                   {/* Competition route  */}
@@ -155,7 +167,10 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/event-list`} element={<EventList />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.ADD_EVENT_MODULE.ACTIVE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.ADD_EVENT_MODULE.ACTIVE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/api-event-list`} element={<ApiEventForm />} />
                   </Route>
 
@@ -165,21 +180,39 @@ const Root = () => {
                   </Route>
 
                   {/* Theme User route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.CREATE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.CREATE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-form`} element={<ThemeUserForm />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.ACTIVE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.THEME_USER_MODULE.ACTIVE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/theme-user-list`} element={<ThemeUserList />} />
                   </Route>
 
                   {/* Theme User route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.TRANSCATION_PANEL_USER_MODULE.CREATE} />}>
-                    <Route path={`${process.env.PUBLIC_URL}/transaction-panel-user-form`} element={<TransactionPanelUserForm />} />
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.TRANSCATION_PANEL_USER_MODULE.CREATE} />}
+                  >
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/transaction-panel-user-form`}
+                      element={<TransactionPanelUserForm />}
+                    />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.TRANSCATION_PANEL_USER_MODULE.ACTIVE} />}>
-                    <Route path={`${process.env.PUBLIC_URL}/transaction-panel-user-list`} element={<TransactionPanelUserList />} />
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.TRANSCATION_PANEL_USER_MODULE.ACTIVE} />}
+                  >
+                    <Route
+                      path={`${process.env.PUBLIC_URL}/transaction-panel-user-list`}
+                      element={<TransactionPanelUserList />}
+                    />
                   </Route>
 
                   {/* Accounts route  */}
@@ -222,15 +255,24 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/user-edit/:id`} element={<UserEditForm />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.MULTI_LOGIN_MODULE.ACTIVE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.MULTI_LOGIN_MODULE.ACTIVE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/multi-login`} element={<MultiLogin />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.REPORT_MODULE.ACCOUNT_STATEMENT} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.REPORT_MODULE.ACCOUNT_STATEMENT} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
                   </Route>
 
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_HISTORY_REPORT_MODULE} />}>
+                  <Route
+                    path="/"
+                    element={<ProtectedRoutes allowedRoles={mergedPermissions.USER_HISTORY_REPORT_MODULE} />}
+                  >
                     <Route path={`${process.env.PUBLIC_URL}/user-history`} element={<UserHistory />} />
                   </Route>
 
@@ -257,6 +299,4 @@ const Root = () => {
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<SocketProvider>
-  <Root />
-</SocketProvider>);
+root.render(<Root />);
