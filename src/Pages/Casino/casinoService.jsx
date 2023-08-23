@@ -5,11 +5,6 @@ export const getAllCasino = async (request) => {
   return result.success ? result.data : [];
 };
 
-export const getAllCasinoOptions = async (request) => {
-  const result = await postData("casino/getAllCasinoList", request);
-  return result.success ? result.data : [];
-};
-
 export const deleteCasino = async (id) => {
   const result = await postData("casino/deleteCasino", {
     _id: id,

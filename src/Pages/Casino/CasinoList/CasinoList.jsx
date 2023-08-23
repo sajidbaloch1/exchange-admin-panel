@@ -39,7 +39,6 @@ export default function CasinoList() {
       const newStatus = !isVisible;
       const request = { _id: id, fieldName: "isVisible", status: newStatus.toString() };
       const result = await changeStatus(request);
-      //const result = await changeStatus({ _id: id, status: newStatus.toString() });
       if (result.success) {
         Notify.success("Status updated successfully");
         updateCasinoStatus(id, "isVisible", result.data.details.isVisible);
