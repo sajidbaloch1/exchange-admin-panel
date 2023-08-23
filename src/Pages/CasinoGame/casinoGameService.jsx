@@ -37,7 +37,7 @@ export const updateCasinoGame = async (request) => {
   return result;
 };
 
-export const changeStatus = async (request) => {
+export const updateCasinoGameStatus = async (request) => {
   const result = await postData("casinoGame/updateCasinoGameStatus", request);
   return result;
 };

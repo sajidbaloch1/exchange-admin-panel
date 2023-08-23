@@ -8,7 +8,7 @@ import SearchInput from "../../../components/Common/FormComponents/SearchInput";
 import { showAlert } from "../../../utils/alertUtils";
 import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
-import { deleteCasinoGame, getAllCasinoGame, changeStatus } from "../casinoGameService";
+import { deleteCasinoGame, getAllCasinoGame, updateCasinoGameStatus } from "../casinoGameService";
 import { permission } from "../../../lib/user-permissions";
 
 export default function CasinoGameList() {
@@ -32,7 +32,7 @@ export default function CasinoGameList() {
   const [favouriteStatus, setFavouriteStatus] = useState({});
 
   const changeStatus = async (type, id, key, value) => {
-    if (type === "bet") {
+    if (type === "favourite") {
       setFavouriteStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
     } else {
       setVisibleStatus((prev) => ({ ...prev, [id]: { ...prev[id], [key]: value } }));
@@ -44,9 +44,10 @@ export default function CasinoGameList() {
     const fieldName = type === "favourite" ? "isFavourite" : "isVisible";
     try {
       const status = type === "favourite" ? !favouriteStatus[id]?.isFavourite : !visibleStatus[id]?.isVisible;
-      const request = { _id: id, fieldName, status: status };
+      const request = { _id: id, fieldName, status: status.toString() };
       console.log(request);
-      const result = await changeStatus(request);
+      const result = await updateCasinoGameStatus(request);
+
       if (result.success) {
         Notify.success(
           type === "favourite" ? "Favourite status changed successfully" : "visible status updated successfully"
