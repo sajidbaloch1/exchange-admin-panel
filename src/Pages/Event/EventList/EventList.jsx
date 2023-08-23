@@ -112,7 +112,6 @@ export default function EventList() {
           day: "numeric",
           hour: "numeric",
           minute: "numeric",
-          second: "numeric",
         });
         return formattedDate;
       },

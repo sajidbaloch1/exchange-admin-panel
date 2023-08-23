@@ -26,6 +26,14 @@ const CurrencyForm = React.lazy(() => import("./Pages/Currency/CurrencyForm/Curr
 const CompetitionList = React.lazy(() => import("./Pages/Competition/CompetitionList/CompetitionList"));
 const CompetitionForm = React.lazy(() => import("./Pages/Competition/CompetitionForm/CompetitionForm"));
 
+// Casino Module
+const CasinoList = React.lazy(() => import("./Pages/Casino/CasinoList/CasinoList"));
+const CasinoForm = React.lazy(() => import("./Pages/Casino/CasinoForm/CasinoForm"));
+
+// Casino Module
+const CasinoGameList = React.lazy(() => import("./Pages/CasinoGame/CasinoGameList/CasinoGameList"));
+const CasinoGameForm = React.lazy(() => import("./Pages/CasinoGame/CasinoGameForm/CasinoGameForm"));
+
 // Event Module
 const EventList = React.lazy(() => import("./Pages/Event/EventList/EventList"));
 const EventForm = React.lazy(() => import("./Pages/Event/EventForm/EventForm"));
@@ -33,9 +41,6 @@ const ApiEventForm = React.lazy(() => import("./Pages/Event/ApiEventForm/ApiEven
 
 // Event Bet
 const EventBetDetail = React.lazy(() => import("./Pages/EventBet/EventBetDetail"));
-
-// Theme Setting
-const ThemeSettingForm = React.lazy(() => import("./Pages/ThemeSetting/ThemeSettingForm/ThemeSettingForm"));
 
 // Theme User
 const ThemeUserList = React.lazy(() => import("./Pages/ThemeUser/ThemeUserList/ThemeUserList"));
@@ -141,14 +146,30 @@ const Root = () => {
                   <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/competition-event-list`} element={<EventList />} />
                   </Route>
+                  {/* Casino route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                    {" "}
+                    <Route path={`${process.env.PUBLIC_URL}/casino-form`} element={<CasinoForm />} />{" "}
+                  </Route>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/casino-list`} element={<CasinoList />} />
+                  </Route>
+                  {/* Casino game route  */}
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                    {" "}
+                    <Route path={`${process.env.PUBLIC_URL}/casino-game-form`} element={<CasinoGameForm />} />{" "}
+                  </Route>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                    <Route path={`${process.env.PUBLIC_URL}/casino-game-list`} element={<CasinoGameList />} />
+                  </Route>
                   {/* Event route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/event-form`} element={<EventForm />} />
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/event-list`} element={<EventList />} />
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.CREATE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.EVENTS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/api-event-list`} element={<ApiEventForm />} />
                   </Route>
                   {/* Event Bet  */}
