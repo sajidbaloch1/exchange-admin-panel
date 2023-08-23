@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Container, Dropdown, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../components/AuthContext";
-import { postData } from "../../utils/fetch-services";
+import { userSocket } from "../../lib/socket";
 
 export function Header() {
   //full screen
@@ -45,8 +45,8 @@ export function Header() {
   };
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
-
   const user = JSON.parse(localStorage.getItem("user_info"));
+  const [userBalance, setUserBalance] = useState("");
 
   const signout = (e) => {
     logout();
@@ -54,28 +54,63 @@ export function Header() {
   };
 
   useEffect(() => {
-    const rehydrateUser = async () => {
-      if (!user) {
-        signout();
-      }
-      const result = await postData("users/rehydrateUser", { _id: user._id });
-      if (result.success) {
-        localStorage.setItem("user_info", JSON.stringify(result.data.details));
-        if (result.data.details.scKey) {
-          localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, JSON.stringify(result.data.details.scKey));
-        } else {
-          signout();
-        }
-      }
+    userSocket.on("disconnect", (data) => {
+      console.log("disconnected");
+    });
+
+    userSocket.on("connect_error", (err) => {
+      console.log(err.message);
+    });
+
+    userSocket.on("server_error", (message) => {
+      console.log(message);
+    });
+
+    userSocket.on(`user:${user._id}`, (data) => {
+      //console.log("innn 1");
+      //console.log(data.balance);
+      setUserBalance(data.balance);
+    });
+
+    return () => {
+      userSocket.off("disconnect");
+      userSocket.off("connect_error");
+      userSocket.off("server_error");
+      userSocket.off(`user:${user._id}`);
     };
+  }, []);
 
-    const interval = setInterval(() => {
-      rehydrateUser();
-    }, 60 * 1000 * 1); // 1 minute
+  useEffect(() => {
+    userSocket.auth = { token: localStorage.getItem("jws_token") };
+    userSocket.connect();
+    return () => {
+      userSocket.disconnect();
+    };
+  }, []);
 
-    rehydrateUser();
-    return () => clearInterval(interval);
-  });
+  // useEffect(() => {
+  //   const rehydrateUser = async () => {
+  //     if (!user) {
+  //       signout();
+  //     }
+  //     const result = await postData("users/rehydrateUser", { _id: user._id });
+  //     if (result.success) {
+  //       localStorage.setItem("user_info", JSON.stringify(result.data.details));
+  //       if (result.data.details.scKey) {
+  //         localStorage.setItem(process.env.REACT_APP_PERMISSIONS_UPLS_KEY, JSON.stringify(result.data.details.scKey));
+  //       } else {
+  //         signout();
+  //       }
+  //     }
+  //   };
+
+  //   const interval = setInterval(() => {
+  //     rehydrateUser();
+  //   }, 60 * 1000 * 1); // 1 minute
+
+  //   rehydrateUser();
+  //   return () => clearInterval(interval);
+  // });
 
   return (
     <Navbar expand="md" className="app-header header sticky">
@@ -160,8 +195,8 @@ export function Header() {
                   {user.role !== "system_owner" && (
                     <div className="dropdown d-md-flex mx-4">
                       <div className="theme-layout nav-link-bg layout-setting pt-1">
-                        <span className="dark-layout fw-semibold">PTS: {user.balance}</span>
-                        <span className="light-layout fw-semibold text-light">PTS: {user.balance}</span>
+                        <span className="dark-layout fw-semibold">PTS: {userBalance}</span>
+                        <span className="light-layout fw-semibold text-light">PTS: {userBalance}</span>
                       </div>
                     </div>
                   )}
