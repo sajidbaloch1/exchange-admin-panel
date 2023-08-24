@@ -29,6 +29,7 @@ export default function EventForm() {
       name: "",
       matchDate: "",
       matchTime: "",
+      betDelay: 0,
       oddsLimit: 0,
       volumeLimit: 0,
       maxStake: 0,
@@ -50,6 +51,7 @@ export default function EventForm() {
       minStake: Yup.number(),
       minStakeSession: Yup.number(),
       maxStakeSession: Yup.number(),
+      betDelay: Yup.number(),
     }),
     onSubmit: async (values) => {
       setServerError(null);
@@ -64,6 +66,7 @@ export default function EventForm() {
           minStake: values.minStake || 0,
           minStakeSession: values.minStakeSession || 0,
           maxStakeSession: values.maxStakeSession || 0,
+          betDelay: values.betDelay || 0,
         };
         if (id) {
           body._id = id;
@@ -112,6 +115,7 @@ export default function EventForm() {
           isActive: result.isActive || false,
           completed: result.completed || false,
           betDeleted: result.betDeleted || false,
+          betDelay: result.betDelay,
         }));
 
         competitionBody.competitionId = result.competitionId;
@@ -284,6 +288,18 @@ export default function EventForm() {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.maxStakeSession && formik.errors.maxStakeSession}
+                    width={3}
+                  />
+
+                  <FormInput
+                    className="mt-3"
+                    label="Bet Delay"
+                    name="betDelay"
+                    type="number"
+                    value={formik.values.betDelay}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.betDelay && formik.errors.betDelay}
                     width={3}
                   />
                 </Row>

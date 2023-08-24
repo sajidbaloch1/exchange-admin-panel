@@ -24,20 +24,31 @@ function MatchDetails({ eventId }) {
     };
   }, [eventId]);
 
+  console.log(selectedEvent);
+
   return (
     <div>
       {selectedEvent ? (
         <Row>
           <h4>
-            {selectedEvent?.competitionName} {" > "} {selectedEvent?.eventName}
+            {selectedEvent?.competitionName} {" > "} {selectedEvent?.name}
           </h4>
 
           <CCol md={8}>
-            {marketId ? (
+            {selectedEvent && selectedEvent.market
+              ? selectedEvent.market.map((marketItem) => {
+                  if (marketItem.name === "Match Odds") {
+                    return <MatchOdds key={marketItem.id} marketId={marketItem.marketId} selectedEvent={marketItem} />;
+                  }
+                  return null;
+                })
+              : null}
+
+            {/* {marketId ? (
               <>
                 <MatchOdds marketId={marketId} selectedEvent={selectedEvent} />
               </>
-            ) : null}
+            ) : null} */}
           </CCol>
 
           <CCol md={4}>

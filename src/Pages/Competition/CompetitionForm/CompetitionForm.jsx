@@ -30,6 +30,7 @@ export default function CompetitionForm() {
       sportId: "",
       startDate: "",
       endDate: "",
+      betDelay: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
@@ -42,7 +43,6 @@ export default function CompetitionForm() {
       try {
         let response = null;
 
-        const { name, sportId } = values;
         if (editMode) {
           response = await updateCompetition({
             _id: id,
@@ -87,6 +87,7 @@ export default function CompetitionForm() {
           sportId: result.sportId || "",
           startDate: startDateFormatted,
           endDate: endDateFormatted || "",
+          betDelay: result.betDelay || "",
         }));
       }
       setSportLoading(true);
@@ -194,6 +195,18 @@ export default function CompetitionForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.endDate && formik.errors.endDate}
+                  width={3}
+                />
+
+                <FormInput
+                  label="Bet Delay"
+                  name="betDelay"
+                  type="number"
+                  value={formik.values.betDelay}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.betDelay && formik.errors.betDelay}
+                  isRequired="false"
                   width={3}
                 />
 
