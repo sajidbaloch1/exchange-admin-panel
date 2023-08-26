@@ -58,13 +58,13 @@ const menuItems = [
     icon: "layers",
   },
   {
-    id: activeModules?.SPORTS,
+    id: activeModules?.CASINO,
     title: "Casino",
     path: `${process.env.PUBLIC_URL}/casino-list`,
     icon: "grid",
   },
   {
-    id: activeModules?.SPORTS,
+    id: activeModules?.CASINO_GAME,
     title: "Casino Game",
     path: `${process.env.PUBLIC_URL}/casino-game-list`,
     icon: "grid",

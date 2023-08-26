@@ -36,7 +36,9 @@ export default function Bank() {
   const { _id } = JSON.parse(localStorage.getItem("user_info")) || {};
 
   const handleAllButtonClick = (row) => {
-    const updatedRow = { ...row, amount: row.userPl || 0 };
+    console.log(row);
+    const oppositeValue = -row.userPl;
+    const updatedRow = { ...row, amount: oppositeValue || 0 };
     const updatedData = data.map((rowData) => (rowData === row ? updatedRow : rowData));
     setData(updatedData);
   };
@@ -51,16 +53,25 @@ export default function Bank() {
   };
 
   const handleSubmitButtonClick = async (row) => {
-    const amount = row.amount || 0;
-    if (amount === 0) {
-      let msg = "Please Enter amount";
-      Notify.error(msg);
-      // No amounts to transfer
-      return;
-    }
     try {
       // Call your API function here with the amount
       // Example: await yourApiFunction(row, amount);
+
+      const amount = row.amount || 0;
+      if (amount === 0) {
+        let msg = "Please Enter amount";
+        Notify.error(msg);
+        // No amounts to transfer
+        return;
+      }
+
+      // if (row.userPl < row.amount) {
+      //   let msg = "Please Enter valid amount";
+      //   Notify.error(msg);
+      //   // No amounts to transfer
+      //   return;
+      // }
+
       setLoading(true);
       let settlementData = [
         {
@@ -78,6 +89,7 @@ export default function Bank() {
       if (response.success) {
         let msg = "Account settlement successfully";
         Notify.success(msg);
+        fetchData(filters);
       } else {
         throw new Error(response.message);
       }
@@ -205,6 +217,7 @@ export default function Bank() {
       if (response.success) {
         let msg = "Account settlement successfully";
         Notify.success(msg);
+        fetchData(filters);
       } else {
         throw new Error(response.message);
       }

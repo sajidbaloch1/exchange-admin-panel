@@ -149,6 +149,12 @@ export const permission = {
   COMPETITIONS: {
     ACTIVE: hasPermission(activeModules?.COMPETITIONS),
   },
+  CASINO: {
+    ACTIVE: hasPermission(activeModules?.EVENTS),
+  },
+  CASINO_GAME: {
+    ACTIVE: hasPermission(activeModules?.EVENTS),
+  },
   EVENTS: {
     ACTIVE: hasPermission(activeModules?.EVENTS),
   },
