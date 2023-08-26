@@ -39,6 +39,7 @@ export default function EventForm() {
       isActive: false,
       completed: false,
       betDeleted: false,
+      betLock: false,
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
@@ -116,6 +117,7 @@ export default function EventForm() {
           completed: result.completed || false,
           betDeleted: result.betDeleted || false,
           betDelay: result.betDelay,
+          betLock: result.betLock || false,
         }));
 
         competitionBody.competitionId = result.competitionId;
@@ -338,6 +340,17 @@ export default function EventForm() {
                           checked={formik.values.betDeleted}
                           onChange={() => {
                             formik.setFieldValue("betDeleted", !formik.values.betDeleted);
+                          }}
+                        />
+                      </CCol>
+                      <CCol sm="4" md="2" lg="1">
+                        <CFormLabel htmlFor="betLock">Bet Lock</CFormLabel>
+                        <FormToggleSwitch
+                          id="betLock"
+                          name="betLock"
+                          checked={formik.values.betLock}
+                          onChange={() => {
+                            formik.setFieldValue("betLock", !formik.values.betLock);
                           }}
                         />
                       </CCol>
