@@ -8,6 +8,8 @@ const BetLockModal = ({ show, onHide, betList }) => {
 
   const [loading, setLoading] = useState(false);
   const transactionText = "All Bet";
+  console.log("nnnn");
+  console.log(betList);
 
   return (
     <Modal size="xl" show={show} onHide={onHide} aria-labelledby="example-modal-sizes-title-lg">
@@ -40,7 +42,7 @@ const BetLockModal = ({ show, onHide, betList }) => {
                   </thead>
                   <tbody>
                     {betList.map((bet, bet_index) => (
-                      <tr key={bet_index}>
+                      <tr key={bet_index} className={`${bet.isBack ? "back0" : "lay2"}`}>
                         <td className="text-right">{bet_index + 1}</td>
                         <td className="text-right">{bet.userName}</td>
                         <td className="text-right">{bet.runnerName}</td>
