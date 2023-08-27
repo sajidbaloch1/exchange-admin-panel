@@ -199,6 +199,12 @@ export default function CompetitionList() {
         </div>
       ),
     },
+    {
+      name: "BET DELAY SEC",
+      selector: (row) => [row.betDelay],
+      sortable: true,
+      sortField: "betDelay",
+    },
     permission.COMPETITIONS.ACTIVE && {
       name: "ACTION",
       cell: (row) => (

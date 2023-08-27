@@ -1,75 +1,104 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Row, Card, Col, Breadcrumb, Button } from "react-bootstrap";
+import { Row, Card, Col, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import "react-data-table-component-extensions/dist/index.css";
-import { getAllTransactionActivity, deleteCurrency } from "../bankStatementService";
-import { downloadCSV } from '../../../utils/csvUtils';
-import { showAlert } from '../../../utils/alertUtils';
+import { getChildUserData, settlement } from "../bankStatementService";
+import { Notify } from "../../../utils/notify";
+import { downloadCSV } from "../../../utils/csvUtils";
+import { showAlert } from "../../../utils/alertUtils";
 import SearchInput from "../../../components/Common/FormComponents/SearchInput"; // Import the SearchInput component
 
 import { getAllData } from "../../Account/accountService";
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
-import { DateRangePicker } from 'react-date-range';
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
 import { CCol, CButton, CSpinner } from "@coreui/react";
 import FormSelectWithSearch from "../../../components/Common/FormComponents/FormSelectWithSearch";
 import FormInput from "../../../components/Common/FormComponents/FormInput";
-import { exportToExcel, exportToPDF } from '../../../utils/exportUtils'; // Import utility functions for exporting
-
+import { exportToExcel, exportToPDF } from "../../../utils/exportUtils"; // Import utility functions for exporting
 
 export default function Bank() {
-
   const Export = ({ onExport }) => (
-    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>Export</Button>
+    <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
+      Export
+    </Button>
   );
 
-  const [searchQuery, setSearchQuery] = React.useState('');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [totalRows, setTotalRows] = useState(0);
-  const [perPage, setPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [direction, setDirection] = useState('desc');
-
   const [userList, setuserList] = useState([]);
-  const [startDateValue, setStartDateValue] = useState('');
-  const [endDateValue, setEndDateValue] = useState('');
-  const [selectedUser, setSelectedUser] = useState('');
+  const [transactionCode, setTransactionCode] = useState("");
+  const [selectedUser, setSelectedUser] = useState("");
   const [filters, setFilters] = useState({
-    userId: "",
-    starDate: "",
-    endDate: "",
+    filterUserId: "",
     // Add more filters here if needed
   });
   const [formSelectKey, setFormSelectKey] = useState(0);
+  const { _id } = JSON.parse(localStorage.getItem("user_info")) || {};
 
   const handleAllButtonClick = (row) => {
-    const updatedRow = { ...row, amount: row.client_p_n_l || 0 };
-    const updatedData = data.map((rowData) =>
-      rowData === row ? updatedRow : rowData
-    );
+    console.log(row);
+    const oppositeValue = -row.userPl;
+    const updatedRow = { ...row, amount: oppositeValue || 0 };
+    const updatedData = data.map((rowData) => (rowData === row ? updatedRow : rowData));
     setData(updatedData);
   };
 
   const handleAmountChange = (row, event) => {
-    const updatedData = data.map((rowData) =>
-      rowData === row ? { ...rowData, amount: event.target.value } : rowData
-    );
-    setData(updatedData);
+    const newValue = event.target.value;
+    if (newValue >= 0) {
+      // Check if the entered value is greater than or equal to 0
+      const updatedData = data.map((rowData) => (rowData === row ? { ...rowData, amount: newValue } : rowData));
+      setData(updatedData);
+    }
   };
 
   const handleSubmitButtonClick = async (row) => {
-    const amount = row.amount || 0;
-
     try {
       // Call your API function here with the amount
       // Example: await yourApiFunction(row, amount);
-      console.log("API call with amount:", amount);
+
+      const amount = row.amount || 0;
+      if (amount === 0) {
+        let msg = "Please Enter amount";
+        Notify.error(msg);
+        // No amounts to transfer
+        return;
+      }
+
+      // if (row.userPl < row.amount) {
+      //   let msg = "Please Enter valid amount";
+      //   Notify.error(msg);
+      //   // No amounts to transfer
+      //   return;
+      // }
+
+      setLoading(true);
+      let settlementData = [
+        {
+          userId: row._id,
+          amount: row.amount,
+        },
+      ];
+
+      let response = null;
+      response = await settlement({
+        loginUserId: _id,
+        transactionCode: transactionCode,
+        settlementData,
+      });
+      if (response.success) {
+        let msg = "Account settlement successfully";
+        Notify.success(msg);
+        fetchData(filters);
+      } else {
+        throw new Error(response.message);
+      }
     } catch (error) {
+      Notify.error(error.message);
       console.error("Error calling API:", error);
       // Handle the error as needed
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,62 +112,52 @@ export default function Bank() {
       name: "USERNAME",
       selector: (row) => [row.username],
       sortable: true,
-      sortField: 'points',
-
+      sortField: "username",
     },
     {
       name: "CR",
-      selector: (row) => [row.credit_point],
+      selector: (row) => [row.creditPoints],
       sortable: true,
-      sortField: 'points',
-
+      sortField: "creditPoints",
     },
     {
       name: "PTS",
-      selector: (row) => [row.pts],
+      selector: (row) => [row.points],
       sortable: true,
-      sortField: 'pts',
+      sortField: "points",
     },
     {
       name: "CLIENT(P/L)",
-      selector: (row) => [row.client_p_n_l],
+      selector: (row) => [row.userPl],
       sortable: true,
-      sortField: 'client_p_n_l',
+      sortField: "userPl",
     },
     {
       name: "EXPOSURE",
       selector: (row) => [row.exposure],
       sortable: true,
-      sortField: 'exposure',
-
+      sortField: "exposure",
     },
     {
       name: "AVAILABLE PTS",
-      selector: (row) => [row.available_pts],
+      selector: (row) => [row.balance],
       sortable: true,
-      sortField: 'fromtoName',
-
+      sortField: "balance",
     },
     {
       name: "ACCOUNT TYPE",
-      selector: (row) => [row.fromtoName],
+      selector: (row) => [row.role],
       sortable: true,
-      sortField: 'fromtoName',
-      cell: (row) => (
-        <div>
-          Admin
-        </div>
-      ),
+      sortField: "role",
     },
     {
       name: "ACTION",
       selector: (row) => [row.fromtoName],
       sortable: true,
-      sortField: 'fromtoName',
-      width: '200px',
+      sortField: "fromtoName",
+      width: "200px",
       cell: (row) => (
         <Row className=" row-sm">
-
           <Col lg={4}>
             <button
               className="text-success"
@@ -154,104 +173,73 @@ export default function Bank() {
               name="amount"
               placeholder="0"
               className="form-control form-control-sm transfer-amt"
-              value={row.amount || ''}
+              value={row.amount || ""}
               onChange={(e) => handleAmountChange(row, e)}
             />
           </Col>
-          <button
-            className="btn btn-info btn-sm mt-2"
-            onClick={() => handleSubmitButtonClick(row)}
-          >
+          <button className="btn btn-info btn-sm mt-2" onClick={() => handleSubmitButtonClick(row)}>
             Submit
           </button>
         </Row>
-
       ),
     },
     {
       name: "STATUS",
       selector: (row) => [row.fromtoName],
       sortable: true,
-      sortField: 'fromtoName',
-      cell: (row) => (
-        <div>
-
-        </div>
-      ),
+      sortField: "fromtoName",
+      cell: (row) => <div></div>,
     },
   ];
 
   const transferAmounts = async () => {
-    const amountsToTransfer = data
-      .filter((row) => row.amount > 0)
-      .map((row) => ({ _id: row._id, amount: row.amount }));
-
-    if (amountsToTransfer.length === 0) {
+    const settlementData = data.filter((row) => row.amount > 0).map((row) => ({ _id: row._id, amount: row.amount }));
+    if (settlementData.length === 0) {
+      let msg = "Please add amount";
+      Notify.error(msg);
       // No amounts to transfer
       return;
     }
-
+    console.log(transactionCode);
+    if (!transactionCode) {
+      let msg = "Please Enter Transaction Code";
+      Notify.error(msg);
+      // No amounts to transfer
+      return;
+    }
     try {
-      // Call your API function here with the amountsToTransfer array
-      // Example: await yourApiFunction(amountsToTransfer);
-      console.log("API call with amounts:", amountsToTransfer);
+      let response = null;
+      response = await settlement({
+        loginUserId: _id,
+        transactionCode: transactionCode,
+        settlementData,
+      });
+      if (response.success) {
+        let msg = "Account settlement successfully";
+        Notify.success(msg);
+        fetchData(filters);
+      } else {
+        throw new Error(response.message);
+      }
     } catch (error) {
+      Notify.error(error.message);
       console.error("Error calling API:", error);
       // Handle the error as needed
     }
   };
 
-  const fetchData = async (page, sortBy, direction, searchQuery, filters) => {
+  const fetchData = async (filters) => {
     setLoading(true);
     try {
-      const { userId, fromDate, toDate } = filters;
-      const result = await getAllTransactionActivity({
-        page: page,
-        perPage: perPage,
-        sortBy: sortBy,
-        direction: direction,
-        searchQuery: searchQuery,
-        userId: userId,
-        fromDate: fromDate,
-        toDate: toDate
+      const { filterUserId } = filters;
+      const result = await getChildUserData({
+        userId: _id,
+        filterUserId: filterUserId,
       });
 
-      const dummyDataArray = [
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 1',
-          'credit_point': 1000,
-          "pts": 3000,
-          "client_p_n_l": 100,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 2',
-          'credit_point': 1000,
-          "pts": 2000,
-          "client_p_n_l": 200,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 3',
-          'credit_point': 1000,
-          "pts": 1000,
-          "client_p_n_l": 300,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-      ];
-
-      //setData(result.records);
-      setData(dummyDataArray)
-      setTotalRows(result.totalRecords);
+      setData(result.details);
+      //setData(dummyDataArray);
+      //setTotalRows(result.totalRecords);
       setLoading(false);
     } catch (error) {
       // Handle error
@@ -262,156 +250,76 @@ export default function Bank() {
     }
   };
 
-  const handleSort = (column, sortDirection) => {
-    // simulate server sort
-    setSortBy(column.sortField);
-    setDirection(sortDirection);
-    setCurrentPage(1);
-    fetchData(currentPage, sortBy, direction, searchQuery, filters);
-    setLoading(false);
-  };
-
-  const handlePageChange = page => {
-    setCurrentPage(page);
-    fetchData(page, sortBy, direction, searchQuery, filters);
-  };
-
-  const handlePerRowsChange = async (newPerPage, page) => {
-    setLoading(true);
-    setPerPage(newPerPage);
-    setLoading(false);
-  };
-
-  const handleExcelExport = async () => {
+  const handleExcelExport = async (filters) => {
     try {
       //const response = await yourExcelApiCall(); // Replace with your actual API call
       // Generate and download Excel file
-      const data = [
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 1',
-          'credit_point': 1000,
-          "pts": 3000,
-          "client_p_n_l": 100,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 2',
-          'credit_point': 1000,
-          "pts": 2000,
-          "client_p_n_l": 200,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 3',
-          'credit_point': 1000,
-          "pts": 1000,
-          "client_p_n_l": 300,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-      ];
+      const { filterUserId } = filters;
+      const result = await getChildUserData({
+        userId: _id,
+        filterUserId: filterUserId,
+      });
 
-      const formattedData = data.map(item => ({
-        "USERNAME": item.username,
-        "CR": item.credit_point,
-        "PTS": item.pts,
-        "CLIENT(P/L)": item.client_p_n_l,
-        "EXPOSURE": item.exposure,
-        "AVAILABLE PTS": item.available_pts,
-        "ACCOUNT TYPE": item.account_type,
+      const formattedData = result.details.map((item) => ({
+        USERNAME: item.username,
+        CR: item.creditPoints,
+        PTS: item.points,
+        "CLIENT(P/L)": item.userPl,
+        EXPOSURE: item.exposure,
+        "AVAILABLE PTS": item.balance,
+        "ACCOUNT TYPE": item.role,
       }));
-      exportToExcel(formattedData, 'bank.xlsx'); // Utilize exportToExcel utility function
+      exportToExcel(formattedData, "bank.xlsx"); // Utilize exportToExcel utility function
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
+      console.error("Error exporting to Excel:", error);
     }
   };
 
-  const handlePDFExport = async () => {
+  const handlePDFExport = async (filters) => {
     try {
       //const response = await yourPDFApiCall(); // Replace with your actual API call
-      // Generate and download PDF file
 
-      const columns = ['USERNAME', 'CR', 'PTS', 'CLIENT(P/L)', 'EXPOSURE', 'AVAILABLE PTS', 'ACCOUNT TYPE'];
-      const data = [
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 1',
-          'credit_point': 1000,
-          "pts": 3000,
-          "client_p_n_l": 100,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 2',
-          'credit_point': 1000,
-          "pts": 2000,
-          "client_p_n_l": 200,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-        {
-          "_id": "64cdfff1284feb5a9236dc98",
-          "username": 'dummy 3',
-          'credit_point': 1000,
-          "pts": 1000,
-          "client_p_n_l": 300,
-          "exposure": 200,
-          "available_pts": 3000,
-          "account_type": "admin",
-        },
-      ];
+      const { filterUserId } = filters;
+      const result = await getChildUserData({
+        userId: _id,
+        filterUserId: filterUserId,
+      });
 
-      const formattedData = data.map(item => ({
-        "USERNAME": item.username,
-        "CR": item.credit_point,
-        "PTS": item.pts,
-        "CLIENT(P/L)": item.client_p_n_l,
-        "EXPOSURE": item.exposure,
-        "AVAILABLE PTS": item.available_pts,
-        "ACCOUNT TYPE": item.account_type,
+      const columns = ["USERNAME", "CR", "PTS", "CLIENT(P/L)", "EXPOSURE", "AVAILABLE PTS", "ACCOUNT TYPE"];
+
+      const formattedData = result.details.map((item) => ({
+        USERNAME: item.username,
+        CR: item.creditPoints,
+        PTS: item.points,
+        "CLIENT(P/L)": item.userPl,
+        EXPOSURE: item.exposure,
+        "AVAILABLE PTS": item.balance,
+        "ACCOUNT TYPE": item.role,
       }));
-      exportToPDF(columns, formattedData, 'filename.pdf');
+      exportToPDF(columns, formattedData, "book.pdf");
     } catch (error) {
-      console.error('Error exporting to PDF:', error);
+      console.error("Error exporting to PDF:", error);
     }
   };
 
   const handleFilterClick = () => {
     const newFilters = {
-      userId: selectedUser,
-      fromDate: startDateValue, // Replace startDateValue with the actual state value for start date
-      toDate: endDateValue, // Replace endDateValue with the actual state value for end date
+      filterUserId: selectedUser,
     };
     setFilters(newFilters);
     // Fetch data with the updated filters object
-    fetchData(currentPage, sortBy, direction, searchQuery, newFilters);
+    fetchData(newFilters);
   };
 
   const resetFilters = () => {
     // Clear the filter values
     setSelectedUser("");
-    setStartDateValue("");
-    setEndDateValue("");
     // Add more filter states if needed
     setFormSelectKey(formSelectKey + 1);
 
     // Fetch data with the updated filters object
-    fetchData(currentPage, sortBy, direction, searchQuery, {
-      sportId: "",
-      startDate: "",
-      endDate: "",
+    fetchData({
+      filterUserId: "",
       // Add more filters here if needed
     });
   };
@@ -420,7 +328,7 @@ export default function Bank() {
     try {
       const userData = await getAllData();
       if (userData.records) {
-        const dropdownOptions = userData.records.map(option => ({
+        const dropdownOptions = userData.records.map((option) => ({
           value: option._id,
           label: option.username,
         }));
@@ -433,13 +341,9 @@ export default function Bank() {
   };
 
   useEffect(() => {
-    if (searchQuery !== '') {
-      fetchData(currentPage, sortBy, direction, searchQuery, filters); // fetch page 1 of users
-    } else {
-      fetchData(currentPage, sortBy, direction, '', filters); // fetch page 1 of users
-    }
-    filterData()
-  }, [perPage, searchQuery]);
+    fetchData(filters); // fetch page 1 of users
+    filterData();
+  }, []);
 
   return (
     <div>
@@ -459,7 +363,7 @@ export default function Bank() {
                 name="sportId"
                 value={selectedUser} // Set the selectedUser as the value
                 onChange={(name, selectedValue) => setSelectedUser(selectedValue)} // Update the selectedUser
-                onBlur={() => { }} // Add an empty function as onBlur prop
+                onBlur={() => {}} // Add an empty function as onBlur prop
                 error=""
                 width={2}
                 options={userList}
@@ -479,15 +383,19 @@ export default function Bank() {
                 </div>
               </CCol>
 
-              <Button variant="success" className="me-2 mt-6" onClick={handleExcelExport}><i className="fa fa-file-excel-o"></i></Button>
-              <Button variant="primary" className=" mt-6" onClick={handlePDFExport}><i className="fa fa-file-pdf-o"></i></Button>
+              <Button variant="success" className="me-2 mt-6" onClick={handleExcelExport}>
+                <i className="fa fa-file-excel-o"></i>
+              </Button>
+              <Button variant="primary" className=" mt-6" onClick={handlePDFExport}>
+                <i className="fa fa-file-pdf-o"></i>
+              </Button>
               <FormInput
                 label="Transaction Code "
-                name=""
+                name="transactionCode"
                 type="text"
-                value={startDateValue}
-                onChange={(event) => setStartDateValue(event.target.value)} // Use event.target.value to get the updated value
-                onBlur={() => { }}
+                value={transactionCode}
+                onChange={(event) => setTransactionCode(event.target.value)} // Use event.target.value to get the updated value
+                onBlur={() => {}}
                 width={2}
               />
               <CCol xs={3}>
@@ -497,30 +405,18 @@ export default function Bank() {
                   </CButton>
                 </div>
               </CCol>
-
             </Card.Header>
             <Card.Body>
-              <SearchInput
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                loading={loading}
-              />
-
               <div className="table-responsive export-table">
                 <DataTable
                   columns={columns}
                   data={data}
-
                   //selectableRows
-                  pagination
+                  //pagination
                   highlightOnHover
                   progressPending={loading}
-                  paginationServer
-                  paginationTotalRows={totalRows}
-                  onChangeRowsPerPage={handlePerRowsChange}
-                  onChangePage={handlePageChange}
-                  sortServer
-                  onSort={handleSort}
+                  //paginationServer
+                  //paginationTotalRows={totalRows}
                 />
               </div>
             </Card.Body>

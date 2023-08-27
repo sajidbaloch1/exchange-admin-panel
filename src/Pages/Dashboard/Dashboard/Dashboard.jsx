@@ -81,7 +81,7 @@ export default function Dashboard() {
           setCreditPts(response.result[0].creditPoints);
           setAllPts(response.result[0].AllPts);
           setSettlementPts(response.result[0].settlementPoint);
-          setUpPts(response.result[0].upperPoint);
+          setUpPts(response.result[0].upPoint);
           setDownPts(response.result[0].downPoint);
         }
       }

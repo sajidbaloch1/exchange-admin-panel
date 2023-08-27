@@ -111,7 +111,7 @@ function MatchOdds({ marketId, selectedEvent }) {
           <div className="row pb-2">
             <div className="col-md-4 col-sm-12 col-12">
               <div className="title-area">
-                <span>{selectedEvent.marketRunners[0]?.runnerName}</span>
+                <span>{selectedEvent.market_runner[0]?.runnerName}</span>
               </div>
             </div>
             <div className="col-md-8 col-sm-12 col-12">
@@ -143,7 +143,7 @@ function MatchOdds({ marketId, selectedEvent }) {
           <div className="row pb-2">
             <div className="col-md-4 col-sm-12 col-12">
               <div className="title-area">
-                <span>{selectedEvent.marketRunners[1]?.runnerName}</span>
+                <span>{selectedEvent.market_runner[1]?.runnerName}</span>{" "}
               </div>
             </div>
 

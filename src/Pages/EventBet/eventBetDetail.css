@@ -57,27 +57,27 @@
 }
 
 .back0 {
-  background-color: #72BBEFA3;
+  background-color: #72bbefa3;
 }
 
 .back1 {
-  background-color: #72BBEFCC;
+  background-color: #72bbefcc;
 }
 
 .back2 {
-  background-color: #72BBEF;
+  background-color: #72bbef;
 }
 
 .lay0 {
-  background-color: #F994BA;
+  background-color: #f994ba;
 }
 
 .lay1 {
-  background-color: #F994BACC;
+  background-color: #f994bacc;
 }
 
 .lay2 {
-  background-color: #F994BAA3;
+  background-color: #f994baa3;
 }
 
 .bg-green {
@@ -92,4 +92,8 @@
   /* Red with 30% opacity */
   transition: background-color 0.5s ease-in-out;
   /* Smooth transition over 0.5 seconds */
+}
+
+.tooltip {
+  z-index: 2000; /* Adjust the value as needed */
 }

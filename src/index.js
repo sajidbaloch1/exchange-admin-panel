@@ -95,8 +95,12 @@ const Loaderimg = () => {
   );
 };
 
+console.log(permission);
+
 const Root = () => {
   useEffect(() => {
+    console.log("innn");
+    console.log(permission);
     //Switcherdata.localStorageBackUp();
     //Switcherdata.HorizontalHoverMenu();
   }, []);
@@ -147,19 +151,19 @@ const Root = () => {
                     <Route path={`${process.env.PUBLIC_URL}/competition-event-list`} element={<EventList />} />
                   </Route>
                   {/* Casino route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.CASINO.ACTIVE} />}>
                     {" "}
                     <Route path={`${process.env.PUBLIC_URL}/casino-form`} element={<CasinoForm />} />{" "}
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.CASINO.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/casino-list`} element={<CasinoList />} />
                   </Route>
                   {/* Casino game route  */}
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.CASINO_GAME.ACTIVE} />}>
                     {" "}
                     <Route path={`${process.env.PUBLIC_URL}/casino-game-form`} element={<CasinoGameForm />} />{" "}
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.CASINO_GAME.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/casino-game-list`} element={<CasinoGameList />} />
                   </Route>
                   {/* Event route  */}
@@ -242,7 +246,7 @@ const Root = () => {
                   >
                     <Route path={`${process.env.PUBLIC_URL}/account-statement`} element={<AccountStatement />} />
                   </Route>
-                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.USER_HISTORY_REPORT_MODULE} />}>
+                  <Route path="/" element={<ProtectedRoutes allowedRoles={permission.COMPETITIONS.ACTIVE} />}>
                     <Route path={`${process.env.PUBLIC_URL}/user-history`} element={<UserHistory />} />
                   </Route>
                   <Route path="/" element={<ProtectedRoutes allowedRoles={permission.BANK_MODULE.ACTIVE} />}>

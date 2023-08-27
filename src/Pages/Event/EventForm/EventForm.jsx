@@ -29,6 +29,7 @@ export default function EventForm() {
       name: "",
       matchDate: "",
       matchTime: "",
+      betDelay: 0,
       oddsLimit: 0,
       volumeLimit: 0,
       maxStake: 0,
@@ -38,6 +39,7 @@ export default function EventForm() {
       isActive: false,
       completed: false,
       betDeleted: false,
+      betLock: false,
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is required"),
@@ -50,6 +52,7 @@ export default function EventForm() {
       minStake: Yup.number(),
       minStakeSession: Yup.number(),
       maxStakeSession: Yup.number(),
+      betDelay: Yup.number(),
     }),
     onSubmit: async (values) => {
       setServerError(null);
@@ -64,6 +67,7 @@ export default function EventForm() {
           minStake: values.minStake || 0,
           minStakeSession: values.minStakeSession || 0,
           maxStakeSession: values.maxStakeSession || 0,
+          betDelay: values.betDelay || 0,
         };
         if (id) {
           body._id = id;
@@ -112,6 +116,8 @@ export default function EventForm() {
           isActive: result.isActive || false,
           completed: result.completed || false,
           betDeleted: result.betDeleted || false,
+          betDelay: result.betDelay,
+          betLock: result.betLock || false,
         }));
 
         competitionBody.competitionId = result.competitionId;
@@ -286,6 +292,18 @@ export default function EventForm() {
                     error={formik.touched.maxStakeSession && formik.errors.maxStakeSession}
                     width={3}
                   />
+
+                  <FormInput
+                    className="mt-3"
+                    label="Bet Delay"
+                    name="betDelay"
+                    type="number"
+                    value={formik.values.betDelay}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.betDelay && formik.errors.betDelay}
+                    width={3}
+                  />
                 </Row>
 
                 <Row className="pt-4 pb-3">
@@ -322,6 +340,17 @@ export default function EventForm() {
                           checked={formik.values.betDeleted}
                           onChange={() => {
                             formik.setFieldValue("betDeleted", !formik.values.betDeleted);
+                          }}
+                        />
+                      </CCol>
+                      <CCol sm="4" md="2" lg="1">
+                        <CFormLabel htmlFor="betLock">Bet Lock</CFormLabel>
+                        <FormToggleSwitch
+                          id="betLock"
+                          name="betLock"
+                          checked={formik.values.betLock}
+                          onChange={() => {
+                            formik.setFieldValue("betLock", !formik.values.betLock);
                           }}
                         />
                       </CCol>
