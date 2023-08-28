@@ -6,8 +6,6 @@ const ProtectedRoutes = ({ allowedRoles }) => {
   const location = useLocation();
   let token = localStorage.getItem("jws_token");
   const { role } = JSON.parse(localStorage.getItem("user_info")) || {};
-  console.log(allowedRoles);
-  console.log(token);
 
   useEffect(() => {}, [role, allowedRoles]);
 
