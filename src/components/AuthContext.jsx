@@ -71,6 +71,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         setLoginError("");
         navigate("/dashboard");
+        window.location.reload();
       }
     } else {
       setLoginError(result.message);
@@ -99,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       setLoginError("");
       navigate("/dashboard", { state: { newUser: true, user: result.data } });
+      window.location.reload();
     } else {
       setLoginError(result.message);
     }
