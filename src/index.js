@@ -95,12 +95,8 @@ const Loaderimg = () => {
   );
 };
 
-console.log(permission);
-
 const Root = () => {
   useEffect(() => {
-    console.log("innn");
-    console.log(permission);
     //Switcherdata.localStorageBackUp();
     //Switcherdata.HorizontalHoverMenu();
   }, []);

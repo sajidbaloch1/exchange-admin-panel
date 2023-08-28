@@ -68,7 +68,8 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (newUser && authUser) {
+    console.log(newUser, authUser);
+    if (newUser) {
       setCode(getTransactionCode(authUser.transactionCode));
     }
 
@@ -91,7 +92,8 @@ export default function Dashboard() {
       setCode("");
       setShow(false);
     };
-  }, [authUser, newUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
@@ -108,6 +110,7 @@ export default function Dashboard() {
           </Breadcrumb>
         </div>
       </div>
+
       <Row>
         <Col lg={12} md={12} sm={12} xl={12}>
           <Row>
@@ -435,6 +438,7 @@ export default function Dashboard() {
             onClick={() => {
               navigate("/dashboard");
               setShow(false);
+              window.location.reload();
             }}
           >
             Continue

@@ -10,6 +10,8 @@ import { downloadCSV } from "../../../utils/csvUtils";
 import { Notify } from "../../../utils/notify";
 import { deleteData, getAllData, updateUserStatus } from "../accountService";
 import { permission } from "../../../lib/user-permissions";
+import TransactionModal from "../TransactionModal";
+import { createTransaction } from "../accountService";
 
 export default function UserList() {
   const location = useLocation();
@@ -21,7 +23,7 @@ export default function UserList() {
 
   //console.log(permission);
   const { id } = useParams();
-  const initialParentId = id ? id : (user.isClone) ? user.cloneParentId : login_user_id;
+  const initialParentId = id ? id : user.isClone ? user.cloneParentId : login_user_id;
   const [parentId, setParentId] = useState(initialParentId);
   const Export = ({ onExport }) => (
     <Button className="btn btn-secondary" onClick={(e) => onExport(e.target.value)}>
@@ -39,6 +41,10 @@ export default function UserList() {
   const [direction, setDirection] = useState("desc");
   const [userStatus, setUserStatus] = useState({});
   const [userBetStatus, setUserBetStatus] = useState({});
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [rowData, setRowData] = useState("");
+  const [transactionType, setTransactionType] = useState("");
+  const [serverError, setServerError] = useState(null);
 
   const allowedRoles = ["user"];
 
@@ -66,6 +72,43 @@ export default function UserList() {
       console.error("Error removing :", error);
     }
     changeUserStatus(type, id, "loading", false);
+  };
+
+  const handleDepositClick = (row) => {
+    // Set initial values for the Deposit modal based on the row data
+    setShowTransactionModal(true);
+    setRowData(row);
+    setTransactionType("credit");
+  };
+
+  const handleWithdrawClick = (row) => {
+    // Set initial values for the Withdraw modal based on the row data
+    setShowTransactionModal(true);
+    setRowData(row);
+    setTransactionType("debit");
+  };
+
+  const handleTransactionSubmit = async (amount, remarks, transactionCode, transactionType, userId) => {
+    try {
+      const result = await createTransaction({
+        userId: login_user_id,
+        fromId: userId,
+        points: amount,
+        type: transactionType,
+        remark: remarks,
+        transactionCode: transactionCode,
+      });
+      if (!result.success) {
+        throw new Error(result.message);
+      } else {
+        Notify.success("Transaction Done!!!.");
+        setShowTransactionModal(false);
+        fetchData(currentPage, sortBy, direction, searchQuery, parentId); // fetch page 1 of users
+      }
+    } catch (error) {
+      Notify.error(error.message);
+      setServerError(error.message);
+    }
   };
 
   const columns = [
@@ -152,8 +195,25 @@ export default function UserList() {
     },
     permission.USER_MODULE.UPDATE && {
       name: "ACTION",
+      width: "200px",
       cell: (row) => (
         <div>
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to deposit</Tooltip>}>
+            <Button variant="success" onClick={() => handleDepositClick(row)} className="btn btn-lg " title="Deposit">
+              D
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger placement="top" overlay={<Tooltip> Click here to withdrw</Tooltip>}>
+            <Button
+              variant="danger"
+              onClick={() => handleWithdrawClick(row)}
+              className="btn btn-lg ms-2 me-2"
+              title="Withdraw"
+            >
+              W
+            </Button>
+          </OverlayTrigger>
 
           <OverlayTrigger placement="top" overlay={<Tooltip> Click here to edit</Tooltip>}>
             <Link to={`${process.env.PUBLIC_URL}/user-edit/` + row._id} className="btn btn-primary btn-lg">
@@ -290,7 +350,7 @@ export default function UserList() {
           <h1 className="page-title">ALL USERS</h1>
         </div>
         <div className="ms-auto pageheader-btn">
-          {(permission.USER_MODULE.CREATE) && (
+          {permission.USER_MODULE.CREATE && (
             <Link to={`${process.env.PUBLIC_URL}/user-form`} className="btn btn-primary btn-icon text-white me-3">
               <span>
                 <i className="fe fe-plus"></i>&nbsp;
@@ -336,6 +396,13 @@ export default function UserList() {
           </Card>
         </Col>
       </Row>
+      <TransactionModal
+        show={showTransactionModal}
+        onHide={() => setShowTransactionModal(false)}
+        handleTransactionSubmit={handleTransactionSubmit}
+        rowData={rowData}
+        transactionType={transactionType}
+      />
     </div>
   );
 }
