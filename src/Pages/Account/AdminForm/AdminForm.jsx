@@ -2,6 +2,8 @@ import { CButton, CCol, CForm, CFormLabel, CSpinner } from "@coreui/react";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Card, Col, Row } from "react-bootstrap";
+import CryptoJS from "crypto-js";
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../../components/Common/FormComponents/FormInput"; // Import the FormInput component
@@ -33,12 +35,12 @@ export default function AdminForm() {
     creditPoints: "",
     role: "admin",
     rate: "",
+    transactionCode: '',
     isBetLock: false,
     isActive: true,
     forcePasswordChange: true,
     loginUserData: loginUserData,
   };
-
   const validationSchemaForCreate = Yup.object({
     username: Yup.string()
       .required("Username is required")
@@ -75,9 +77,11 @@ export default function AdminForm() {
         }
         return true; // Validation passed
       }),
+    transactionCode: Yup.string().matches(/^\d{6}$/,"Transaction Code must be 6 digits"),
+
   });
 
-  const validationSchemaForUpdate = Yup.object({
+const validationSchemaForUpdate = Yup.object({
     username: Yup.string()
       .required("Username is required")
       .test("no-spaces", "Spaces are not allowed in the username", (value) => {
@@ -168,6 +172,7 @@ export default function AdminForm() {
             role: result.role || "",
             isBetLock: result.isBetLock || false,
             isActive: result.isActive || false,
+            transactionCode: result.transactionCode || 0,
             forcePasswordChange: result.forcePasswordChange || false,
           }));
         }
@@ -302,6 +307,17 @@ export default function AdminForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={formik.touched.rate && formik.errors.rate}
+                  isRequired="true"
+                  width={3}
+                />
+                <FormInput
+                  label="Transaction Code"
+                  name="transactionCode"
+                  type="text"
+                  value={formik.values.transactionCode}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.transactionCode && formik.errors.transactionCode}
                   isRequired="true"
                   width={3}
                 />
